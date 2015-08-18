@@ -1,0 +1,92 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\author{Marten Jäger}
+\title{Manual}
+\begin{document}
+\maketitle
+
+For several regions of the new genome release GRCh38 exists alternative loci.
+
+The reference genome chromosomes with their corresponding accession numbers are
+stored in \\
+
+\url{ftp://ftp.ncbi.nlm.nih.gov/genomes/H_sapiens/Assembled_chromosomes/chr_accessions_GRCh38.p2}
+
+e.g. it looks like this:
+\begin{verbatim}
+#Chromosome	RefSeq Accession.version	RefSeq gi	GenBank Accession.version	GenBank gi
+1	NC_000001.11	568815597	CM000663.2	568336023
+2	NC_000002.12	568815596	CM000664.2	568336022
+...
+MT	NC_012920.1	251831106	J01415.2	113200490
+\end{verbatim}
+
+An overview of the alternative loci can be found in \\
+
+\url{ftp://ftp.ncbi.nlm.nih.gov/genomes/H_sapiens/Assembled_chromosomes/alts_accessions_GRCh38.p2}
+
+\begin{verbatim}
+#Chromosome	RefSeq Accession.version	RefSeq gi	GenBank Accession.version	GenBank gi
+1	NW_011332688.1	732663890	KN538361.1	729255073
+1	NW_009646195.1	698040070	KN196473.1	693592224
+1	NW_009646194.1	698040071	KN196472.1	693592225
+1	NW_009646196.1	698040069	KN196474.1	693592223
+1	NW_011332687.1	732663891	KN538360.1	729255091
+2	NW_011332690.1	732663888	KN538363.1	729255051
+...
+\end{verbatim}
+
+Where the Chromosome column corresponds to the Chromosome column in the
+\textit{chr\_accessions\_GRCh38.p2} file and the \textit{GenBank
+Accession.version} column in modofied version to the chromosome ref in the VCF
+files.
+
+
+The regions are defined in a file at \\
+\url{ftp://ftp.ncbi.nlm.nih.gov/genomes/H\_sapiens/chr\_context\_for\_alt\_loci/GRCh38.p2/genomic\_regions\_definitions.txt}
+
+
+\begin{verbatim}
+#region_name    chromosome      start   stop
+REGION108       NC_000001.11    2448811 2791270
+PRAME_REGION_1  NC_000001.11    13075113        13312803
+REGION200       NC_000001.11    17157487        17460319
+REGION189       NC_000001.11    26512383        26678582
+REGION109       NC_000001.11    30352191        30456601
+FOXO6   NC_000001.11    41250328        41436604
+REGION190       NC_000001.11    112909422       113029606
+CEN1    NC_000001.11    122026460       125184587
+1Q21    NC_000001.11    144488706       144674781
+...
+\end{verbatim}
+
+
+Which alt loci belongs to which region can now be derived from the files in the
+subfolder of  \\
+\url{ftp://ftp.ncbi.nlm.nih.gov/genomes/H_sapiens/chr_context_for_alt_loci/GRCh38.p2/ALT_REF_LOCI_X/alt_scaffolds/alt_scaffold_placement.txt}
+
+where \textit{X} is in $[1..35]$.
+
+This means we can build up a tree like structure for the alt loci
+
+\begin{verbatim}
+genome
+|- chr1
+|- chr2
+:   |-Region2.1
+:   |-Region2.2
+:   :   |-alt_loci2.2.1
+:   :   |-alt_loci2.2.2
+:   :   |-alt_loci2.2.3
+:   :   :
+\end{verbatim}
+
+\end{document}
