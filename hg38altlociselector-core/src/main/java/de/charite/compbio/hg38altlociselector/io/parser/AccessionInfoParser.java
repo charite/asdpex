@@ -84,13 +84,13 @@ public class AccessionInfoParser {
 		try {
 			builder.refseqGi(Integer.parseInt(fields[2]));
 		} catch (NumberFormatException e) {
-			throw new AccessionInfoParseException("Failed to parse Interger from Regseq gi field entry: " + fields[2]);
+			throw new AccessionInfoParseException("Failed to parse Integer from Regseq gi field entry: " + fields[2]);
 		}
 		builder.genbankAccessionVersion(fields[3]);
 		try {
 			builder.genbankGi(Integer.parseInt(fields[4]));
 		} catch (NumberFormatException e) {
-			throw new AccessionInfoParseException("Failed to parse Interger from GenBank gi field entry: " + fields[4]);
+			throw new AccessionInfoParseException("Failed to parse Integer from GenBank gi field entry: " + fields[4]);
 		}
 
 		return builder;
