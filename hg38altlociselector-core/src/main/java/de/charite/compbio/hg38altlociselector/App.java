@@ -1,4 +1,4 @@
-package de.charite.compbio;
+package de.charite.compbio.hg38altlociselector;
 
 /**
  * Hello world!
