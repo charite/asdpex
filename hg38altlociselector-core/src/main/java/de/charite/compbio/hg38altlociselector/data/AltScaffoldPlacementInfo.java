@@ -37,6 +37,238 @@ public class AltScaffoldPlacementInfo implements Serializable {
 	private int altStopTail; // alt_stop_tail
 
 	/**
+	 * @return the altAssemblyName
+	 */
+	public String getAltAssemblyName() {
+		return altAssemblyName;
+	}
+
+	/**
+	 * @param altAssemblyName
+	 *            the altAssemblyName to set
+	 */
+	public void setAltAssemblyName(String altAssemblyName) {
+		this.altAssemblyName = altAssemblyName;
+	}
+
+	/**
+	 * @return the primAssemblyName
+	 */
+	public String getPrimAssemblyName() {
+		return primAssemblyName;
+	}
+
+	/**
+	 * @param primAssemblyName
+	 *            the primAssemblyName to set
+	 */
+	public void setPrimAssemblyName(String primAssemblyName) {
+		this.primAssemblyName = primAssemblyName;
+	}
+
+	/**
+	 * @return the altScafName
+	 */
+	public String getAltScafName() {
+		return altScafName;
+	}
+
+	/**
+	 * @param altScafName
+	 *            the altScafName to set
+	 */
+	public void setAltScafName(String altScafName) {
+		this.altScafName = altScafName;
+	}
+
+	/**
+	 * @return the altScafAcc
+	 */
+	public String getAltScafAcc() {
+		return altScafAcc;
+	}
+
+	/**
+	 * @param altScafAcc
+	 *            the altScafAcc to set
+	 */
+	public void setAltScafAcc(String altScafAcc) {
+		this.altScafAcc = altScafAcc;
+	}
+
+	/**
+	 * @return the parentType
+	 */
+	public String getParentType() {
+		return parentType;
+	}
+
+	/**
+	 * @param parentType
+	 *            the parentType to set
+	 */
+	public void setParentType(String parentType) {
+		this.parentType = parentType;
+	}
+
+	/**
+	 * @return the parentName
+	 */
+	public String getParentName() {
+		return parentName;
+	}
+
+	/**
+	 * @param parentName
+	 *            the parentName to set
+	 */
+	public void setParentName(String parentName) {
+		this.parentName = parentName;
+	}
+
+	/**
+	 * @return the parentAcc
+	 */
+	public String getParentAcc() {
+		return parentAcc;
+	}
+
+	/**
+	 * @param parentAcc
+	 *            the parentAcc to set
+	 */
+	public void setParentAcc(String parentAcc) {
+		this.parentAcc = parentAcc;
+	}
+
+	/**
+	 * @return the region
+	 */
+	public String getRegion() {
+		return region;
+	}
+
+	/**
+	 * @param region
+	 *            the region to set
+	 */
+	public void setRegion(String region) {
+		this.region = region;
+	}
+
+	/**
+	 * @return the strand
+	 */
+	public boolean isStrand() {
+		return strand;
+	}
+
+	/**
+	 * @param strand
+	 *            the strand to set
+	 */
+	public void setStrand(boolean strand) {
+		this.strand = strand;
+	}
+
+	/**
+	 * @return the altScafStart
+	 */
+	public int getAltScafStart() {
+		return altScafStart;
+	}
+
+	/**
+	 * @param altScafStart
+	 *            the altScafStart to set
+	 */
+	public void setAltScafStart(int altScafStart) {
+		this.altScafStart = altScafStart;
+	}
+
+	/**
+	 * @return the altScafStop
+	 */
+	public int getAltScafStop() {
+		return altScafStop;
+	}
+
+	/**
+	 * @param altScafStop
+	 *            the altScafStop to set
+	 */
+	public void setAltScafStop(int altScafStop) {
+		this.altScafStop = altScafStop;
+	}
+
+	/**
+	 * @return the parentStart
+	 */
+	public int getParentStart() {
+		return parentStart;
+	}
+
+	/**
+	 * @param parentStart
+	 *            the parentStart to set
+	 */
+	public void setParentStart(int parentStart) {
+		this.parentStart = parentStart;
+	}
+
+	/**
+	 * @return the parentStop
+	 */
+	public int getParentStop() {
+		return parentStop;
+	}
+
+	/**
+	 * @param parentStop
+	 *            the parentStop to set
+	 */
+	public void setParentStop(int parentStop) {
+		this.parentStop = parentStop;
+	}
+
+	/**
+	 * @return the altStartTail
+	 */
+	public int getAltStartTail() {
+		return altStartTail;
+	}
+
+	/**
+	 * @param altStartTail
+	 *            the altStartTail to set
+	 */
+	public void setAltStartTail(int altStartTail) {
+		this.altStartTail = altStartTail;
+	}
+
+	/**
+	 * @return the altStopTail
+	 */
+	public int getAltStopTail() {
+		return altStopTail;
+	}
+
+	/**
+	 * @param altStopTail
+	 *            the altStopTail to set
+	 */
+	public void setAltStopTail(int altStopTail) {
+		this.altStopTail = altStopTail;
+	}
+
+	/**
+	 * @return the serialversionuid
+	 */
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	/**
 	 * 
 	 */
 	private AltScaffoldPlacementInfo(AltScaffoldPlacementInfoBuilder builder) {
@@ -148,6 +380,10 @@ public class AltScaffoldPlacementInfo implements Serializable {
 		public AltScaffoldPlacementInfoBuilder altStopTail(int val) {
 			this.altStopTail = val;
 			return this;
+		}
+
+		public AltScaffoldPlacementInfo build() {
+			return new AltScaffoldPlacementInfo(this);
 		}
 
 	}

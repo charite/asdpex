@@ -7,7 +7,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import de.charite.compbio.hg38altlociselector.data.AccessionInfo;
 import de.charite.compbio.hg38altlociselector.data.AccessionInfo.AccessionInfoBuilder;
@@ -15,7 +15,7 @@ import de.charite.compbio.hg38altlociselector.exceptions.AccessionInfoParseExcep
 import de.charite.compbio.hg38altlociselector.util.IOUtil;
 
 /**
- * 
+ * Parser for the NCBI alts/chr_accession_GRCh..
  *
  * @author Marten Jäger <marten.jaeger@charite.de>
  *
@@ -32,32 +32,31 @@ public class AccessionInfoParser {
 	private static final int NFIELDS = 5;
 
 	/**
+	 * Dummy to prevent from using
+	 */
+	@SuppressWarnings("unused")
+	private AccessionInfoParser() {
+	}
+
+	/**
 	 * 
 	 */
 	public AccessionInfoParser(String filepath) {
 		this.file = new File(filepath);
 	}
 
-	private BufferedReader open() {
-		try {
-			return IOUtil.getBufferedReaderFromFileName(this.file);
-		} catch (IOException e) {
-			// LOGGER.error("failed to open the file: " + this.file.getAbsolutePath());
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public ImmutableList<AccessionInfo> parse() {
-		ImmutableList.Builder<AccessionInfo> result = new ImmutableList.Builder<AccessionInfo>();
-		BufferedReader reader;
-		reader = this.open();
+	public ImmutableMap<String, AccessionInfo> parse() {
+		ImmutableMap.Builder<String, AccessionInfo> result = new ImmutableMap.Builder<String, AccessionInfo>();
+		BufferedReader reader = null;
+		// reader = this.open();
 		String line;
 		try {
+			reader = IOUtil.getBufferedReaderFromFileName(this.file);
 			while ((line = reader.readLine()) != null) {
 				try {
 					AccessionInfoBuilder aiBuilder = createBuilderFromLine(line);
-					result.add(aiBuilder.build());
+					AccessionInfo info = aiBuilder.build();
+					result.put(info.getRefseqAccessionVersion(), info);
 				} catch (AccessionInfoParseException e) {
 					e.printStackTrace();
 				}
