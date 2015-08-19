@@ -54,6 +54,8 @@ public class AccessionInfoParser {
 			reader = IOUtil.getBufferedReaderFromFileName(this.file);
 			while ((line = reader.readLine()) != null) {
 				try {
+					if (line.startsWith("#"))
+						continue;
 					AccessionInfoBuilder aiBuilder = createBuilderFromLine(line);
 					AccessionInfo info = aiBuilder.build();
 					result.put(info.getRefseqAccessionVersion(), info);

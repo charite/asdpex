@@ -47,6 +47,8 @@ public class AltScaffoldPlacementParser {
 			reader = IOUtil.getBufferedReaderFromFileName(this.file);
 			while ((line = reader.readLine()) != null) {
 				try {
+					if (line.startsWith("#"))
+						continue;
 					AltScaffoldPlacementInfoBuilder siBuilder = createBuilderFromLine(line);
 					AltScaffoldPlacementInfo info = siBuilder.build();
 					result.put(info.getAltScafAcc(), info);
