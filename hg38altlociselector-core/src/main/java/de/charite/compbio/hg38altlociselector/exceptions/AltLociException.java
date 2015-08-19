@@ -9,7 +9,7 @@ package de.charite.compbio.hg38altlociselector.exceptions;
  * @author Marten Jäger <marten.jaeger@charite.de>
  *
  */
-public class AltLociException extends Exception {
+public class AltLociException extends AltLociSelectorException {
 
 	private static final long serialVersionUID = 1L;
 
