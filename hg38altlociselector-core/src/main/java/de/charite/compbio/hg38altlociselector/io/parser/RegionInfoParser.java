@@ -11,42 +11,43 @@ import com.google.common.collect.ImmutableMap;
 
 import de.charite.compbio.hg38altlociselector.data.AccessionInfo;
 import de.charite.compbio.hg38altlociselector.data.AccessionInfo.AccessionInfoBuilder;
+import de.charite.compbio.hg38altlociselector.data.RegionInfo;
+import de.charite.compbio.hg38altlociselector.data.RegionInfo.RegionInfoBuilder;
 import de.charite.compbio.hg38altlociselector.exceptions.AccessionInfoParseException;
 import de.charite.compbio.hg38altlociselector.util.IOUtil;
 
 /**
- * Parser for the NCBI alts/chr_accession_GRCh..
+ * Parser for the NCBI genomic_regions_definitions.txt
  *
  * @author Marten Jäger <marten.jaeger@charite.de>
  *
  */
-public class AccessionInfoParser {
+public class RegionInfoParser {
 
 	private File file;
-	/** the logger object to use */
-	// private static final Logger LOGGER = LoggerFactory.getLogger(AccessionInfoParser.class);
-
+	
 	/**
-	 * Number of tab-separated fields in then NCBI alts_accessions_xxx file
+	 * Number of tab-separated fields in then NCBI genomic_regions_definitions.txt file
 	 */
-	private static final int NFIELDS = 5;
-
+	private static final int NFIELDS = 4;
+	
 	/**
 	 * Dummy to prevent from using
 	 */
 	@SuppressWarnings("unused")
-	private AccessionInfoParser() {
+	private RegionInfoParser() {
 	}
-
+	
 	/**
 	 * 
+	 * @param filepath
 	 */
-	public AccessionInfoParser(String filepath) {
+	public RegionInfoParser(String filepath) {
 		this.file = new File(filepath);
 	}
-
-	public ImmutableMap<String, AccessionInfo> parse() {
-		ImmutableMap.Builder<String, AccessionInfo> result = new ImmutableMap.Builder<String, AccessionInfo>();
+	
+	public ImmutableMap<String, RegionInfo> parse() {
+		ImmutableMap.Builder<String, RegionInfo> result = new ImmutableMap.Builder<String, RegionInfo>();
 		BufferedReader reader = null;
 		// reader = this.open();
 		String line;
@@ -56,9 +57,9 @@ public class AccessionInfoParser {
 				try {
 					if (line.startsWith("#"))
 						continue;
-					AccessionInfoBuilder aiBuilder = createBuilderFromLine(line);
-					AccessionInfo info = aiBuilder.build();
-					result.put(info.getRefseqAccessionVersion(), info);
+					RegionInfoBuilder builder = createBuilderFromLine(line);
+					RegionInfo info = builder.build();
+					result.put(info.getRegionName(), info);
 				} catch (AccessionInfoParseException e) {
 					e.printStackTrace();
 				}
@@ -70,31 +71,29 @@ public class AccessionInfoParser {
 		IOUtil.close(reader);
 		return result.build();
 	}
-
-	private AccessionInfoBuilder createBuilderFromLine(String line) throws AccessionInfoParseException {
-		AccessionInfoBuilder builder = new AccessionInfoBuilder();
+	
+	private RegionInfoBuilder createBuilderFromLine(String line) throws AccessionInfoParseException {
+		RegionInfoBuilder builder = new RegionInfoBuilder();
 		String[] fields = line.split("\t");
 		if (fields.length != this.NFIELDS) {
 			String error = String.format(
-					"Malformed line in NCBI alts_accessions_xxx file:\n%s\nExpected %d fields but there were %d", line,
+					"Malformed line in NCBI genomic_regions_definitions.txt file:\n%s\nExpected %d fields but there were %d", line,
 					NFIELDS, fields.length);
 			throw new AccessionInfoParseException(error);
 		}
-		builder.chromosome(fields[0]);
-		builder.refseqAccessionVersion(fields[1]);
+		builder.regionName(fields[0]);
+		builder.chromosome(fields[1]);
 		try {
-			builder.refseqGi(Integer.parseInt(fields[2]));
+			builder.start(Integer.parseInt(fields[2]));
 		} catch (NumberFormatException e) {
-			throw new AccessionInfoParseException("Failed to parse Integer from Regseq gi field entry: " + fields[2]);
+			throw new AccessionInfoParseException("Failed to parse Integer from start field entry: " + fields[2]);
 		}
-		builder.genbankAccessionVersion(fields[3]);
 		try {
-			builder.genbankGi(Integer.parseInt(fields[4]));
+			builder.stop(Integer.parseInt(fields[3]));
 		} catch (NumberFormatException e) {
-			throw new AccessionInfoParseException("Failed to parse Integer from GenBank gi field entry: " + fields[4]);
+			throw new AccessionInfoParseException("Failed to parse Integer from stop field entry: " + fields[3]);
 		}
 
 		return builder;
 	}
-
 }

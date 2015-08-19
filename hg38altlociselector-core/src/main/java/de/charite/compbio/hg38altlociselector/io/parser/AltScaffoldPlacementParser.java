@@ -69,7 +69,7 @@ public class AltScaffoldPlacementParser {
 		String[] fields = line.split("\t");
 		if (fields.length != this.NFIELDS) {
 			String error = String.format(
-					"Malformed line in UCSC knownGene.txt file:\n%s\nExpected %d fields but there were %d", line,
+					"Malformed line in NCBI alt_scaffold_placement.txt file:\n%s\nExpected %d fields but there were %d", line,
 					NFIELDS, fields.length);
 			throw new AccessionInfoParseException(error);
 		}
