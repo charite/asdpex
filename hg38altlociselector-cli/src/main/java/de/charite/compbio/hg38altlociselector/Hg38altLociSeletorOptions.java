@@ -15,11 +15,19 @@ public final class Hg38altLociSeletorOptions {
 
 	/** directory to use for the downloads and the serialized file */
 	public String downloadPath = "../data";
+
+	public String fastqOutputPath = "../fasta";
 	public Command command;
 
 	public String altAccessionsPath = downloadPath + "/alts_accessions_GRCh38.p2";
 	public String altScaffoldPlacementPath = downloadPath + "/all_alt_scaffold_placement.txt";
 	public String referencePath = downloadPath + "/bwa.kit/hs38DH.fa";
+	public String genomicRegionsDefinitionsPath = downloadPath + "/genomic_regions_definitions.txt";
+
+	/**
+	 * Line length of output fasta files.
+	 */
+	public int fastaLineLength = 70;
 
 	/**
 	 * The command that is to be executed.
