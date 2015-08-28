@@ -87,16 +87,32 @@ public class IOUtil {
 	 * 
 	 * @param file
 	 *            the file to write
+	 * @param append
+	 *            append to the end of the file
+	 * @return the {@link BufferedWriter} object for the given file.
+	 * @throws UnsupportedEncodingException
+	 * @throws IOException
+	 */
+	public static BufferedWriter getBufferedFileWriter(File file, boolean append)
+			throws UnsupportedEncodingException, IOException {
+		FileOutputStream output = new FileOutputStream(file, append);
+		if (file.getName().endsWith(".gz"))
+			return new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(output), "UTF-8"));
+		else
+			return new BufferedWriter(new OutputStreamWriter(output, "UTF-8"));
+	}
+
+	/**
+	 * Opens a file handle to a new file. Handles gzip-compression depending on the file name extension
+	 * 
+	 * @param file
+	 *            the file to write
 	 * @return the {@link BufferedWriter} object for the given file.
 	 * @throws UnsupportedEncodingException
 	 * @throws IOException
 	 */
 	public static BufferedWriter getBufferedFileWriter(File file) throws UnsupportedEncodingException, IOException {
-		FileOutputStream output = new FileOutputStream(file);
-		if (file.getName().endsWith(".gz"))
-			return new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(output), "UTF-8"));
-		else
-			return new BufferedWriter(new OutputStreamWriter(output, "UTF-8"));
+		return getBufferedFileWriter(file, false);
 	}
 
 }
