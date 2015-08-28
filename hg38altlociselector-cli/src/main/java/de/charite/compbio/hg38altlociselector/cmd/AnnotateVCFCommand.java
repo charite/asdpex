@@ -1,9 +1,9 @@
 /**
  * 
  */
-package de.charite.compbio.hg38altlociselector;
+package de.charite.compbio.hg38altlociselector.cmd;
 
-import de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand;
+import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
 import de.charite.compbio.hg38altlociselector.exceptions.AltLociSelectorException;
 import de.charite.compbio.hg38altlociselector.exceptions.CommandLineParsingException;
 import de.charite.compbio.hg38altlociselector.exceptions.HelpRequestedException;

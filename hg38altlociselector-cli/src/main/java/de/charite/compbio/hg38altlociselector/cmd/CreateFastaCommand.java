@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.charite.compbio.hg38altlociselector;
+package de.charite.compbio.hg38altlociselector.cmd;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,8 +13,7 @@ import org.apache.commons.lang.ArrayUtils;
 
 import com.google.common.collect.ImmutableMap;
 
-import de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand;
-import de.charite.compbio.hg38altlociselector.cmd.CreateFastaCommandLineParser;
+import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
 import de.charite.compbio.hg38altlociselector.data.AccessionInfo;
 import de.charite.compbio.hg38altlociselector.data.AltScaffoldPlacementInfo;
 import de.charite.compbio.hg38altlociselector.data.RegionInfo;

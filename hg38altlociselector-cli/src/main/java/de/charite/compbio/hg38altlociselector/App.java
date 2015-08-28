@@ -1,6 +1,8 @@
 package de.charite.compbio.hg38altlociselector;
 
 import de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand;
+import de.charite.compbio.hg38altlociselector.cmd.AnnotateVCFCommand;
+import de.charite.compbio.hg38altlociselector.cmd.CreateFastaCommand;
 import de.charite.compbio.hg38altlociselector.cmd.DownloadCommand;
 import de.charite.compbio.hg38altlociselector.exceptions.AltLociSelectorException;
 import de.charite.compbio.hg38altlociselector.exceptions.CommandLineParsingException;
