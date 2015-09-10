@@ -36,6 +36,7 @@ public final class CreateFastaCommandLineParser {
 		options = new Options();
 		options.addOption("h", "help", false, "show this help");
 		options.addOption("d", "data-dir", true, "target folder for downloaded files, defaults to \"data\"");
+		options.addOption("s", "single", false, "split the extended alternatove loci into single files");
 		parser = new DefaultParser();
 	}
 
@@ -53,6 +54,9 @@ public final class CreateFastaCommandLineParser {
 
 		if (cmd.hasOption("data-dir"))
 			result.downloadPath = cmd.getOptionValue("data-dir");
+
+		if (cmd.hasOption("single"))
+			result.singleAltLociFile = true;
 
 		return result;
 	}

@@ -24,6 +24,8 @@ public final class Hg38altLociSeletorOptions {
 	public String referencePath = downloadPath + "/bwa.kit/hs38DH.fa";
 	public String genomicRegionsDefinitionsPath = downloadPath + "/genomic_regions_definitions.txt";
 
+	public boolean singleAltLociFile = false;
+
 	/**
 	 * Line length of output fasta files.
 	 */

@@ -148,8 +148,12 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
 			System.out.println(altExtended.length + "\t" + (currentReg.getStop() - currentReg.getStart() + 1));
 
 			try {
-				createFastaFile(options.fastqOutputPath + "/altLoci/" + identifier + "_extended.fa", identifier,
-						altExtended);
+				if (options.singleAltLociFile)
+					createFastaFile(options.fastqOutputPath + "/altLoci_single/" + identifier + "_extended.fa",
+							identifier, altExtended, false);
+				else
+					createFastaFile(options.fastqOutputPath + "/altLoci/" + currentReg.getRegionName() + "_altLoci.fa",
+							identifier, altExtended, true);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -159,7 +163,7 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
 					currentReg.getStop());
 			try {
 				createFastaFile(options.fastqOutputPath + "/regions/" + currentReg.getRegionName() + ".fa",
-						currentReg.getRegionName(), reg.getBases());
+						currentReg.getRegionName(), reg.getBases(), false);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -174,16 +178,22 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
 		return identifier.toString();
 	}
 
-	private void createFastaFile(String path, String name, byte[] bases)
+	private void createFastaFile(String path, String name, byte[] bases, boolean multiFasta)
 			throws UnsupportedEncodingException, IOException {
 		File file = new File(path);
 
+		final BufferedWriter out;
 		if (file.exists()) {
-			System.out.println("[INFO] file already exists. Skipping.");
-			return;
+			if (options.singleAltLociFile) {
+				System.out.println("[INFO] file already exists. Skipping.");
+				return;
+			}
 		}
 		file.getParentFile().mkdirs();
-		final BufferedWriter out = IOUtil.getBufferedFileWriter(file);
+		if (multiFasta)
+			out = IOUtil.getBufferedFileWriter(file, true);
+		else
+			out = IOUtil.getBufferedFileWriter(file);
 		out.write(">");
 		out.write(name);
 		out.write("\n");
