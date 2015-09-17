@@ -45,6 +45,12 @@ public class AccessionInfoParser {
 		this.file = new File(filepath);
 	}
 
+	/**
+	 * Processes the file and return a Map with the {@link AccessionInfo}s, where the key is the
+	 * "RefSeq Accession.version"
+	 * 
+	 * @return Map with (RefSeq Accession.version | AccessionInfo) pairs
+	 */
 	public ImmutableMap<String, AccessionInfo> parse() {
 		ImmutableMap.Builder<String, AccessionInfo> result = new ImmutableMap.Builder<String, AccessionInfo>();
 		BufferedReader reader = null;

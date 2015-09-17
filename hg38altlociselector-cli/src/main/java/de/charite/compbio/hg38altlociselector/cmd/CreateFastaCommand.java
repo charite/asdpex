@@ -80,7 +80,7 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
 		ImmutableMap<String, AltScaffoldPlacementInfo> asMap = asParser.parse();
 		System.out.println("[INFO] found placement for " + asMap.size() + " alt_loci");
 
-		System.out.println("[INFO] Read alt_loci placement");
+		System.out.println("[INFO] Read region definitions");
 		RegionInfoParser regParser = new RegionInfoParser(options.genomicRegionsDefinitionsPath);
 		ImmutableMap<String, RegionInfo> regMap = regParser.parse();
 		System.out.println("[INFO] found " + regMap.size() + " regions definitions");
@@ -171,6 +171,14 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
 		}
 	}
 
+	/**
+	 * Creates the Fasta identifier from accessionInfo file row in the format they are used in the reference fasta
+	 * files: chr<1-22|X|Y|M>_<GenBank Accession.version with '.'->'v'>_alt<br>
+	 * e.g.: chr21_GL383580v2_alt
+	 * 
+	 * @param info
+	 * @return
+	 */
 	private String createFastaIdentifier(AccessionInfo info) {
 		StringBuilder identifier = new StringBuilder();
 		identifier.append("chr").append(info.getChromosome()).append("_")
