@@ -3,6 +3,7 @@ package de.charite.compbio.hg38altlociselector;
 import de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand;
 import de.charite.compbio.hg38altlociselector.cmd.AnnotateVCFCommand;
 import de.charite.compbio.hg38altlociselector.cmd.CreateFastaCommand;
+import de.charite.compbio.hg38altlociselector.cmd.CreateSeedCommand;
 import de.charite.compbio.hg38altlociselector.cmd.DownloadCommand;
 import de.charite.compbio.hg38altlociselector.exceptions.AltLociSelectorException;
 import de.charite.compbio.hg38altlociselector.exceptions.CommandLineParsingException;
@@ -29,6 +30,8 @@ public class App {
 				cmd = new DownloadCommand(args);
 			else if (args[0].equals("create-fa"))
 				cmd = new CreateFastaCommand(args);
+			else if (args[0].equals("create-seed"))
+				cmd = new CreateSeedCommand(args);
 			else if (args[0].equals("annotate"))
 				cmd = new AnnotateVCFCommand(args);
 			else

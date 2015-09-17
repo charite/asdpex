@@ -17,6 +17,9 @@ public final class Hg38altLociSeletorOptions {
 	public String downloadPath = "../data";
 
 	public String fastqOutputPath = "../fasta";
+
+	public String alignmentPath = "../data/alignments";
+
 	public Command command;
 
 	public String altAccessionsPath = downloadPath + "/alts_accessions_GRCh38.p2";
@@ -35,6 +38,6 @@ public final class Hg38altLociSeletorOptions {
 	 * The command that is to be executed.
 	 */
 	public enum Command {
-		DOWNLOAD, ANNOTATE_VCF, CREATE_FASTA
+		DOWNLOAD, ANNOTATE_VCF, CREATE_FASTA, CREATE_SEED
 	}
 }
