@@ -38,6 +38,8 @@ public class CreateSeedCommandLineParser {
 		options.addOption("d", "data-dir", true, "folder with NCBI info files, defaults to \"data\"");
 		options.addOption("a", "aln-dir", true,
 				"folder with NCBI alignment gff files, defaults to \"data/alignments\"");
+		options.addOption("s", "seed-dir", true,
+				"folder where the seed info files will be stored, defaults to \"seed\"");
 		parser = new DefaultParser();
 	}
 
@@ -55,9 +57,10 @@ public class CreateSeedCommandLineParser {
 
 		if (cmd.hasOption("data-dir"))
 			result.downloadPath = cmd.getOptionValue("data-dir");
-
 		if (cmd.hasOption("aln-dir"))
 			result.alignmentPath = cmd.getOptionValue("aln-dir");
+		if (cmd.hasOption("seed-dir"))
+			result.seedInfoPath = cmd.getOptionValue("seed-dir");
 
 		return result;
 	}

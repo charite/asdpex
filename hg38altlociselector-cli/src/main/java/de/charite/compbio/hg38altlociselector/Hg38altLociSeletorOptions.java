@@ -20,6 +20,8 @@ public final class Hg38altLociSeletorOptions {
 
 	public String alignmentPath = "../data/alignments";
 
+	public String seedInfoPath = "../seed";
+
 	public Command command;
 
 	public String altAccessionsPath = downloadPath + "/alts_accessions_GRCh38.p2";
