@@ -102,7 +102,7 @@ public class CreateSeedCommand extends AltLociSelectorCommand {
 			// + (scaffold.getParentStop() - currentReg.getStart()));
 			// System.out.println(createFastaIdentifier(currentAI));
 			try {
-				createMatchesFile(options.seedInfoPath, createFastaIdentifier(currentAI) + ".tab", matches,
+				createMatchesFile(options.seedInfoPath, createFastaIdentifier(currentAI) + "_extended.tab", matches,
 						(scaffold.getParentStart() - currentReg.getStart()),
 						(currentReg.getStop() - scaffold.getParentStop()));
 			} catch (IOException e) {
