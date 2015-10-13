@@ -56,7 +56,7 @@ public class CreateSeedCommandLineParser {
 		}
 
 		if (cmd.hasOption("data-dir"))
-			result.downloadPath = cmd.getOptionValue("data-dir");
+			result.dataPath = cmd.getOptionValue("data-dir");
 		if (cmd.hasOption("aln-dir"))
 			result.alignmentPath = cmd.getOptionValue("aln-dir");
 		if (cmd.hasOption("seed-dir"))

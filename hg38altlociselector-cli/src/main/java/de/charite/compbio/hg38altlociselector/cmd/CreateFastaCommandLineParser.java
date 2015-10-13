@@ -53,7 +53,7 @@ public final class CreateFastaCommandLineParser {
 		}
 
 		if (cmd.hasOption("data-dir"))
-			result.downloadPath = cmd.getOptionValue("data-dir");
+			result.dataPath = cmd.getOptionValue("data-dir");
 
 		if (cmd.hasOption("single"))
 			result.singleAltLociFile = true;
