@@ -11,11 +11,14 @@ import java.io.UnsupportedEncodingException;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang.ArrayUtils;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
 import de.charite.compbio.hg38altlociselector.data.AccessionInfo;
 import de.charite.compbio.hg38altlociselector.data.AltScaffoldPlacementInfo;
+import de.charite.compbio.hg38altlociselector.data.AlternativeLociBuilder;
+import de.charite.compbio.hg38altlociselector.data.AlternativeLocus;
 import de.charite.compbio.hg38altlociselector.data.RegionInfo;
 import de.charite.compbio.hg38altlociselector.exceptions.AltLociSelectorException;
 import de.charite.compbio.hg38altlociselector.exceptions.CommandLineParsingException;
@@ -68,112 +71,79 @@ public class AlignCommand extends AltLociSelectorCommand {
 	 */
 	@Override
 	public void run() throws AltLociSelectorException {
-		System.out.println("[INFO] Creating fasta files");
+		System.out.println("[INFO] Creating seed files");
 		if (options == null)
 			System.err.println("[ERROR] option = null");
-		System.out.println("[INFO] Read alt_loci accessions");
-		AccessionInfoParser aiParser = new AccessionInfoParser(options.altAccessionsPath);
-		ImmutableMap<String, AccessionInfo> aiMap = aiParser.parse();
-		System.out.println("[INFO] found " + aiMap.size() + " alt_loci");
-
-		System.out.println("[INFO] Read alt_loci placement");
-		AltScaffoldPlacementParser asParser = new AltScaffoldPlacementParser(options.altScaffoldPlacementPath);
-		ImmutableMap<String, AltScaffoldPlacementInfo> asMap = asParser.parse();
-		System.out.println("[INFO] found placement for " + asMap.size() + " alt_loci");
-
-		System.out.println("[INFO] Read region definitions");
-		RegionInfoParser regParser = new RegionInfoParser(options.genomicRegionsDefinitionsPath);
-		ImmutableMap<String, RegionInfo> regMap = regParser.parse();
-		System.out.println("[INFO] found " + regMap.size() + " regions definitions");
-
+		// alt. loci info parsing
+		ImmutableList<AlternativeLocus> loci = new AlternativeLociBuilder(options.altAccessionsPath, options.altScaffoldPlacementPath, options.genomicRegionsDefinitionsPath).build();
+		// Ref fasta File
 		final ReferenceSequenceFile refFile = ReferenceSequenceFileFactory
 				.getReferenceSequenceFile(new File(options.referencePath));
-		System.out.println(refFile.isIndexed());
-
-		// ReferenceSequence seq;
-		// while ((seq = refFile.nextSequence()) != null) {
-		// System.out.println(seq.getName() + "\t" + seq.getBases().length);
-		// }
-
-		for (AltScaffoldPlacementInfo scaffold : asMap.values()) {
-			AccessionInfo currentAI = aiMap.get(scaffold.getAltScafAcc());
-			RegionInfo currentReg = regMap.get(scaffold.getRegion());
-			System.out.println();
-			System.out.println(createFastaIdentifier(currentAI));
-			// break;
-
-			System.out.println(currentReg.getStart() + "\t" + currentReg.getStop());
-			System.out.println(scaffold.getParentStart() + "\t" + scaffold.getParentStop());
-
-			// ALT_LOCI
-			// ReferenceSequence alt = refFile.getSequence(createFastaIdentifier(currentAI));
-			// System.out.println(scaffold.getAltScafStop() + scaffold.getAltStopTail() + "\t" + alt.getBases().length);
-
-			// TODO ALL OF THIS SHOULD BE PUT INTO A FASTA-FACTORY
-
-			// sequence between region start and alt_loci start - to take from reference
-			int fiveprimeFillingStart = currentReg.getStart();
-			int fiveprimeFillingStop = scaffold.getParentStart() - 1; // since its inclusive
-
-			// sequence inserted from the alt loci - w/o the tails
-			int altLociStart = scaffold.getAltScafStart();
-			int altLociStop = scaffold.getAltScafStop();
-
-			// sequence between alt_loci stop and region stop - to take from reference
-			int threeprimeFillingStart = scaffold.getParentStop() + 1; // since its inclusive
-			int threeprimeFillingStop = currentReg.getStop();
-
-			byte[] altExtended = new byte[0];
-			System.out.println(altExtended.length);
-
-			// add 5' Tail
-			if (fiveprimeFillingStart < fiveprimeFillingStop) {
-				ReferenceSequence ref = refFile.getSubsequenceAt("chr" + scaffold.getParentName(),
-						fiveprimeFillingStart, fiveprimeFillingStop);
-				altExtended = ArrayUtils.addAll(altExtended, ref.getBases());
+		if(!refFile.isIndexed()){
+			System.err.println("The FastA is not index - please index file first and run again.");
+			System.exit(1);
+		}
+		// visualisation
+		System.out.println("[INFO] processing alt. loci");
+		System.out.println("0%       50%       100%");
+		System.out.println("|.........|.........|");
+		int c=1;
+		int limit=0;
+		for (AlternativeLocus locus : loci) {
+			if(100.0*c++/loci.size() > limit){
+				limit+=5;
+				System.out.print("*");
 			}
-			System.out.println(altExtended.length);
-
-			String identifier = createFastaIdentifier(currentAI);
-			// add alt_loci
-			byte[] bases = refFile.getSubsequenceAt(identifier, altLociStart, altLociStop).getBases();
-
-			if (!scaffold.isStrand())
-				SequenceUtil.reverseComplement(bases);
-
-			altExtended = ArrayUtils.addAll(altExtended, bases);
-			System.out.println(altExtended.length);
-
-			// add 3' tail
-			if (threeprimeFillingStart < threeprimeFillingStop) {
-				ReferenceSequence ref = refFile.getSubsequenceAt("chr" + scaffold.getParentName(),
-						threeprimeFillingStart, threeprimeFillingStop);
-				altExtended = ArrayUtils.addAll(altExtended, ref.getBases());
+			// identifier used for fastA and seed file
+			String identifier = createFastaIdentifier(locus.getAccessionInfo());
+//			System.out.println(identifier);
+			if(!identifier.equals("chr17_GL000258v2_alt"))
+				continue;
+			
+			// alt_loci
+			byte[] altLoci = extractSequence(refFile, identifier, locus.getPlacementInfo().getAltScafStart(), locus.getPlacementInfo().getAltScafStop(), locus.getPlacementInfo().isStrand());
+			byte[] ref = extractSequence(refFile, "chr" + locus.getPlacementInfo().getParentName(), locus.getPlacementInfo().getParentStart(), locus.getPlacementInfo().getParentStop(), true); 
+			
+			int i=0;
+			int counter=0;
+			for(byte b : altLoci){
+				if(b == 'N')
+					counter++;
 			}
-			System.out.println(altExtended.length + "\t" + (currentReg.getStop() - currentReg.getStart() + 1));
-
+			System.out.println(identifier+": "+counter);
+			
+			// write fasta files
 			try {
-				if (options.singleAltLociFile)
-					createFastaFile(options.fastqOutputPath + "/altLoci_single/" + identifier + "_extended.fa",
-							identifier, altExtended, false);
-				else
-					createFastaFile(options.fastqOutputPath + "/altLoci/" + currentReg.getRegionName() + "_altLoci.fa",
-							identifier, altExtended, true);
+				createFastaFile(options.tempFolder + "/" + identifier + "_altLoci.fa",identifier,altLoci, false);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 
-			// now we also have to create the corresponding regions references
-			ReferenceSequence reg = refFile.getSubsequenceAt("chr" + scaffold.getParentName(), currentReg.getStart(),
-					currentReg.getStop());
 			try {
-				createFastaFile(options.fastqOutputPath + "/regions/" + currentReg.getRegionName() + ".fa",
-						currentReg.getRegionName(), reg.getBases(), false);
+				createFastaFile(options.tempFolder + "/" + identifier + "_ref.fa",identifier, ref,false);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+		System.out.println("*");
+	}
+	
+	/**
+	 * Extract the Sequence from the 
+	 * @param refFile
+	 * @param id
+	 * @param start
+	 * @param stop
+	 * @param strand
+	 * @return
+	 */
+	private byte[] extractSequence(ReferenceSequenceFile refFile, String id, int start, int stop, boolean strand){
+		byte[] bases = refFile.getSubsequenceAt(id, start, stop).getBases();
+
+		if (!strand)
+			SequenceUtil.reverseComplement(bases);
+
+		return bases;
 	}
 
 	/**
@@ -191,6 +161,15 @@ public class AlignCommand extends AltLociSelectorCommand {
 		return identifier.toString();
 	}
 
+	/**
+	 * 
+	 * @param path
+	 * @param name
+	 * @param bases
+	 * @param multiFasta
+	 * @throws UnsupportedEncodingException
+	 * @throws IOException
+	 */
 	private void createFastaFile(String path, String name, byte[] bases, boolean multiFasta)
 			throws UnsupportedEncodingException, IOException {
 		File file = new File(path);
