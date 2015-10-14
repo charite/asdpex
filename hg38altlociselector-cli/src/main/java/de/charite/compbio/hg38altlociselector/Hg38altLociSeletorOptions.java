@@ -21,8 +21,10 @@ public final class Hg38altLociSeletorOptions {
 	public String alignmentPath = "../data/alignments";
 
 	public String seedInfoPath = "../seed";
-	
+
 	public String seqanALign = "../seqan/regionalign2bed";
+
+	public String tempFolder = "../tmp";
 
 	public Command command;
 
@@ -42,6 +44,6 @@ public final class Hg38altLociSeletorOptions {
 	 * The command that is to be executed.
 	 */
 	public enum Command {
-		DOWNLOAD, ANNOTATE_VCF, CREATE_FASTA, CREATE_SEED
+		DOWNLOAD, ANNOTATE_VCF, CREATE_FASTA, CREATE_SEED, ALIGN
 	}
 }

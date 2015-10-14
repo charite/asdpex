@@ -1,5 +1,6 @@
 package de.charite.compbio.hg38altlociselector;
 
+import de.charite.compbio.hg38altlociselector.cmd.AlignCommand;
 import de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand;
 import de.charite.compbio.hg38altlociselector.cmd.AnnotateVCFCommand;
 import de.charite.compbio.hg38altlociselector.cmd.CreateFastaCommand;
@@ -26,14 +27,16 @@ public class App {
 		// Create the corresponding command.
 		AltLociSelectorCommand cmd = null;
 		try {
-			if (args[0].equals("download"))
-				cmd = new DownloadCommand(args);
+			if (args[0].equals("align"))
+				cmd = new AlignCommand(args);
+			else if (args[0].equals("annotate"))
+				cmd = new AnnotateVCFCommand(args);
 			else if (args[0].equals("create-fa"))
 				cmd = new CreateFastaCommand(args);
 			else if (args[0].equals("create-seed"))
 				cmd = new CreateSeedCommand(args);
-			else if (args[0].equals("annotate"))
-				cmd = new AnnotateVCFCommand(args);
+			else if (args[0].equals("download"))
+				cmd = new DownloadCommand(args);
 			else
 				System.err.println("unrecognized command " + args[0]);
 		} catch (CommandLineParsingException e) {
@@ -104,7 +107,8 @@ public class App {
 		System.err.println("Command: download      download transcript database (not yet implemented)");
 		System.err.println("         annotate      functional annotation of VCF files");
 		System.err.println("         create-fa     construct fasta files for the alignments");
-		System.err.println("         create-seed   construct seed files for the alignments from the NCBI alignments");		
+		System.err.println("         create-seed   construct seed files for the alignments from the NCBI alignments");
+		System.err.println("         align		   construct fasta and seed files and do the alignments");
 		System.err.println("");
 		System.err.println("Example: java -jar hg38altlociselector.jar download GRCh38");
 		System.err.println("         java -jar hg38altlociselector.jar create-fa -o data/");
