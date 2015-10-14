@@ -27,6 +27,7 @@ import de.charite.compbio.hg38altlociselector.util.IOUtil;
 import htsjdk.samtools.reference.ReferenceSequence;
 import htsjdk.samtools.reference.ReferenceSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequenceFileFactory;
+import htsjdk.samtools.util.SequenceUtil;
 
 /**
  * 
@@ -135,8 +136,12 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
 
 			String identifier = createFastaIdentifier(currentAI);
 			// add alt_loci
-			ReferenceSequence alt = refFile.getSubsequenceAt(identifier, altLociStart, altLociStop);
-			altExtended = ArrayUtils.addAll(altExtended, alt.getBases());
+			byte[] bases = refFile.getSubsequenceAt(identifier, altLociStart, altLociStop).getBases();
+
+			if (!scaffold.isStrand())
+				SequenceUtil.reverseComplement(bases);
+
+			altExtended = ArrayUtils.addAll(altExtended, bases);
 			System.out.println(altExtended.length);
 
 			// add 3' tail
