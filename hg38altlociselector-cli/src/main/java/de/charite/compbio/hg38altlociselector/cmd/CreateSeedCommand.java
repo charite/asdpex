@@ -15,6 +15,8 @@ import com.google.common.collect.ImmutableMap;
 import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
 import de.charite.compbio.hg38altlociselector.data.AccessionInfo;
 import de.charite.compbio.hg38altlociselector.data.AltScaffoldPlacementInfo;
+import de.charite.compbio.hg38altlociselector.data.AlternativeLociBuilder;
+import de.charite.compbio.hg38altlociselector.data.AlternativeLocus;
 import de.charite.compbio.hg38altlociselector.data.NCBIgffAlignmentMatch;
 import de.charite.compbio.hg38altlociselector.data.RegionInfo;
 import de.charite.compbio.hg38altlociselector.exceptions.AltLociSelectorException;
@@ -63,29 +65,20 @@ public class CreateSeedCommand extends AltLociSelectorCommand {
 		System.out.println("[INFO] Creating seed files");
 		if (options == null)
 			System.err.println("[ERROR] option = null");
+		ImmutableList<AlternativeLocus> loci = new AlternativeLociBuilder(options.altAccessionsPath, options.altScaffoldPlacementPath, options.genomicRegionsDefinitionsPath).build();
 		// alts_accessions
-		System.out.println("[INFO] Read alt_loci accessions");
-		AccessionInfoParser aiParser = new AccessionInfoParser(options.altAccessionsPath);
-		ImmutableMap<String, AccessionInfo> aiMap = aiParser.parse();
-		System.out.println("[INFO] found " + aiMap.size() + " alt_loci");
+		System.out.println("[INFO] processing alt. loci");
+		System.out.println("0%       50%       100%");
+		System.out.println("|.........|.........|");
+		int c=1;
+		int limit=0;
+		for (AlternativeLocus locus : loci) {
+			if(100.0*c++/loci.size() > limit){
+				limit+=5;
+				System.out.print("*");
+			}
 
-		// scaffold_placement
-		System.out.println("[INFO] Read alt_loci placement");
-		AltScaffoldPlacementParser asParser = new AltScaffoldPlacementParser(options.altScaffoldPlacementPath);
-		ImmutableMap<String, AltScaffoldPlacementInfo> asMap = asParser.parse();
-		System.out.println("[INFO] found placement for " + asMap.size() + " alt_loci");
-
-		// regions definitions
-		System.out.println("[INFO] Read region definitions");
-		RegionInfoParser regParser = new RegionInfoParser(options.genomicRegionsDefinitionsPath);
-		ImmutableMap<String, RegionInfo> regMap = regParser.parse();
-		System.out.println("[INFO] found " + regMap.size() + " regions definitions");
-
-		for (AltScaffoldPlacementInfo scaffold : asMap.values()) {
-			AccessionInfo currentAI = aiMap.get(scaffold.getAltScafAcc());
-			RegionInfo currentReg = regMap.get(scaffold.getRegion());
-			String gff = scaffold.getAltScafAcc() + "_" + scaffold.getParentAcc() + ".gff";
-			// System.out.println(gff);
+			String gff = locus.getPlacementInfo().getAltScafAcc() + "_" + locus.getPlacementInfo().getParentAcc() + ".gff";
 			ImmutableList<NCBIgffAlignmentMatch> matches = null;
 			if (new File(options.alignmentPath, gff).exists()) {
 				matches = new NCBIgffAlignmentParser(new File(options.alignmentPath, gff)).parse();
@@ -93,23 +86,18 @@ public class CreateSeedCommand extends AltLociSelectorCommand {
 				System.err.println("File is missing: " + gff);
 				continue;
 			}
-			// System.out.println("Matches: " + matches.size());
-			// build
-			// System.out.println(
-			// "difference start region <-> alt-loci:\t" + (scaffold.getParentStart() - currentReg.getStart()));
-			// System.out.println("tail region <-> alt-loci:\t\t" + (currentReg.getStop() - scaffold.getParentStop()));
-			// System.out.println((scaffold.getAltScafStop() + scaffold.getParentStart() - currentReg.getStart()) + "\t"
-			// + (scaffold.getParentStop() - currentReg.getStart()));
-			// System.out.println(createFastaIdentifier(currentAI));
+
 			try {
-				createMatchesFile(options.seedInfoPath, createFastaIdentifier(currentAI) + "_extended.tab", matches,
-						(scaffold.getParentStart() - currentReg.getStart()),
-						(currentReg.getStop() - scaffold.getParentStop()));
+				createMatchesFile(options.seedInfoPath, createFastaIdentifier(locus.getAccessionInfo()) + "_extended.tab", matches,
+						(locus.getPlacementInfo().getParentStart() - locus.getRegionInfo().getStart()),
+						(locus.getRegionInfo().getStop() - locus.getPlacementInfo().getParentStop()));
 			} catch (IOException e) {
-				System.err.println("[ERROR] failed to create seed info file for sample: " + scaffold.getAltScafAcc());
+				System.err.println("[ERROR] failed to create seed info file for sample: " + locus.getPlacementInfo().getAltScafAcc());
 				e.printStackTrace();
 			}
 		}
+
+		System.out.println();
 	}
 
 	private void createMatchesFile(String path, String filename, ImmutableList<NCBIgffAlignmentMatch> matches,

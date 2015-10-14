@@ -104,6 +104,7 @@ public class App {
 		System.err.println("Command: download      download transcript database (not yet implemented)");
 		System.err.println("         annotate      functional annotation of VCF files");
 		System.err.println("         create-fa     construct fasta files for the alignments");
+		System.err.println("         create-seed   construct seed files for the alignments from the NCBI alignments");		
 		System.err.println("");
 		System.err.println("Example: java -jar hg38altlociselector.jar download GRCh38");
 		System.err.println("         java -jar hg38altlociselector.jar create-fa -o data/");
