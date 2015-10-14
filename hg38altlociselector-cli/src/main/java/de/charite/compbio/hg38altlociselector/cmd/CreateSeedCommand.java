@@ -17,7 +17,8 @@ import de.charite.compbio.hg38altlociselector.data.AccessionInfo;
 import de.charite.compbio.hg38altlociselector.data.AltScaffoldPlacementInfo;
 import de.charite.compbio.hg38altlociselector.data.AlternativeLociBuilder;
 import de.charite.compbio.hg38altlociselector.data.AlternativeLocus;
-import de.charite.compbio.hg38altlociselector.data.NCBIgffAlignmentMatch;
+import de.charite.compbio.hg38altlociselector.data.NCBIgffAlignmentElement;
+import de.charite.compbio.hg38altlociselector.data.NCBIgffAlignmentElementType;
 import de.charite.compbio.hg38altlociselector.data.RegionInfo;
 import de.charite.compbio.hg38altlociselector.exceptions.AltLociSelectorException;
 import de.charite.compbio.hg38altlociselector.exceptions.CommandLineParsingException;
@@ -79,9 +80,9 @@ public class CreateSeedCommand extends AltLociSelectorCommand {
 			}
 
 			String gff = locus.getPlacementInfo().getAltScafAcc() + "_" + locus.getPlacementInfo().getParentAcc() + ".gff";
-			ImmutableList<NCBIgffAlignmentMatch> matches = null;
+			ImmutableList<NCBIgffAlignmentElement> matches = null;
 			if (new File(options.alignmentPath, gff).exists()) {
-				matches = new NCBIgffAlignmentParser(new File(options.alignmentPath, gff)).parse();
+				matches = new NCBIgffAlignmentParser(new File(options.alignmentPath, gff)).parse().get(0).getElements();
 			} else {
 				System.err.println("File is missing: " + gff);
 				continue;
@@ -100,7 +101,7 @@ public class CreateSeedCommand extends AltLociSelectorCommand {
 		System.out.println();
 	}
 
-	private void createMatchesFile(String path, String filename, ImmutableList<NCBIgffAlignmentMatch> matches,
+	private void createMatchesFile(String path, String filename, ImmutableList<NCBIgffAlignmentElement> matches,
 			int offset, int tail) throws IOException {
 
 		File file = new File(path, filename);
@@ -113,7 +114,9 @@ public class CreateSeedCommand extends AltLociSelectorCommand {
 		boolean first = true;
 		int c = 0;
 
-		for (NCBIgffAlignmentMatch match : matches) {
+		for (NCBIgffAlignmentElement match : matches) {
+			if(match.getType() != NCBIgffAlignmentElementType.MATCH)
+				continue;
 			c++;
 			// extend the first seed to the begin of the region
 			if (first) {

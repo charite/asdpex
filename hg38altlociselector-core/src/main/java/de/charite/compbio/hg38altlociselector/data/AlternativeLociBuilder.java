@@ -65,7 +65,7 @@ public class AlternativeLociBuilder {
 			if(scaffold != null && currentAI != null && currentReg != null)
 				builder.add(new AlternativeLocus(currentAI, currentReg, scaffold));
 		}
-		System.out.println();		
+		System.out.println("*");		
 		return builder.build();
 	}
 	

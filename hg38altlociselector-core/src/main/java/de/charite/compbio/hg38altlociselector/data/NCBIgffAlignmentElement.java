@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @author Marten Jäger <marten.jaeger@charite.de>
  *
  */
-public class NCBIgffAlignmentMatch implements Serializable {
+public class NCBIgffAlignmentElement implements Serializable {
 	/*
 	 * default serial ID
 	 */
@@ -23,6 +23,8 @@ public class NCBIgffAlignmentMatch implements Serializable {
 	private final int alt_start;
 	/* Length of the match */
 	private final int length;
+	/* ELement type*/
+	private final NCBIgffAlignmentElementType type;
 
 	/**
 	 * default serial ID
@@ -60,14 +62,19 @@ public class NCBIgffAlignmentMatch implements Serializable {
 		return length;
 	}
 
-	private NCBIgffAlignmentMatch(NCBIgffAlignmentMatchBuilder builder) {
+	public NCBIgffAlignmentElementType getType() {
+		return type;
+	}
+
+	private NCBIgffAlignmentElement(NCBIgffAlignmentMatchBuilder builder) {
 		this.ref_start = builder.ref_start;
 		this.alt_start = builder.alt_start;
 		this.length = builder.length;
+		this.type = builder.type;
 	}
 
 	/**
-	 * Nested builder for the {@link NCBIgffAlignmentMatch}s.
+	 * Nested builder for the {@link NCBIgffAlignmentElement}s.
 	 * 
 	 *
 	 * @author Marten Jäger <marten.jaeger@charite.de>
@@ -77,6 +84,7 @@ public class NCBIgffAlignmentMatch implements Serializable {
 		private int ref_start;
 		private int alt_start;
 		private int length;
+		private NCBIgffAlignmentElementType type;
 
 		public NCBIgffAlignmentMatchBuilder refStart(int value) {
 			this.ref_start = value;
@@ -93,8 +101,19 @@ public class NCBIgffAlignmentMatch implements Serializable {
 			return this;
 		}
 
-		public NCBIgffAlignmentMatch build() {
-			return new NCBIgffAlignmentMatch(this);
+		public NCBIgffAlignmentMatchBuilder type(char type) {
+			switch(type){
+				case 'M': this.type = NCBIgffAlignmentElementType.MATCH; break;
+				case 'I': this.type = NCBIgffAlignmentElementType.INSERTION; break;
+				case 'D': this.type = NCBIgffAlignmentElementType.DELETION; break;
+				default:  this.type = NCBIgffAlignmentElementType.UNKNOWN;
+			}
+			
+			return this;
+		}
+
+		public NCBIgffAlignmentElement build() {
+			return new NCBIgffAlignmentElement(this);
 		}
 	}
 }
