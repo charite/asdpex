@@ -69,8 +69,8 @@ public class AltScaffoldPlacementParser {
 		String[] fields = line.split("\t");
 		if (fields.length != this.NFIELDS) {
 			String error = String.format(
-					"Malformed line in NCBI alt_scaffold_placement.txt file:\n%s\nExpected %d fields but there were %d", line,
-					NFIELDS, fields.length);
+					"Malformed line in NCBI alt_scaffold_placement.txt file:\n%s\nExpected %d fields but there were %d",
+					line, NFIELDS, fields.length);
 			throw new AccessionInfoParseException(error);
 		}
 		builder.altAssemblyName(fields[0]);
@@ -81,7 +81,8 @@ public class AltScaffoldPlacementParser {
 		builder.parentName(fields[5]);
 		builder.parentAcc(fields[6]);
 		builder.region(fields[7]);
-		builder.strand(fields[8].equals("+") ? true : false);
+		// builder.strand(fields[8].equals("+") ? true : false);
+		builder.strand(fields[8].equals("-") ? false : true);
 
 		try {
 			builder.altScafStart(Integer.parseInt(fields[9]));
