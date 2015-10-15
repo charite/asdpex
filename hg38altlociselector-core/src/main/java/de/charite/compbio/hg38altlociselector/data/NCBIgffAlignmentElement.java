@@ -66,7 +66,7 @@ public class NCBIgffAlignmentElement implements Serializable {
 		return type;
 	}
 
-	private NCBIgffAlignmentElement(NCBIgffAlignmentMatchBuilder builder) {
+	private NCBIgffAlignmentElement(NCBIgffAlignmentElementBuilder builder) {
 		this.ref_start = builder.ref_start;
 		this.alt_start = builder.alt_start;
 		this.length = builder.length;
@@ -80,28 +80,28 @@ public class NCBIgffAlignmentElement implements Serializable {
 	 * @author Marten Jäger <marten.jaeger@charite.de>
 	 *
 	 */
-	public static class NCBIgffAlignmentMatchBuilder {
+	public static class NCBIgffAlignmentElementBuilder {
 		private int ref_start;
 		private int alt_start;
 		private int length;
 		private NCBIgffAlignmentElementType type;
 
-		public NCBIgffAlignmentMatchBuilder refStart(int value) {
+		public NCBIgffAlignmentElementBuilder refStart(int value) {
 			this.ref_start = value;
 			return this;
 		}
 
-		public NCBIgffAlignmentMatchBuilder altStart(int value) {
+		public NCBIgffAlignmentElementBuilder altStart(int value) {
 			this.alt_start = value;
 			return this;
 		}
 
-		public NCBIgffAlignmentMatchBuilder length(int value) {
+		public NCBIgffAlignmentElementBuilder length(int value) {
 			this.length = value;
 			return this;
 		}
 
-		public NCBIgffAlignmentMatchBuilder type(char type) {
+		public NCBIgffAlignmentElementBuilder type(char type) {
 			switch(type){
 				case 'M': this.type = NCBIgffAlignmentElementType.MATCH; break;
 				case 'I': this.type = NCBIgffAlignmentElementType.INSERTION; break;

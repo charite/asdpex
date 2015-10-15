@@ -97,8 +97,8 @@ public class AlignCommand extends AltLociSelectorCommand {
 			// identifier used for fastA and seed file
 			String identifier = createFastaIdentifier(locus.getAccessionInfo());
 //			System.out.println(identifier);
-			if(!identifier.equals("chr17_GL000258v2_alt"))
-				continue;
+//			if(!identifier.equals("chr17_GL000258v2_alt"))
+//				continue;
 			
 			// alt_loci
 			byte[] altLoci = extractSequence(refFile, identifier, locus.getPlacementInfo().getAltScafStart(), locus.getPlacementInfo().getAltScafStop(), locus.getPlacementInfo().isStrand());
@@ -106,11 +106,19 @@ public class AlignCommand extends AltLociSelectorCommand {
 			
 			int i=0;
 			int counter=0;
+			int cAll=0;
 			for(byte b : altLoci){
 				if(b == 'N')
 					counter++;
+				else{
+					if(counter > 0){
+						System.err.println(identifier+" 'N'-segment: "+counter);
+						cAll += counter;
+						counter = 0;
+					}
+				}
 			}
-			System.out.println(identifier+": "+counter);
+			System.out.println(identifier+" all 'N': "+cAll);
 			
 			// write fasta files
 			try {

@@ -12,7 +12,8 @@ import com.google.common.collect.ImmutableList.Builder;
 
 import de.charite.compbio.hg38altlociselector.data.NCBIgffAlignment;
 import de.charite.compbio.hg38altlociselector.data.NCBIgffAlignmentElement;
-import de.charite.compbio.hg38altlociselector.data.NCBIgffAlignmentElement.NCBIgffAlignmentMatchBuilder;
+import de.charite.compbio.hg38altlociselector.data.NCBIgffAlignmentElement.NCBIgffAlignmentElementBuilder;
+import de.charite.compbio.hg38altlociselector.data.NCBIgffAlignmentElementType;
 import de.charite.compbio.hg38altlociselector.exceptions.NCBIgffAlignmentInfoParseException;
 import de.charite.compbio.hg38altlociselector.util.IOUtil;
 
@@ -50,6 +51,7 @@ public class NCBIgffAlignmentParser {
 	public ImmutableList<NCBIgffAlignment> parse() {
 		ImmutableList.Builder<NCBIgffAlignment> alignments = new ImmutableList.Builder<NCBIgffAlignment>();
 		BufferedReader reader = null;
+		NCBIgffAlignment alignment;
 		String line;
 		try {
 			reader = IOUtil.getBufferedReaderFromFileName(this.gffFile);
@@ -58,7 +60,8 @@ public class NCBIgffAlignmentParser {
 					if (line.startsWith("#"))
 						continue;
 					else {
-						createAlignmentFromLine(line, alignments);
+						alignment = createAlignmentFromLine(line);
+						postprocess(alignment, alignments);
 					}
 				} catch (NCBIgffAlignmentInfoParseException e) {
 					e.printStackTrace();
@@ -73,7 +76,35 @@ public class NCBIgffAlignmentParser {
 		return alignments.build();
 	}
 
-	private void createAlignmentFromLine(String line, Builder<NCBIgffAlignment> alignments)
+	/**
+	 * Processes the alignment found in the gff line info field.
+	 * Manly the corrupting large insertions end deletions are processed and the alignment is split into two separate alignments. 
+	 * @param alignment - the alignment to be processed.
+	 * @param alignments - the ListBuilder where the checked and/or processed alignments are put
+	 */
+	private void postprocess(NCBIgffAlignment alignment, Builder<NCBIgffAlignment> alignments) {
+		alignments.add(alignment);
+		NCBIgffAlignmentElement previousElement = null;
+		for(NCBIgffAlignmentElement element : alignment.getElements()){
+			if( previousElement != null){
+				if(previousElement.getType() == NCBIgffAlignmentElementType.DELETION 
+						&& previousElement.getLength() > 10000 
+						&& element.getType() == NCBIgffAlignmentElementType.INSERTION
+						&& element.getLength() > 10000){
+					System.err.println("We have to split this alignment: " + alignment.getAltId());
+				}
+				if(previousElement.getType() == NCBIgffAlignmentElementType.INSERTION 
+						&& previousElement.getLength() > 10000 
+						&& element.getType() == NCBIgffAlignmentElementType.DELETION
+						&& element.getLength() > 10000){
+					System.err.println("We have to split this alignment: " + alignment.getAltId());
+				}
+			}
+			previousElement = element;
+		}
+	}
+
+	private NCBIgffAlignment createAlignmentFromLine(String line)
 			throws NCBIgffAlignmentInfoParseException {
 		String refId = null;
 		int refStart = 0;
@@ -129,8 +160,8 @@ public class NCBIgffAlignmentParser {
 				break;
 			}
 		}
-		System.out.println(elements.build().size());
-		alignments.add(new NCBIgffAlignment( refId, altId, refStart, refStop,altStart,altStop, altStrand,elements.build()));
+//		System.out.println(elements.build().size());
+		return(new NCBIgffAlignment( refId, altId, refStart, refStop,altStart,altStop, altStrand,elements.build()));
 	}
 
 	/**
@@ -143,16 +174,17 @@ public class NCBIgffAlignmentParser {
 	private void feedBuilderWithMatches(Builder<NCBIgffAlignmentElement> builder, String elements)
 			throws NCBIgffAlignmentInfoParseException {
 
-		NCBIgffAlignmentMatchBuilder matchBuilder = new NCBIgffAlignmentMatchBuilder();
+		NCBIgffAlignmentElementBuilder elementBuilder = new NCBIgffAlignmentElementBuilder();
 		String[] fields = elements.split(" ");
 		for (String elem : fields) {
 			int length = Integer.parseInt(elem.substring(1));
 			
-			matchBuilder.refStart(this.start_ref);
-			matchBuilder.altStart(this.start_alt);
-			matchBuilder.length(length);
-			matchBuilder.type(elem.charAt(0));
-//			
+			elementBuilder.refStart(this.start_ref);
+			elementBuilder.altStart(this.start_alt);
+			elementBuilder.length(length);
+			elementBuilder.type(elem.charAt(0));
+			builder.add(elementBuilder.build());
+			// and adapt length	
 			switch (elem.charAt(0)) {
 				case 'M':
 					this.start_alt += length;
@@ -167,29 +199,6 @@ public class NCBIgffAlignmentParser {
 				default:
 					throw new NCBIgffAlignmentInfoParseException("unknown alignment block description: " + elem);
 			}
-			builder.add(matchBuilder.build());
-//			switch (elem.charAt(0)) {
-//			case 'M':
-//				// System.out.println(
-//				// String.format("add ref - %d\t alt - %d\tlength - %d", this.start_ref, this.start_alt, length));
-//				matchBuilder.refStart(this.start_ref);
-//				matchBuilder.altStart(this.start_alt);
-//				matchBuilder.length(length);
-//				matchBuilder.type('M');
-//				builder.add(matchBuilder.build());
-//				this.start_alt += length;
-//				this.start_ref += length;
-//				break;
-//			case 'I':
-//				this.start_alt += length;
-//				matchBuilder.type('M');
-//				break;
-//			case 'D':
-//				this.start_ref += length;
-//				break;
-//			default:
-//				throw new NCBIgffAlignmentInfoParseException("unknown alignment block description: " + elem);
-//			}
 		}
 
 	}
