@@ -97,8 +97,8 @@ public class AlignCommand extends AltLociSelectorCommand {
 			String identifier = createFastaIdentifier(locus.getAccessionInfo());
 
 			// System.out.println(identifier);
-			if (!identifier.equals("chr17_GL000258v2_alt"))
-				continue;
+			// if (!identifier.equals("chr17_GL000258v2_alt"))
+			// continue;
 
 			// identifier for the GFF file
 			String filenameGFF = createGffIdentifier(locus.getPlacementInfo());
@@ -114,10 +114,12 @@ public class AlignCommand extends AltLociSelectorCommand {
 			System.out.println(filenameGFF);
 			int block = 1;
 			for (NCBIgffAlignment alignment : alignments) {
-				System.out.println(alignment.getAltId() + ":\t" + alignment.getAltStart() + "\t"
-						+ alignment.getAltStop() + "\t" + alignment.isAltStrand());
-				System.out.println(alignment.getRefId() + ":\t" + alignment.getRefStart() + "\t"
-						+ alignment.getRefStop() + "\t" + alignment.isRefStrand());
+
+				splitupAlignment(alignment);
+				// System.out.println(alignment.getAltId() + ":\t" + alignment.getAltStart() + "\t"
+				// + alignment.getAltStop() + "\t" + alignment.isAltStrand());
+				// System.out.println(alignment.getRefId() + ":\t" + alignment.getRefStart() + "\t"
+				// + alignment.getRefStop() + "\t" + alignment.isRefStrand());
 
 				// alt_loci
 				byte[] altLoci = extractSequence(refFile, identifier, alignment.getAltStart(), alignment.getAltStop(),
@@ -126,6 +128,7 @@ public class AlignCommand extends AltLociSelectorCommand {
 						alignment.getRefStart(), alignment.getRefStop(), alignment.isRefStrand());
 
 				ArrayList<Tuple> list = getNonNblocks(altLoci);
+				System.out.println(identifier + ": " + list.size());
 
 				// write fasta files
 				try {
@@ -183,7 +186,31 @@ public class AlignCommand extends AltLociSelectorCommand {
 		System.out.println("*");
 	}
 
-	// private ArrayList<Tuple> splitupAlignment(NCBIgffAlignment alignment)
+	/**
+	 * SPlit up the alignment at these curious large Insert/Deletions.
+	 * 
+	 * @param alignment
+	 * @return
+	 */
+	private void splitupAlignment(NCBIgffAlignment alignment) {
+		final int LIMIT = 5000;
+		int start = 0;
+		int stop = start;
+		int obacht = 0;
+		for (NCBIgffAlignmentElement element : alignment.getElements()) {
+			if (element.getType() == NCBIgffAlignmentElementType.INSERTION && element.getLength() >= LIMIT)
+				obacht++;
+			else if (element.getType() == NCBIgffAlignmentElementType.DELETION && element.getLength() >= LIMIT)
+				obacht++;
+			else
+				obacht = 0;
+
+			if (obacht > 1)
+				System.out.println("Split the alignment at element: " + stop + "\t" + element.getLength());
+			stop++;
+			// alignment.getElements().
+		}
+	}
 
 	/**
 	 * Extract list
