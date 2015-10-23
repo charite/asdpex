@@ -143,9 +143,8 @@ public class AlignCommand extends AltLociSelectorCommand {
 				}
 				// seed file
 				try {
-					createMatchesFile(options.tempFolder, identifier + "_" + block + ".tab", alignment.getElements(),
-							(locus.getPlacementInfo().getParentStart() - locus.getRegionInfo().getStart()),
-							(locus.getRegionInfo().getStop() - locus.getPlacementInfo().getParentStop()));
+					createMatchesFile(options.tempFolder, identifier + "_" + block + ".tab", alignment.getElements(), 0,
+							0);
 				} catch (IOException e) {
 					System.err.println("[ERROR] failed to create seed info file for sample: "
 							+ locus.getPlacementInfo().getAltScafAcc());
@@ -183,6 +182,8 @@ public class AlignCommand extends AltLociSelectorCommand {
 		}
 		System.out.println("*");
 	}
+
+	// private ArrayList<Tuple> splitupAlignment(NCBIgffAlignment alignment)
 
 	/**
 	 * Extract list
