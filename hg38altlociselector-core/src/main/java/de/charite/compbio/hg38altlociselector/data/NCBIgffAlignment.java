@@ -71,4 +71,32 @@ public class NCBIgffAlignment {
 		return elements;
 	}
 
+	/**
+	 * 
+	 */
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(getRefId()).append("\tRefSeq\tmacth\t").append(getRefStart()).append("\t").append(getRefStop())
+				.append("\t0\t").append(isRefStrand()).append("\t.\tTarget=").append(getAltId()).append("\t")
+				.append(getAltStart()).append("\t").append(getAltStop()).append("\t").append(isAltStrand())
+				.append(";Gap=");
+		for (NCBIgffAlignmentElement element : elements) {
+			switch (element.getType()) {
+			case MATCH:
+				sb.append("M");
+				break;
+			case INSERTION:
+				sb.append("I");
+				break;
+			case DELETION:
+				sb.append("D");
+				break;
+			default:
+				break;
+			}
+			sb.append(element.getLength()).append(" ");
+		}
+		return sb.toString();
+	}
+
 }
