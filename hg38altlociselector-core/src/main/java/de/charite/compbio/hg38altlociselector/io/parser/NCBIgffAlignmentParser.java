@@ -12,7 +12,8 @@ import com.google.common.collect.ImmutableList.Builder;
 
 import de.charite.compbio.hg38altlociselector.data.NCBIgffAlignment;
 import de.charite.compbio.hg38altlociselector.data.NCBIgffAlignmentElement;
-import de.charite.compbio.hg38altlociselector.data.NCBIgffAlignmentElement.NCBIgffAlignmentMatchBuilder;
+import de.charite.compbio.hg38altlociselector.data.NCBIgffAlignmentElement.NCBIgffAlignmentElementBuilder;
+import de.charite.compbio.hg38altlociselector.data.NCBIgffAlignmentElementType;
 import de.charite.compbio.hg38altlociselector.exceptions.NCBIgffAlignmentInfoParseException;
 import de.charite.compbio.hg38altlociselector.util.IOUtil;
 
@@ -130,9 +131,47 @@ public class NCBIgffAlignmentParser {
 				break;
 			}
 		}
-		// System.out.println(elements.build().size());
+		// System.out.println("before collapse: " + elements.build().size());
+		// collapse the Alignment elements
+		elements = collapseElements(elements.build());
+		// System.out.println("after collapse: " + elements.build().size());
+
 		alignments.add(new NCBIgffAlignment(refId, altId, refStart, refStop, refStrand, altStart, altStop, altStrand,
 				elements.build()));
+	}
+
+	/**
+	 * Collapses {@link NCBIgffAlignmentElement}s. If there are contiuous Insertions/deletions/matches these elements
+	 * will be condensed into a single one of the cummulative length.
+	 * 
+	 * @param elements
+	 * @return
+	 */
+	private ImmutableList.Builder<NCBIgffAlignmentElement> collapseElements(
+			ImmutableList<NCBIgffAlignmentElement> elements) {
+		ImmutableList.Builder<NCBIgffAlignmentElement> collapsedElements = new ImmutableList.Builder<NCBIgffAlignmentElement>();
+		NCBIgffAlignmentElement prev_element = null;
+		NCBIgffAlignmentElementBuilder matchBuilder;
+		for (NCBIgffAlignmentElement cur_element : elements) {
+			if (prev_element != null) {
+				if (prev_element.getType() == cur_element.getType()) { // collapse continuous same types
+					matchBuilder = new NCBIgffAlignmentElementBuilder();
+					matchBuilder.refStart(prev_element.getRef_start());
+					matchBuilder.altStart(prev_element.getAlt_start());
+					matchBuilder.type(prev_element.getType());
+					matchBuilder.length(prev_element.getLength() + cur_element.getLength());
+					prev_element = matchBuilder.build();
+				} else {
+					collapsedElements.add(prev_element);
+					prev_element = cur_element;
+				}
+			} else {
+				prev_element = cur_element;
+			}
+
+		}
+		collapsedElements.add(prev_element);
+		return collapsedElements;
 	}
 
 	/**
@@ -145,7 +184,7 @@ public class NCBIgffAlignmentParser {
 	private void feedBuilderWithMatches(Builder<NCBIgffAlignmentElement> builder, String elements)
 			throws NCBIgffAlignmentInfoParseException {
 
-		NCBIgffAlignmentMatchBuilder matchBuilder = new NCBIgffAlignmentMatchBuilder();
+		NCBIgffAlignmentElementBuilder matchBuilder = new NCBIgffAlignmentElementBuilder();
 		String[] fields = elements.split(" ");
 		for (String elem : fields) {
 			int length = Integer.parseInt(elem.substring(1));
@@ -153,18 +192,20 @@ public class NCBIgffAlignmentParser {
 			matchBuilder.refStart(this.start_ref);
 			matchBuilder.altStart(this.start_alt);
 			matchBuilder.length(length);
-			matchBuilder.type(elem.charAt(0));
 			//
 			switch (elem.charAt(0)) {
 			case 'M':
 				this.start_alt += length;
 				this.start_ref += length;
+				matchBuilder.type(NCBIgffAlignmentElementType.MATCH);
 				break;
 			case 'I':
 				this.start_alt += length;
+				matchBuilder.type(NCBIgffAlignmentElementType.INSERTION);
 				break;
 			case 'D':
 				this.start_ref += length;
+				matchBuilder.type(NCBIgffAlignmentElementType.DELETION);
 				break;
 			default:
 				throw new NCBIgffAlignmentInfoParseException("unknown alignment block description: " + elem);
