@@ -149,7 +149,10 @@ public class NCBIgffAlignmentParser {
 	 */
 	private ImmutableList.Builder<NCBIgffAlignmentElement> collapseElements(
 			ImmutableList<NCBIgffAlignmentElement> elements) {
+
 		ImmutableList.Builder<NCBIgffAlignmentElement> collapsedElements = new ImmutableList.Builder<NCBIgffAlignmentElement>();
+		if (elements.size() == 0)
+			return collapsedElements;
 		NCBIgffAlignmentElement prev_element = null;
 		NCBIgffAlignmentElementBuilder matchBuilder;
 		for (NCBIgffAlignmentElement cur_element : elements) {
