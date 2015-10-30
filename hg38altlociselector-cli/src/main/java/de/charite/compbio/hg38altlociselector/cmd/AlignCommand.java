@@ -96,12 +96,14 @@ public class AlignCommand extends AltLociSelectorCommand {
 			// identifier used for fastA and seed file
 			String identifier = createFastaIdentifier(locus.getAccessionInfo());
 
-			// System.out.println(identifier);
-			// if (!identifier.equals("chr17_GL000258v2_alt"))
+			// if (!identifier.equals("chr5_GL383532v1_alt"))
 			// continue;
 
 			// identifier for the GFF file
 			String filenameGFF = createGffIdentifier(locus.getPlacementInfo());
+
+			System.out.println("\nIdentifier: " + identifier);
+			System.out.println("GFF filename: " + filenameGFF);
 
 			ImmutableList<NCBIgffAlignment> alignments = null;
 			if (new File(options.alignmentPath, filenameGFF).exists()) {
@@ -111,55 +113,75 @@ public class AlignCommand extends AltLociSelectorCommand {
 				continue;
 			}
 
-			System.out.println(filenameGFF);
 			int block = 1;
 			for (NCBIgffAlignment alignment : alignments) {
+				System.out.println("process gff alignment: " + block + " | " + alignments.size());
 
-				splitupAlignment(alignment);
+				ArrayList<NCBIgffAlignment> indelSplitAlignments = splitupAlignmentAtLargeIndels(alignment);
 				// System.out.println(alignment.getAltId() + ":\t" + alignment.getAltStart() + "\t"
 				// + alignment.getAltStop() + "\t" + alignment.isAltStrand());
 				// System.out.println(alignment.getRefId() + ":\t" + alignment.getRefStart() + "\t"
 				// + alignment.getRefStop() + "\t" + alignment.isRefStrand());
+				int splitC = 1;
+				for (NCBIgffAlignment indelSplitAlignment : indelSplitAlignments) {
+					System.out
+							.println("- process Indel split alignment " + splitC + " | " + indelSplitAlignments.size());
+					splitC++;
+					// ALT LOCI
+					byte[] altLoci = extractSequence(refFile, identifier, indelSplitAlignment.getAltStart(),
+							indelSplitAlignment.getAltStop(), indelSplitAlignment.isAltStrand());
+					byte[] ref = extractSequence(refFile, "chr" + locus.getPlacementInfo().getParentName(),
+							indelSplitAlignment.getRefStart(), indelSplitAlignment.getRefStop(),
+							indelSplitAlignment.isRefStrand());
 
-				// alt_loci
-				byte[] altLoci = extractSequence(refFile, identifier, alignment.getAltStart(), alignment.getAltStop(),
-						alignment.isAltStrand());
-				byte[] ref = extractSequence(refFile, "chr" + locus.getPlacementInfo().getParentName(),
-						alignment.getRefStart(), alignment.getRefStop(), alignment.isRefStrand());
+					ArrayList<Tuple> list = getNblocks(altLoci);
+					System.out.println("\tfound 'N' blocks: " + list.size());
+					for (Tuple tuple : list) {
+						if (tuple.end - tuple.start > 10)
+							System.out.println("\t'N' block (> 10bp) from: " + tuple.start + " - " + tuple.end);
+						else
 
-				ArrayList<Tuple> list = getNonNblocks(altLoci);
-				System.out.println(identifier + ": " + list.size());
+							System.out.println("\t'N' block (< 10bp) from: " + tuple.start + " - " + tuple.end);
+					}
 
-				// write fasta files
-				try {
-					createFastaFile(options.tempFolder + "/" + identifier + "_altLoci_" + block + ".fa", identifier,
-							altLoci, false);
-				} catch (IOException e) {
-					e.printStackTrace();
+					// splitupAlignmentAtNstrech(alignment, list);
+
+					if (block > 0)
+						continue;
+
+					// FASTA FILES
+					// alt loci
+					try {
+						createFastaFile(options.tempFolder + "/" + identifier + "_altLoci_" + block + ".fa", identifier,
+								altLoci, false);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					// ref
+					try {
+						createFastaFile(options.tempFolder + "/" + identifier + "_ref_" + block + ".fa", identifier,
+								ref, false);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+					// SEED FILES
+					try {
+						createMatchesFile(options.tempFolder, identifier + "_" + block + ".tab",
+								alignment.getElements(), 0, 0);
+					} catch (IOException e) {
+						System.err.println("[ERROR] failed to create seed info file for sample: "
+								+ locus.getPlacementInfo().getAltScafAcc());
+						e.printStackTrace();
+					}
+
+					// for (Tuple tuple : list) {
+					// // System.out.println(tuple.start + " - " + tuple.end + " : "
+					// // + new String(altLoci).substring(tuple.start, tuple.end));
+					// System.out.println(tuple.start + " - " + tuple.end);
+					// }
+					block++;
 				}
-
-				try {
-					createFastaFile(options.tempFolder + "/" + identifier + "_ref_" + block + ".fa", identifier, ref,
-							false);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				// seed file
-				try {
-					createMatchesFile(options.tempFolder, identifier + "_" + block + ".tab", alignment.getElements(), 0,
-							0);
-				} catch (IOException e) {
-					System.err.println("[ERROR] failed to create seed info file for sample: "
-							+ locus.getPlacementInfo().getAltScafAcc());
-					e.printStackTrace();
-				}
-
-				// for (Tuple tuple : list) {
-				// // System.out.println(tuple.start + " - " + tuple.end + " : "
-				// // + new String(altLoci).substring(tuple.start, tuple.end));
-				// System.out.println(tuple.start + " - " + tuple.end);
-				// }
-				block++;
 			}
 
 			// int i = 0;
@@ -187,16 +209,70 @@ public class AlignCommand extends AltLociSelectorCommand {
 	}
 
 	/**
+	 * Split the alignment into blocks at 'N'-Stretches.
+	 * 
+	 * @param alignment
+	 * @param tuples
+	 *            sorted list with non-overlapping
+	 * @return
+	 */
+	private ArrayList<NCBIgffAlignment> splitupAlignmentAtNstrech(NCBIgffAlignment alignment, ArrayList<Tuple> tuples) {
+		ArrayList<NCBIgffAlignment> alignments = new ArrayList<>();
+		if (tuples.size() == 1) {
+			alignments.add(alignment);
+			return alignments;
+		}
+
+		int elemIdx = 0;
+		int refLength = 0;
+		int altLength = 0;
+		int tupleIdx = 0;
+		for (NCBIgffAlignmentElement element : alignment.getElements()) {
+			switch (element.getType()) {
+			case MATCH:
+				if (altLength + element.getLength() >= tuples.get(tupleIdx).end) {
+					System.err.println("Split inside Match");
+					tupleIdx++;
+				}
+				refLength += element.getLength();
+				altLength += element.getLength();
+				break;
+			case INSERTION:
+				if (altLength + element.getLength() >= tuples.get(tupleIdx).end) {
+					System.err.println("Split inside Insertion");
+					tupleIdx++;
+				}
+				altLength += element.getLength();
+				break;
+			case DELETION:
+				refLength += element.getLength();
+				break;
+
+			default:
+				System.out.println("Was denn hier los?!");
+				break;
+			}
+			if (tupleIdx >= tuples.size())
+				break;
+		}
+		return alignments;
+	}
+
+	/**
 	 * SPlit up the alignment at these curious large Insert/Deletions.
 	 * 
 	 * @param alignment
 	 * @return
 	 */
-	private void splitupAlignment(NCBIgffAlignment alignment) {
+	private ArrayList<NCBIgffAlignment> splitupAlignmentAtLargeIndels(NCBIgffAlignment alignment) {
+		ArrayList<NCBIgffAlignment> alignments = new ArrayList<>();
 		final int LIMIT = 5000;
 		int start = 0;
 		int stop = start;
 		int obacht = 0;
+		// tmp
+		// int ref = alignment.getRefStart() - 1;
+		// int alt = alignment.getAltStart() - 1;
 		for (NCBIgffAlignmentElement element : alignment.getElements()) {
 			if (element.getType() == NCBIgffAlignmentElementType.INSERTION && element.getLength() >= LIMIT)
 				obacht++;
@@ -205,11 +281,92 @@ public class AlignCommand extends AltLociSelectorCommand {
 			else
 				obacht = 0;
 
-			if (obacht > 1)
-				System.out.println("Split the alignment at element: " + stop + "\t" + element.getLength());
+			if (obacht > 1) {
+				// NCBIgffAlignment subAlignment = extractSubAlignment(alignment, start, stop - 1);
+				// System.out.println(subAlignment + "\n\n");
+				// alignments.add(subAlignment);
+				alignments.add(extractSubAlignment(alignment, start, stop - 1));
+				start = stop + 1;
+			}
 			stop++;
-			// alignment.getElements().
 		}
+		// System.out.println("stop: " + stop + " elements: " + alignment.getElements().size());
+		// NCBIgffAlignment subAlignment = extractSubAlignment(alignment, start, stop);
+		// System.out.println(subAlignment + "\n\n");
+		// alignments.add(subAlignment);
+		if (start < stop)
+			alignments.add(extractSubAlignment(alignment, start, stop));
+		else
+			alignments.add(alignment);
+
+		// System.out.println("refend: " + ref + "\taltend: " + alt);
+		// System.out.println("original:\n" + alignment + "\n\n");
+		return alignments;
+	}
+
+	/**
+	 * Extracts the subalignment from the {@link NCBIgffAlignment} object and returns a new {@link NCBIgffAlignment}
+	 * object.
+	 * 
+	 * @param alignment
+	 *            parent {@link NCBIgffAlignment} object from where the subalignment should be extracted
+	 * @param startElem
+	 *            the first {@link NCBIgffAlignmentElement} contained in the subalignment (0-based)
+	 * @param endElem
+	 *            the last {@link NCBIgffAlignmentElement} contained in the subalignment (excl.)
+	 * @return a new {@link NCBIgffAlignment} object containing the {@link NCBIgffAlignmentElement}s defined by
+	 *         startElem and endElem and updated coordinates for reference and alternative.
+	 */
+	private NCBIgffAlignment extractSubAlignment(NCBIgffAlignment alignment, int startElem, int endElem) {
+
+		int refStart = alignment.getRefStart();
+		int refStop = alignment.getRefStart() - 1; // 1-based --> remove 1 from cumulative length
+		int altStart = alignment.getAltStart();
+		int altStop = alignment.getAltStart() - 1; // 1-based --> remove 1 from cumulative length
+
+		NCBIgffAlignmentElement element;
+		for (int i = 0; i < endElem; i++) {
+			element = alignment.getElements().get(i);
+			if (i < startElem) {
+				switch (element.getType()) {
+				case INSERTION:
+					altStart += element.getLength();
+					break;
+				case DELETION:
+					refStart += element.getLength();
+					break;
+				case MATCH:
+					refStart += element.getLength();
+					altStart += element.getLength();
+					break;
+
+				default:
+					break;
+				}
+			}
+
+			switch (element.getType()) {
+			case INSERTION:
+				altStop += element.getLength();
+				break;
+			case DELETION:
+				refStop += element.getLength();
+				break;
+			case MATCH:
+				refStop += element.getLength();
+				altStop += element.getLength();
+				break;
+
+			default:
+				break;
+			}
+
+		}
+		System.out.println(
+				"\textract elements from: " + startElem + " - " + endElem + " von " + alignment.getElements().size());
+		return new NCBIgffAlignment(alignment.getRefId(), alignment.getAltId(), refStart, refStop,
+				alignment.isRefStrand(), altStart, altStop, alignment.isAltStrand(),
+				alignment.getElements().subList(startElem, endElem));
 	}
 
 	/**
@@ -232,6 +389,31 @@ public class AlignCommand extends AltLociSelectorCommand {
 		}
 		list.add(new Tuple(start, stop));
 		return list;
+	}
+
+	/**
+	 * Extract list
+	 * 
+	 * @param seq
+	 * @return
+	 */
+	private ArrayList<Tuple> getNblocks(byte[] seq) {
+		ArrayList<Tuple> list = new ArrayList<>();
+		int start = 0;
+		int stop = start;
+		for (byte b : seq) {
+
+			if (b != 'N') {
+				if (start < stop) {
+					list.add(new Tuple(start, stop));
+				}
+				start = stop + 1;
+			}
+			stop++;
+		}
+		list.add(new Tuple(start, stop));
+		return list;
+
 	}
 
 	/**
