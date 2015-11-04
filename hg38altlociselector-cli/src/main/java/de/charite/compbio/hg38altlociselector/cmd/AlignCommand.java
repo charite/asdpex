@@ -96,8 +96,8 @@ public class AlignCommand extends AltLociSelectorCommand {
 			// identifier used for fastA and seed file
 			String identifier = createFastaIdentifier(locus.getAccessionInfo());
 
-			// if (!identifier.equals("chr5_GL383532v1_alt"))
-			// continue;
+			if (!identifier.equals("chr11_KI270831v1_alt"))
+				continue;
 
 			// identifier for the GFF file
 			String filenameGFF = createGffIdentifier(locus.getPlacementInfo());
@@ -115,7 +115,7 @@ public class AlignCommand extends AltLociSelectorCommand {
 
 			int block = 1;
 			for (NCBIgffAlignment alignment : alignments) {
-				System.out.println("process gff alignment: " + block + " | " + alignments.size());
+				System.out.println("- process gff alignment: " + block + " | " + alignments.size());
 
 				ArrayList<NCBIgffAlignment> indelSplitAlignments = splitupAlignmentAtLargeIndels(alignment);
 				// System.out.println(alignment.getAltId() + ":\t" + alignment.getAltStart() + "\t"
@@ -137,43 +137,44 @@ public class AlignCommand extends AltLociSelectorCommand {
 					ArrayList<Tuple> list = getNblocks(altLoci);
 					System.out.println("\tfound 'N' blocks: " + list.size());
 					for (Tuple tuple : list) {
-						if (tuple.end - tuple.start > 10)
+						if (tuple.end - tuple.start > 10) {
 							System.out.println("\t'N' block (> 10bp) from: " + tuple.start + " - " + tuple.end);
-						else
-
+						} else {
 							System.out.println("\t'N' block (< 10bp) from: " + tuple.start + " - " + tuple.end);
+							writeFilesToDisc(identifier, block, altLoci, ref);
+						}
 					}
 
 					// splitupAlignmentAtNstrech(alignment, list);
 
-					if (block > 0)
-						continue;
+					// if (block > 0)
+					// continue;
 
-					// FASTA FILES
-					// alt loci
-					try {
-						createFastaFile(options.tempFolder + "/" + identifier + "_altLoci_" + block + ".fa", identifier,
-								altLoci, false);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					// ref
-					try {
-						createFastaFile(options.tempFolder + "/" + identifier + "_ref_" + block + ".fa", identifier,
-								ref, false);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-
-					// SEED FILES
-					try {
-						createMatchesFile(options.tempFolder, identifier + "_" + block + ".tab",
-								alignment.getElements(), 0, 0);
-					} catch (IOException e) {
-						System.err.println("[ERROR] failed to create seed info file for sample: "
-								+ locus.getPlacementInfo().getAltScafAcc());
-						e.printStackTrace();
-					}
+					// // FASTA FILES
+					// // alt loci
+					// try {
+					// createFastaFile(options.tempFolder + "/" + identifier + "_altLoci_" + block + ".fa", identifier,
+					// altLoci, false);
+					// } catch (IOException e) {
+					// e.printStackTrace();
+					// }
+					// // ref
+					// try {
+					// createFastaFile(options.tempFolder + "/" + identifier + "_ref_" + block + ".fa", identifier,
+					// ref, false);
+					// } catch (IOException e) {
+					// e.printStackTrace();
+					// }
+					//
+					// // SEED FILES
+					// try {
+					// createMatchesFile(options.tempFolder, identifier + "_" + block + ".tab",
+					// alignment.getElements(), 0, 0);
+					// } catch (IOException e) {
+					// System.err.println("[ERROR] failed to create seed info file for sample: "
+					// + locus.getPlacementInfo().getAltScafAcc());
+					// e.printStackTrace();
+					// }
 
 					// for (Tuple tuple : list) {
 					// // System.out.println(tuple.start + " - " + tuple.end + " : "
@@ -206,6 +207,35 @@ public class AlignCommand extends AltLociSelectorCommand {
 			// }
 		}
 		System.out.println("*");
+	}
+
+	private boolean writeFilesToDisc(String identifier, int block, byte[] altLoci, byte[] ref) {
+		// FASTA FILES
+		// alt loci
+		try {
+			createFastaFile(options.tempFolder + "/" + identifier + "_altLoci_" + block + ".fa", identifier, altLoci,
+					false);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		// ref
+		try {
+			createFastaFile(options.tempFolder + "/" + identifier + "_ref_" + block + ".fa", identifier, ref, false);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		// // SEED FILES
+		// try {
+		// createMatchesFile(options.tempFolder, identifier + "_" + block + ".tab", alignment.getElements(), 0, 0);
+		// } catch (IOException e) {
+		// System.err.println(
+		// "[ERROR] failed to create seed info file for sample: " + locus.getPlacementInfo().getAltScafAcc());
+		// e.printStackTrace();
+		// }
+		return true;
 	}
 
 	/**
@@ -392,10 +422,12 @@ public class AlignCommand extends AltLociSelectorCommand {
 	}
 
 	/**
-	 * Extract list
+	 * Extract list of {@link Tuple}s with 'N' positions.<br>
+	 * The positions are '0'-based and the start is incl., the stop excl.
 	 * 
 	 * @param seq
-	 * @return
+	 *            the input sequence with alphabet [ACGTN]
+	 * @return List of {@link Tuple}s with 'N'-blocks
 	 */
 	private ArrayList<Tuple> getNblocks(byte[] seq) {
 		ArrayList<Tuple> list = new ArrayList<>();
@@ -411,7 +443,9 @@ public class AlignCommand extends AltLociSelectorCommand {
 			}
 			stop++;
 		}
-		list.add(new Tuple(start, stop));
+		if (start < stop) {
+			list.add(new Tuple(start, stop));
+		}
 		return list;
 
 	}
