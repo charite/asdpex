@@ -5,6 +5,8 @@ package de.charite.compbio.hg38altlociselector.data;
 
 import com.google.common.collect.ImmutableList;
 
+import de.charite.compbio.hg38altlociselector.data.NCBIgffAlignmentElement.NCBIgffAlignmentElementBuilder;
+
 /**
  * slim Representation of the NCBI alignment.
  * 
@@ -157,10 +159,35 @@ public class NCBIgffAlignment {
 			}
 
 		}
+
+		ImmutableList<NCBIgffAlignmentElement> subListElements = updateElementsSublist(
+				this.getElements().subList(startElem, endElem));
 		System.out.println(
 				"\textract elements from: " + startElem + " - " + endElem + " von " + this.getElements().size());
 		return new NCBIgffAlignment(this.getRefId(), this.getAltId(), refStart, refStop, this.isRefStrand(), altStart,
-				altStop, this.isAltStrand(), this.getElements().subList(startElem, endElem));
+				altStop, this.isAltStrand(), subListElements);
+	}
+
+	private ImmutableList<NCBIgffAlignmentElement> updateElementsSublist(
+			ImmutableList<NCBIgffAlignmentElement> subList) {
+		if (subList.size() < 1)
+			return subList;
+		ImmutableList.Builder<NCBIgffAlignmentElement> elements = new ImmutableList.Builder<NCBIgffAlignmentElement>();
+
+		int firstElement_ref_start = subList.get(0).getRef_start();
+		int firstElement_alt_start = subList.get(0).getAlt_start();
+		NCBIgffAlignmentElementBuilder builder;
+
+		for (NCBIgffAlignmentElement element : subList) {
+			builder = new NCBIgffAlignmentElementBuilder();
+			builder.type(element.getType());
+			builder.refStart(element.getRef_start() - firstElement_ref_start);
+			builder.altStart(element.getAlt_start() - firstElement_alt_start);
+			builder.length(element.getLength());
+			elements.add(builder.build());
+		}
+
+		return elements.build();
 	}
 
 }
