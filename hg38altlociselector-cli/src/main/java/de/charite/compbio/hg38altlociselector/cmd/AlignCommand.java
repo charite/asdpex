@@ -136,16 +136,19 @@ public class AlignCommand extends AltLociSelectorCommand {
 
 					ArrayList<Tuple> list = filterTupleByLength(getNblocks(altLoci), 10);
 					System.out.println("\tfound 'N' blocks: " + list.size());
-					for (Tuple tuple : list) {
-						if (tuple.end - tuple.start > 10) {
-							System.out.println("\t'N' block (> 10bp) from: " + tuple.start + " - " + tuple.end);
-						} else {
-							System.out.println("\t'N' block (< 10bp) from: " + tuple.start + " - " + tuple.end);
-						}
+					if (list.size() > 0) {
+						ArrayList<NCBIgffAlignment> indelPlusNSplitAlignments = splitupAlignmentAtNstrech(
+								indelSplitAlignment, list);
+						// for (Tuple tuple : list) {
+						// if (tuple.end - tuple.start > 10) {
+						// System.out.println("\t'N' block (> 10bp) from: " + tuple.start + " - " + tuple.end);
+						// // } else {
+						// // System.out.println("\t'N' block (< 10bp) from: " + tuple.start + " - " + tuple.end);
+						// }
+						// }
+					} else {
+						writeFilesToDisc(identifier, block, altLoci, ref, indelSplitAlignment);
 					}
-					// writeFilesToDisc(identifier, block, altLoci, ref, indelSplitAlignment);
-
-					splitupAlignmentAtNstrech(alignment, list);
 
 					// if (block > 0)
 					// continue;
@@ -211,42 +214,70 @@ public class AlignCommand extends AltLociSelectorCommand {
 			return alignments;
 		}
 
-		ImmutableList.Builder<NCBIgffAlignmentElement> myElements = new ImmutableList.Builder<NCBIgffAlignmentElement>();
-
+		System.out.println("!!! size elements: " + alignment.getElements().size());
+		ImmutableList.Builder<NCBIgffAlignmentElement> myElementsBuilder = new ImmutableList.Builder<NCBIgffAlignmentElement>();
+		ImmutableList<NCBIgffAlignmentElement> myElements;
 		int refLength = 0;
 		int altLength = 0;
+		int curRefOffset = refLength;
+		int curAltOffset = altLength;
 		int tupleIdx = 0;
 		for (NCBIgffAlignmentElement element : alignment.getElements()) {
-			if (altLength + element.getLength() > tuples.get(tupleIdx).start) { // element before 'N'-stretch
+			// element before 'N'-stretch
+			if (element.getAlt_start() + element.getLength() <= tuples.get(tupleIdx).start) {
+				myElementsBuilder.add(element); // TODO update starts!!!
+				continue;
 			}
+
+			// small 'N'-stretches
+			if (tuples.get(tupleIdx).end - tuples.get(tupleIdx).start < 10) {
+				myElementsBuilder.add(element); // TODO update starts!!!
+				continue;
+			}
+
 			switch (element.getType()) {
 			case MATCH:
-				// if (altLength + element.getLength() >= tuples.get(tupleIdx).end) {
-				// System.err.println("Split inside Match");
-				// if (altLength > tuples.get(tupleIdx).start) {
-				// System.err.println("\tin element: " + element);
-				// System.err.println("\t--> 'N'-Stretch range: " + tuples.get(tupleIdx).start + " - "
-				// + tuples.get(tupleIdx).end);
-				//
-				// }
-				// tupleIdx++;
-				// }
+				if (element.getAlt_start() <= tuples.get(tupleIdx).start) {
+					System.err.println("Split inside Match");
+					// if (element.getAlt_start() + element.getLength() >= tuples.get(tupleIdx).end) {
+					System.err.println("\tin element: " + element);
+					System.err.println("\t--> 'N'-Stretch range: " + tuples.get(tupleIdx).start + " - "
+							+ tuples.get(tupleIdx).end);
+					// }
+					tupleIdx++;
+				}
 				refLength += element.getLength();
 				altLength += element.getLength();
 				break;
 			case INSERTION:
-				// if (altLength + element.getLength() >= tuples.get(tupleIdx).end) {
-				// System.err.println("Split inside Insertion");
-				// if (altLength > tuples.get(tupleIdx).start) {
-				// System.err.println("\t--> segment spanning 'N'-Stretch !!! (" + altLength + " "
-				// + (altLength + element.getLength()) + ")");
-				// System.err.println(element);
-				// }
-				// tupleIdx++;
-				// }
+				if (element.getAlt_start() <= tuples.get(tupleIdx).start) {
+					System.err.println("Split inside Insertion");
+					// if (element.getAlt_start() > tuples.get(tupleIdx).start) {
+					System.err.println("\tin element: " + element);
+					System.err.println("\t--> 'N'-Stretch range: " + tuples.get(tupleIdx).start + " - "
+							+ tuples.get(tupleIdx).end);
+					// }
+					myElements = myElementsBuilder.build();
+					alignments.add(new NCBIgffAlignment(alignment.getRefId(), alignment.getAltId(),
+							alignment.getRefStart(), alignment.getRefStart() + curRefOffset, alignment.isRefStrand(),
+							alignment.getAltStart(), alignment.getAltStart() + curAltOffset, alignment.isAltStrand(),
+							myElements));
+					curRefOffset = refLength;
+					curAltOffset = altLength + element.getLength();
+					tupleIdx++;
+				}
 				altLength += element.getLength();
 				break;
 			case DELETION:
+				if (element.getAlt_start() <= tuples.get(tupleIdx).start) {
+					System.err.println("Split inside deletion");
+					// if (element.getAlt_start() > tuples.get(tupleIdx).start) {
+					System.err.println("\tin element: " + element);
+					System.err.println("\t--> 'N'-Stretch range: " + tuples.get(tupleIdx).start + " - "
+							+ tuples.get(tupleIdx).end);
+					// }
+					tupleIdx++;
+				}
 				refLength += element.getLength();
 				break;
 
