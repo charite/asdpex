@@ -110,4 +110,11 @@ public class NCBIgffAlignmentElement implements Serializable {
 			return new NCBIgffAlignmentElement(this);
 		}
 	}
+
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(type.toString()).append("\tref: ").append(ref_start).append("\talt: ").append(alt_start)
+				.append("\tlength: ").append(length);
+		return sb.toString();
+	}
 }

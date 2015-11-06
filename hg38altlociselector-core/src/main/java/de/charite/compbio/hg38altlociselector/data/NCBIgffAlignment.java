@@ -99,4 +99,68 @@ public class NCBIgffAlignment {
 		return sb.toString();
 	}
 
+	/**
+	 * Extracts the subalignment from the {@link NCBIgffAlignment} object and returns a new {@link NCBIgffAlignment}
+	 * object.
+	 * 
+	 * @param alignment
+	 *            parent {@link NCBIgffAlignment} object from where the subalignment should be extracted
+	 * @param startElem
+	 *            the first {@link NCBIgffAlignmentElement} contained in the subalignment (0-based)
+	 * @param endElem
+	 *            the last {@link NCBIgffAlignmentElement} contained in the subalignment (excl.)
+	 * @return a new {@link NCBIgffAlignment} object containing the {@link NCBIgffAlignmentElement}s defined by
+	 *         startElem and endElem and updated coordinates for reference and alternative.
+	 */
+	public NCBIgffAlignment getSubAlignment(int startElem, int endElem) {
+
+		int refStart = this.getRefStart();
+		int refStop = this.getRefStart() - 1; // 1-based --> remove 1 from cumulative length
+		int altStart = this.getAltStart();
+		int altStop = this.getAltStart() - 1; // 1-based --> remove 1 from cumulative length
+
+		NCBIgffAlignmentElement element;
+		for (int i = 0; i < endElem; i++) {
+			element = this.getElements().get(i);
+			if (i < startElem) {
+				switch (element.getType()) {
+				case INSERTION:
+					altStart += element.getLength();
+					break;
+				case DELETION:
+					refStart += element.getLength();
+					break;
+				case MATCH:
+					refStart += element.getLength();
+					altStart += element.getLength();
+					break;
+
+				default:
+					break;
+				}
+			}
+
+			switch (element.getType()) {
+			case INSERTION:
+				altStop += element.getLength();
+				break;
+			case DELETION:
+				refStop += element.getLength();
+				break;
+			case MATCH:
+				refStop += element.getLength();
+				altStop += element.getLength();
+				break;
+
+			default:
+				break;
+			}
+
+		}
+		System.out.println(
+				"\textract elements from: " + startElem + " - " + endElem + " von " + this.getElements().size());
+		return new NCBIgffAlignment(this.getRefId(), this.getAltId(), refStart, refStop, this.isRefStrand(), altStart,
+				altStop, this.isAltStrand(), this.getElements().subList(startElem, endElem));
+	}
+
 }
