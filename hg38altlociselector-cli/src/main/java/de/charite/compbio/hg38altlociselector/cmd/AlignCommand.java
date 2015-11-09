@@ -3,9 +3,13 @@
  */
 package de.charite.compbio.hg38altlociselector.cmd;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
@@ -96,8 +100,8 @@ public class AlignCommand extends AltLociSelectorCommand {
 			// identifier used for fastA and seed file
 			String identifier = createFastaIdentifier(locus.getAccessionInfo());
 
-			if (!identifier.equals("chr19_GL949753v2_alt"))
-				continue;
+			// if (!identifier.equals("chr19_GL949753v2_alt"))
+			// continue;
 
 			// identifier for the GFF file
 			String filenameGFF = createGffIdentifier(locus.getPlacementInfo());
@@ -134,21 +138,29 @@ public class AlignCommand extends AltLociSelectorCommand {
 							indelSplitAlignment.getRefStart(), indelSplitAlignment.getRefStop(),
 							indelSplitAlignment.isRefStrand());
 
-					ArrayList<Tuple> list = filterTupleByLength(getNblocks(altLoci), 10);
-					System.out.println("\tfound 'N' blocks: " + list.size());
-					if (list.size() > 0) {
-						ArrayList<NCBIgffAlignment> indelPlusNSplitAlignments = splitupAlignmentAtNstrech(
-								indelSplitAlignment, list);
-						// for (Tuple tuple : list) {
-						// if (tuple.end - tuple.start > 10) {
-						// System.out.println("\t'N' block (> 10bp) from: " + tuple.start + " - " + tuple.end);
-						// // } else {
-						// // System.out.println("\t'N' block (< 10bp) from: " + tuple.start + " - " + tuple.end);
-						// }
-						// }
-					} else {
-						writeFilesToDisc(identifier, block, altLoci, ref, indelSplitAlignment);
+					writeFilesToDisc(identifier, block, altLoci, ref, indelSplitAlignment);
+					try {
+						runAlignment(identifier, block, altLoci, ref, indelSplitAlignment.getRefStart() - 1);
+					} catch (IOException | InterruptedException e) {
+						System.err.println("Failed to run align command. That's strange ...");
+						e.printStackTrace();
 					}
+
+					// ArrayList<Tuple> list = filterTupleByLength(getNblocks(altLoci), 10);
+					// System.out.println("\tfound 'N' blocks: " + list.size());
+					// if (list.size() > 0) {
+					// ArrayList<NCBIgffAlignment> indelPlusNSplitAlignments = splitupAlignmentAtNstrech(
+					// indelSplitAlignment, list);
+					// // for (Tuple tuple : list) {
+					// // if (tuple.end - tuple.start > 10) {
+					// // System.out.println("\t'N' block (> 10bp) from: " + tuple.start + " - " + tuple.end);
+					// // // } else {
+					// // // System.out.println("\t'N' block (< 10bp) from: " + tuple.start + " - " + tuple.end);
+					// // }
+					// // }
+					// } else {
+					// writeFilesToDisc(identifier, block, altLoci, ref, indelSplitAlignment);
+					// }
 
 					// if (block > 0)
 					// continue;
@@ -159,6 +171,43 @@ public class AlignCommand extends AltLociSelectorCommand {
 
 		}
 		System.out.println("*");
+	}
+
+	private void runAlignment(String identifier, int block, byte[] altLoci, byte[] ref, int offset)
+			throws IOException, InterruptedException {
+		// TODO Auto-generated method stub
+
+		StringBuilder cmd = new StringBuilder();
+		cmd.append(options.seqanALign).append(" -R ")
+				.append(options.tempFolder + "/" + identifier + "_ref_" + block + ".fa").append(" -A ")
+				.append(options.tempFolder + "/" + identifier + "_altLoci_" + block + ".fa").append(" -S ")
+				.append(options.tempFolder + "/" + identifier + "_" + block + ".tab").append(" -V ")
+				.append(options.tempFolder + "/" + identifier + ".vcf").append(" -o ").append(offset);
+		if (block > 1)
+			cmd.append(" -a");
+
+		System.out.println(cmd.toString());
+		Process p = Runtime.getRuntime().exec(cmd.toString());
+		p.waitFor();
+		OutputStream stdin = p.getOutputStream();
+		InputStream stderr = p.getErrorStream();
+		InputStream stdout = p.getInputStream();
+
+		String line;
+		// clean up if any output in stdout
+		BufferedReader brCleanUp = new BufferedReader(new InputStreamReader(stdout));
+		while ((line = brCleanUp.readLine()) != null) {
+			System.out.println("[Stdout] " + line);
+		}
+		brCleanUp.close();
+
+		// clean up if any output in stderr
+		brCleanUp = new BufferedReader(new InputStreamReader(stderr));
+		while ((line = brCleanUp.readLine()) != null) {
+			System.out.println("[Stderr] " + line);
+		}
+		brCleanUp.close();
+		System.out.println(p.exitValue());
 	}
 
 	private ArrayList<Tuple> filterTupleByLength(ArrayList<Tuple> list, int minLength) {
