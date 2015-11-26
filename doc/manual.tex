@@ -116,4 +116,32 @@ There exists alignment information files for each alt. loci on the NCBI FTP-serv
 \item 
 \end{itemize}
 
+\section*{MANUAL}
+
+\subsection*{Usage}
+
+\paragraph*{download}
+
+\begin{verbatim}
+java -jar hg38altlociselector-cli-0.0.1-SNAPSHOT.jar download GRCh38
+\end{verbatim}
+
+Using the \texttt{download} command, all necessary files are downloaded. This includes the genome reference (from BWA-kit) and the region and alt loci definition files (from NCBI s.o.).
+
+\paragraph*{create-fa}
+\begin{verbatim}
+java -jar hg38altlociselector.jar create-fa -o data/
+\end{verbatim}
+
+Creates fasta files for the regions. The alt loci can be extended and adapted to the strand of the reference. Using the \texttt{-o} flag, the outputfolder can be specified.
+
+\paragraph*{create-seed}
+\begin{verbatim}
+java -jar hg38altlociselector.jar create-seed -o data/
+\end{verbatim}
+
+Creates seed files used by the Seqan-Alignment tool in the specified output folder.
+
+\paragraph*{align}
+
 \end{document}
