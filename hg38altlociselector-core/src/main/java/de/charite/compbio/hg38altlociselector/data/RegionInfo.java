@@ -5,7 +5,6 @@ package de.charite.compbio.hg38altlociselector.data;
 
 import java.io.Serializable;
 
-import de.charite.compbio.hg38altlociselector.data.AccessionInfo.AccessionInfoBuilder;
 
 /**
  * @author Marten Jäger <marten.jaeger@charite.de>

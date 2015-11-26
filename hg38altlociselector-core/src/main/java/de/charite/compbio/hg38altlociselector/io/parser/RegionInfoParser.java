@@ -9,8 +9,6 @@ import java.io.IOException;
 
 import com.google.common.collect.ImmutableMap;
 
-import de.charite.compbio.hg38altlociselector.data.AccessionInfo;
-import de.charite.compbio.hg38altlociselector.data.AccessionInfo.AccessionInfoBuilder;
 import de.charite.compbio.hg38altlociselector.data.RegionInfo;
 import de.charite.compbio.hg38altlociselector.data.RegionInfo.RegionInfoBuilder;
 import de.charite.compbio.hg38altlociselector.exceptions.AccessionInfoParseException;
@@ -75,7 +73,7 @@ public class RegionInfoParser {
 	private RegionInfoBuilder createBuilderFromLine(String line) throws AccessionInfoParseException {
 		RegionInfoBuilder builder = new RegionInfoBuilder();
 		String[] fields = line.split("\t");
-		if (fields.length != this.NFIELDS) {
+		if (fields.length != RegionInfoParser.NFIELDS) {
 			String error = String.format(
 					"Malformed line in NCBI genomic_regions_definitions.txt file:\n%s\nExpected %d fields but there were %d", line,
 					NFIELDS, fields.length);

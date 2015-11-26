@@ -10,23 +10,16 @@ import java.io.IOException;
 import org.apache.commons.cli.ParseException;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
 import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
 import de.charite.compbio.hg38altlociselector.data.AccessionInfo;
-import de.charite.compbio.hg38altlociselector.data.AltScaffoldPlacementInfo;
 import de.charite.compbio.hg38altlociselector.data.AlternativeLociBuilder;
 import de.charite.compbio.hg38altlociselector.data.AlternativeLocus;
 import de.charite.compbio.hg38altlociselector.data.NCBIgffAlignmentElement;
 import de.charite.compbio.hg38altlociselector.data.NCBIgffAlignmentElementType;
-import de.charite.compbio.hg38altlociselector.data.RegionInfo;
 import de.charite.compbio.hg38altlociselector.exceptions.AltLociSelectorException;
 import de.charite.compbio.hg38altlociselector.exceptions.CommandLineParsingException;
 import de.charite.compbio.hg38altlociselector.exceptions.HelpRequestedException;
-import de.charite.compbio.hg38altlociselector.io.parser.AccessionInfoParser;
-import de.charite.compbio.hg38altlociselector.io.parser.AltScaffoldPlacementParser;
 import de.charite.compbio.hg38altlociselector.io.parser.NCBIgffAlignmentParser;
-import de.charite.compbio.hg38altlociselector.io.parser.RegionInfoParser;
 import de.charite.compbio.hg38altlociselector.util.IOUtil;
 
 /**

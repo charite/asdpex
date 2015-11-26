@@ -70,7 +70,6 @@ public class App {
 		// // System.out.println("\"" + new String(ref.getBases(), "UTF-8") + "\"");
 		// // System.out.println("\"" + new String(alt.getBases(), "UTF-8") + "\"");
 		// // } catch (UnsupportedEncodingException e) {
-		// // // TODO Auto-generated catch block
 		// // e.printStackTrace();
 		// // }
 		// // System.out.println("Alt_loci:");
@@ -82,7 +81,6 @@ public class App {
 		// alternate = new DNASequence(new String(alt.getBases(), "UTF-8"),
 		// AmbiguityDNACompoundSet.getDNACompoundSet());
 		// } catch (UnsupportedEncodingException | CompoundNotFoundException e) {
-		// // TODO Auto-generated catch block
 		// e.printStackTrace();
 		// }
 		// SubstitutionMatrix<NucleotideCompound> matrix = SubstitutionMatrixHelper.getNuc4_4();

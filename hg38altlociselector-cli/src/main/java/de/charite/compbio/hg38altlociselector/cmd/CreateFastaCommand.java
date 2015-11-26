@@ -170,7 +170,6 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
 				createFastaFile(options.fastqOutputPath + "/regions/" + currentReg.getRegionName() + ".fa",
 						currentReg.getRegionName(), reg.getBases(), false);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

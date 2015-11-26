@@ -37,6 +37,7 @@ public class NCBIgffAlignmentParser {
 	/**
 	 * hidden empty constructor
 	 */
+	@SuppressWarnings("unused")
 	private NCBIgffAlignmentParser() {
 	}
 
@@ -87,7 +88,7 @@ public class NCBIgffAlignmentParser {
 		ImmutableList.Builder<NCBIgffAlignmentElement> elements = new ImmutableList.Builder<NCBIgffAlignmentElement>();
 
 		String[] fields = line.split("\t");
-		if (fields.length != this.NFIELDS) {
+		if (fields.length != NCBIgffAlignmentParser.NFIELDS) {
 			String error = String.format(
 					"Malformed line in NCBI alts_accessions_xxx file:\n%s\nExpected %d fields but there were %d", line,
 					NFIELDS, fields.length);

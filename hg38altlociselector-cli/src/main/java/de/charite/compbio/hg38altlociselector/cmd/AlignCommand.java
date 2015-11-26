@@ -175,7 +175,6 @@ public class AlignCommand extends AltLociSelectorCommand {
 
 	private void runAlignment(String identifier, int block, byte[] altLoci, byte[] ref, int offset)
 			throws IOException, InterruptedException {
-		// TODO Auto-generated method stub
 
 		StringBuilder cmd = new StringBuilder();
 		cmd.append(options.seqanALign).append(" -R ")
@@ -210,6 +209,7 @@ public class AlignCommand extends AltLociSelectorCommand {
 		System.out.println(p.exitValue());
 	}
 
+	@SuppressWarnings("unused")
 	private ArrayList<Tuple> filterTupleByLength(ArrayList<Tuple> list, int minLength) {
 		ArrayList<Tuple> result = new ArrayList<>();
 		for (Tuple tuple : list) {
@@ -449,6 +449,7 @@ public class AlignCommand extends AltLociSelectorCommand {
 	 *            the input sequence with alphabet [ACGTN]
 	 * @return List of {@link Tuple}s with 'N'-blocks
 	 */
+	@SuppressWarnings("unused")
 	private ArrayList<Tuple> getNblocks(byte[] seq) {
 		ArrayList<Tuple> list = new ArrayList<>();
 		int start = 0;
