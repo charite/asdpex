@@ -103,7 +103,7 @@ genome
 
 \begin{itemize}
 \item 261 alt. loci
-\item there are varying numbers of alt. loci covering a region. A alt. loci does not have to cover the whole region (e.g 1Q21, ADAM5, APOBEC, ... - mostly single alt. loci <-> region relations) but can also cover only a part of the region (e.g. ABR, CYP2D6, ...). Some regions are even not covered completely by alt. loci but are defined by the most 5' and 3' alt loci ends in a specific genomic range (e.g. KRTAP_REGION_1, OLFACTORY_REGION_1, PRADER_WILLI, ...)
+\item there are varying numbers of alt. loci covering a region. A alt. loci does not have to cover the whole region (e.g 1Q21, ADAM5, APOBEC, ... - mostly single alt. loci <-> region relations) but can also cover only a part of the region (e.g. ABR, CYP2D6, ...). Some regions are even not covered completely by alt. loci but are defined by the most 5' and 3' alt loci ends in a specific genomic range (e.g. KRTAP\_REGION\_1, OLFACTORY\_REGION\_1, PRADER\_WILLI, ...)
 \end{itemize}
 
 \subsection*{seeds}
@@ -143,5 +143,21 @@ java -jar hg38altlociselector.jar create-seed -o data/
 Creates seed files used by the Seqan-Alignment tool in the specified output folder.
 
 \paragraph*{align}
+\begin{verbatim}
+java -jar hg38altlociselector.jar align -d data/ -s
+\end{verbatim}
+
+Creates the Fasta and seed files and stores them in the \textit{temporary} folder. then calls the Seqan aligner and that creates the VCF files.\\
+With the \texttt{-d} flag you can specify the data directory and with \texttt{-s} you will generate single files for each 
+
+\paragraph*{annotate}
+\begin{verbatim}
+java -jar hg38altlociselector.jar annotate -v file.vcf.gz -a alt_loci.vcf.gz
+\end{verbatim}
+
+The \texttt{annotate} command will annotate an existing vcf-file with the help and knowledge about alternative loci. It will take all known alternative loci for a specific region and according to the overlap with SNVs between the reference toplevel allele and the alternative loci alleles, decide which allele is the most probable. Those variants which are FP in the selected allele will be marked in the \textit{FILTER} column.
+\begin{verbatim}
+##FILTER=<ID=altloci,Description="This is a FP variant according to the most probable alt loci.">
+\end{verbatim}
 
 \end{document}
