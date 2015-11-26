@@ -3,6 +3,8 @@
  */
 package de.charite.compbio.hg38altlociselector.cmd;
 
+import org.apache.commons.cli.ParseException;
+
 import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
 import de.charite.compbio.hg38altlociselector.exceptions.AltLociSelectorException;
 import de.charite.compbio.hg38altlociselector.exceptions.CommandLineParsingException;
@@ -31,9 +33,13 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
 	 * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#parseCommandLine(java.lang.String[])
 	 */
 	@Override
-	protected Hg38altLociSeletorOptions parseCommandLine(String[] args) {
-		// TODO Auto-generated method stub
-		return null;
+	protected Hg38altLociSeletorOptions parseCommandLine(String[] args)
+			throws CommandLineParsingException, HelpRequestedException {
+		try {
+			return new AnnotateVCFCommandLineParser().parse(args);
+		} catch (ParseException e) {
+			throw new CommandLineParsingException("Could not parse the command line.", e);
+		}
 	}
 
 	/*

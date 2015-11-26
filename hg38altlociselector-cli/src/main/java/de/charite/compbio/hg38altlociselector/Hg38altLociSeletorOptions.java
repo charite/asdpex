@@ -40,6 +40,11 @@ public final class Hg38altLociSeletorOptions {
 	 */
 	public int fastaLineLength = 70;
 
+	/** path to the input VCF file for the annotation */
+	public String inputVcf;
+	/** path to the alt-loci VCF file(s) */
+	public String altlociVcf;
+
 	/**
 	 * The command that is to be executed.
 	 */
