@@ -32,7 +32,7 @@ public class AnnotateVCFCommandLineParser {
 		options = new Options();
 		options.addOption("h", "help", false, "show this help");
 		options.addOption("v", "vcf", true, "VCF file to be annotated");
-		options.addOption("a", "alt", false, "vcf file with alt loci information");
+		options.addOption("a", "alt", false, "VCF file with alt loci information");
 		parser = new DefaultParser();
 	}
 
