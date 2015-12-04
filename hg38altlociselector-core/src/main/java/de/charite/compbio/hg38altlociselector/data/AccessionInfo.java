@@ -67,6 +67,21 @@ public class AccessionInfo implements Serializable {
 	}
 
 	/**
+	 * Creates the Fasta identifier from accessionInfo file row in the format they are used in the reference fasta
+	 * files: chr<1-22|X|Y|M>_<GenBank Accession.version with '.'->'v'>_alt<br>
+	 * e.g.: chr21_GL383580v2_alt
+	 * 
+	 * @param info
+	 * @return
+	 */
+	public String createFastaIdentifier() {
+		StringBuilder identifier = new StringBuilder();
+		identifier.append("chr").append(this.getChromosome()).append("_")
+				.append(this.getGenbankAccessionVersion().replace('.', 'v')).append("_alt");
+		return identifier.toString();
+	}
+
+	/**
 	 * Nester builder for the {@link AccessionInfo}s.
 	 * 
 	 *
