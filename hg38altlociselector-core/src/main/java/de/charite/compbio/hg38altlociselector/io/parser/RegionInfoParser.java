@@ -23,19 +23,19 @@ import de.charite.compbio.hg38altlociselector.util.IOUtil;
 public class RegionInfoParser {
 
 	private File file;
-	
+
 	/**
 	 * Number of tab-separated fields in then NCBI genomic_regions_definitions.txt file
 	 */
 	private static final int NFIELDS = 4;
-	
+
 	/**
 	 * Dummy to prevent from using
 	 */
 	@SuppressWarnings("unused")
 	private RegionInfoParser() {
 	}
-	
+
 	/**
 	 * 
 	 * @param filepath
@@ -43,7 +43,12 @@ public class RegionInfoParser {
 	public RegionInfoParser(String filepath) {
 		this.file = new File(filepath);
 	}
-	
+
+	/**
+	 * Parse the file with the {@link RegionInfo}s.
+	 * 
+	 * @return an immutable map with the 'region_name' column ids as keys.
+	 */
 	public ImmutableMap<String, RegionInfo> parse() {
 		ImmutableMap.Builder<String, RegionInfo> result = new ImmutableMap.Builder<String, RegionInfo>();
 		BufferedReader reader = null;
@@ -69,14 +74,14 @@ public class RegionInfoParser {
 		IOUtil.close(reader);
 		return result.build();
 	}
-	
+
 	private RegionInfoBuilder createBuilderFromLine(String line) throws AccessionInfoParseException {
 		RegionInfoBuilder builder = new RegionInfoBuilder();
 		String[] fields = line.split("\t");
 		if (fields.length != RegionInfoParser.NFIELDS) {
 			String error = String.format(
-					"Malformed line in NCBI genomic_regions_definitions.txt file:\n%s\nExpected %d fields but there were %d", line,
-					NFIELDS, fields.length);
+					"Malformed line in NCBI genomic_regions_definitions.txt file:\n%s\nExpected %d fields but there were %d",
+					line, NFIELDS, fields.length);
 			throw new AccessionInfoParseException(error);
 		}
 		builder.regionName(fields[0]);
