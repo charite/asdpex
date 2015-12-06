@@ -3,6 +3,8 @@
  */
 package de.charite.compbio.hg38altlociselector.cmd;
 
+import java.io.File;
+
 import org.apache.commons.cli.ParseException;
 
 import com.google.common.collect.ImmutableList;
@@ -13,6 +15,9 @@ import de.charite.compbio.hg38altlociselector.data.RegionBuilder;
 import de.charite.compbio.hg38altlociselector.exceptions.AltLociSelectorException;
 import de.charite.compbio.hg38altlociselector.exceptions.CommandLineParsingException;
 import de.charite.compbio.hg38altlociselector.exceptions.HelpRequestedException;
+import htsjdk.samtools.util.CloseableIterator;
+import htsjdk.variant.variantcontext.VariantContext;
+import htsjdk.variant.vcf.VCFFileReader;
 
 /**
  * INPUT
@@ -69,16 +74,29 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
 	public void run() throws AltLociSelectorException {
 		// alt. loci info parsing
 
+		VCFFileReader inputVCF = new VCFFileReader(new File(this.options.inputVcf));
+
+		CloseableIterator<VariantContext> iter = inputVCF.query("chr1", 1, 50000);
+		iter.close();
+		for (VariantContext variantContext : iter) {
+			
+		}
 		ImmutableList<Region> regions = new RegionBuilder(options.altAccessionsPath, options.altScaffoldPlacementPath,
-				options.genomicRegionsDefinitionsPath).build();
+				options.genomicRegionsDefinitionsPath).build(); 
 		System.out.println(regions.size());
 		int c = 0;
 		for (Region region : regions) {
-			System.out.println(region.getRegionInfo().getRegionName() + ": " + region.getLoci().size());
-			c += region.getLoci().size();
+			if(region.getLoci() != null)   {
+//				System.out.println(region.getRegionInfo().getRegionName() + ": " + region.getLoci().size());
+				c += region.getLoci().size();
+			}else{
+				System.out.println("[INFO] skip region: "+region.getRegionInfo().getRegionName());
+			}
 		}
 		System.out.println("total of loci: " + c);
 
+		//------------------------------------------------------------------------------------- //
+		
 		// ImmutableList<AlternativeLocus> loci = new AlternativeLociBuilder(options.altAccessionsPath,
 		// options.altScaffoldPlacementPath, options.genomicRegionsDefinitionsPath).build();
 
