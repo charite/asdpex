@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import com.google.common.collect.ImmutableMap;
 
+import de.charite.compbio.hg38altlociselector.data.AccessionInfo;
 import de.charite.compbio.hg38altlociselector.data.RegionInfo;
 import de.charite.compbio.hg38altlociselector.data.RegionInfo.RegionInfoBuilder;
 import de.charite.compbio.hg38altlociselector.exceptions.AccessionInfoParseException;
@@ -22,7 +23,8 @@ import de.charite.compbio.hg38altlociselector.util.IOUtil;
  */
 public class RegionInfoParser {
 
-	private File file;
+	private File regionFile;
+	private File chromosomeFile;
 
 	/**
 	 * Number of tab-separated fields in then NCBI genomic_regions_definitions.txt file
@@ -40,8 +42,9 @@ public class RegionInfoParser {
 	 * 
 	 * @param filepath
 	 */
-	public RegionInfoParser(String filepath) {
-		this.file = new File(filepath);
+	public RegionInfoParser(String regionPath, String chromosomePath) {
+		this.regionFile = new File(regionPath);
+		this.chromosomeFile = new File(chromosomePath);
 	}
 
 	/**
@@ -51,16 +54,18 @@ public class RegionInfoParser {
 	 */
 	public ImmutableMap<String, RegionInfo> parse() {
 		ImmutableMap.Builder<String, RegionInfo> result = new ImmutableMap.Builder<String, RegionInfo>();
+		ImmutableMap<String, AccessionInfo> chromosomMap = (new AccessionInfoParser(
+				this.chromosomeFile.getAbsolutePath())).parse();
 		BufferedReader reader = null;
 		// reader = this.open();
 		String line;
 		try {
-			reader = IOUtil.getBufferedReaderFromFileName(this.file);
+			reader = IOUtil.getBufferedReaderFromFileName(this.regionFile);
 			while ((line = reader.readLine()) != null) {
 				try {
 					if (line.startsWith("#"))
 						continue;
-					RegionInfoBuilder builder = createBuilderFromLine(line);
+					RegionInfoBuilder builder = createBuilderFromLine(line, chromosomMap);
 					RegionInfo info = builder.build();
 					result.put(info.getRegionName(), info);
 				} catch (AccessionInfoParseException e) {
@@ -75,7 +80,8 @@ public class RegionInfoParser {
 		return result.build();
 	}
 
-	private RegionInfoBuilder createBuilderFromLine(String line) throws AccessionInfoParseException {
+	private RegionInfoBuilder createBuilderFromLine(String line, ImmutableMap<String, AccessionInfo> chromosomMap)
+			throws AccessionInfoParseException {
 		RegionInfoBuilder builder = new RegionInfoBuilder();
 		String[] fields = line.split("\t");
 		if (fields.length != RegionInfoParser.NFIELDS) {
@@ -85,7 +91,7 @@ public class RegionInfoParser {
 			throw new AccessionInfoParseException(error);
 		}
 		builder.regionName(fields[0]);
-		builder.chromosome(fields[1]);
+		builder.chromosome(chromosomMap.get(fields[1]));
 		try {
 			builder.start(Integer.parseInt(fields[2]));
 		} catch (NumberFormatException e) {

@@ -20,6 +20,7 @@ public class RegionBuilder {
 	private final String altAccessionsPath;
 	private final String altScaffoldPlacementPath;
 	private final String genomicRegionsDefinitionsPath;
+	private final String chrAccessionsPath;
 
 	/**
 	 * 
@@ -28,10 +29,11 @@ public class RegionBuilder {
 	 * @param genomicRegionsDefinitionsPath
 	 */
 	public RegionBuilder(String altAccessionsPath, String altScaffoldPlacementPath,
-			String genomicRegionsDefinitionsPath) {
+			String genomicRegionsDefinitionsPath, String chrAccessionsPath) {
 		this.altAccessionsPath = altAccessionsPath;
 		this.altScaffoldPlacementPath = altScaffoldPlacementPath;
 		this.genomicRegionsDefinitionsPath = genomicRegionsDefinitionsPath;
+		this.chrAccessionsPath = chrAccessionsPath;
 	}
 
 	public ImmutableList<Region> build() {
@@ -48,7 +50,7 @@ public class RegionBuilder {
 		System.out.println("found placement for " + asMap.size() + " alt_loci");
 
 		System.out.print("[INFO] Read region definitions ... ");
-		RegionInfoParser regParser = new RegionInfoParser(genomicRegionsDefinitionsPath);
+		RegionInfoParser regParser = new RegionInfoParser(genomicRegionsDefinitionsPath, chrAccessionsPath);
 		ImmutableMap<String, RegionInfo> regMap = regParser.parse();
 		System.out.println("found " + regMap.size() + " regions definitions");
 
