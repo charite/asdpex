@@ -13,60 +13,61 @@ package de.charite.compbio.hg38altlociselector;
  */
 public final class Hg38altLociSeletorOptions {
 
-    /** directory to use for the downloads and the serialized file */
-    public String dataPath = "../data";
+	/** directory to use for the downloads and the serialized file */
+	public String dataPath = "../data";
 
-    public String fastqOutputPath = "../fasta";
+	public String fastqOutputPath = "../fasta";
 
-    public String alignmentPath = "../data/alignments";
+	public String alignmentPath = "../data/alignments";
 
-    public String seedInfoPath = "../seed";
+	public String seedInfoPath = "../seed";
 
-    public String seqanALign = "../seqan/regionalign2bed";
+	public String seqanALign = "../seqan/regionalign2bed";
 
-    public String tempFolder = "../tmp";
+	public String tempFolder = "../tmp";
 
-    public Command command;
-    public String error;
+	public Command command;
+	public String error;
 
-    public String altAccessionsPath = dataPath + "/alts_accessions_GRCh38.p2";
-    public String altScaffoldPlacementPath = dataPath + "/all_alt_scaffold_placement.txt";
-    public String referencePath = dataPath + "/bwa.kit/hs38DH.fa";
-    public String genomicRegionsDefinitionsPath = dataPath + "/genomic_regions_definitions.txt";
+	public String chrAccessionsPath = dataPath + "/chr_accessions_GRCh38.p2";
+	public String altAccessionsPath = dataPath + "/alts_accessions_GRCh38.p2";
+	public String altScaffoldPlacementPath = dataPath + "/all_alt_scaffold_placement.txt";
+	public String referencePath = dataPath + "/bwa.kit/hs38DH.fa";
+	public String genomicRegionsDefinitionsPath = dataPath + "/genomic_regions_definitions.txt";
 
-    public boolean singleAltLociFile = false;
+	public boolean singleAltLociFile = false;
 
-    /**
-     * Line length of output fasta files.
-     */
-    public int fastaLineLength = 70;
+	/**
+	 * Line length of output fasta files.
+	 */
+	public int fastaLineLength = 70;
 
-    /** path to the input VCF file for the annotation */
-    public String inputVcf;
-    /** path to the alt-loci VCF file(s) */
-    public String altlociVcf;
+	/** path to the input VCF file for the annotation */
+	public String inputVcf;
+	/** path to the alt-loci VCF file(s) */
+	public String altlociVcf;
 
-    /**
-     * The command that is to be executed.
-     */
-    public enum Command {
-        DOWNLOAD, ANNOTATE_VCF, CREATE_FASTA, CREATE_SEED, ALIGN;
+	/**
+	 * The command that is to be executed.
+	 */
+	public enum Command {
+		DOWNLOAD, ANNOTATE_VCF, CREATE_FASTA, CREATE_SEED, ALIGN;
 
-        public String toString() {
-            switch (this) {
-            case DOWNLOAD:
-                return "download";
-            case ANNOTATE_VCF:
-                return "annotate";
-            case CREATE_FASTA:
-                return "create-fa";
-            case CREATE_SEED:
-                return "create-seed";
-            case ALIGN:
-                return "align";
-            default:
-                return "unknown";
-            }
-        }
-    }
+		public String toString() {
+			switch (this) {
+			case DOWNLOAD:
+				return "download";
+			case ANNOTATE_VCF:
+				return "annotate";
+			case CREATE_FASTA:
+				return "create-fa";
+			case CREATE_SEED:
+				return "create-seed";
+			case ALIGN:
+				return "align";
+			default:
+				return "unknown";
+			}
+		}
+	}
 }

@@ -10,6 +10,7 @@ import java.io.IOException;
 import org.apache.commons.cli.ParseException;
 
 import com.google.common.collect.ImmutableList;
+
 import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
 import de.charite.compbio.hg38altlociselector.data.AccessionInfo;
 import de.charite.compbio.hg38altlociselector.data.AlternativeLociBuilder;
@@ -59,20 +60,23 @@ public class CreateSeedCommand extends AltLociSelectorCommand {
 		System.out.println("[INFO] Creating seed files");
 		if (options == null)
 			System.err.println("[ERROR] option = null");
-		ImmutableList<AlternativeLocus> loci = new AlternativeLociBuilder(options.altAccessionsPath, options.altScaffoldPlacementPath, options.genomicRegionsDefinitionsPath).build();
+		ImmutableList<AlternativeLocus> loci = new AlternativeLociBuilder(options.altAccessionsPath,
+				options.altScaffoldPlacementPath, options.genomicRegionsDefinitionsPath, options.chrAccessionsPath)
+						.build();
 		// alts_accessions
 		System.out.println("[INFO] processing alt. loci");
 		System.out.println("0%       50%       100%");
 		System.out.println("|.........|.........|");
-		int c=1;
-		int limit=0;
+		int c = 1;
+		int limit = 0;
 		for (AlternativeLocus locus : loci) {
-			if(100.0*c++/loci.size() > limit){
-				limit+=5;
+			if (100.0 * c++ / loci.size() > limit) {
+				limit += 5;
 				System.out.print("*");
 			}
 
-			String gff = locus.getPlacementInfo().getAltScafAcc() + "_" + locus.getPlacementInfo().getParentAcc() + ".gff";
+			String gff = locus.getPlacementInfo().getAltScafAcc() + "_" + locus.getPlacementInfo().getParentAcc()
+					+ ".gff";
 			ImmutableList<NCBIgffAlignmentElement> matches = null;
 			if (new File(options.alignmentPath, gff).exists()) {
 				matches = new NCBIgffAlignmentParser(new File(options.alignmentPath, gff)).parse().get(0).getElements();
@@ -82,11 +86,13 @@ public class CreateSeedCommand extends AltLociSelectorCommand {
 			}
 
 			try {
-				createMatchesFile(options.seedInfoPath, createFastaIdentifier(locus.getAccessionInfo()) + "_extended.tab", matches,
+				createMatchesFile(options.seedInfoPath,
+						createFastaIdentifier(locus.getAccessionInfo()) + "_extended.tab", matches,
 						(locus.getPlacementInfo().getParentStart() - locus.getRegionInfo().getStart()),
 						(locus.getRegionInfo().getStop() - locus.getPlacementInfo().getParentStop()));
 			} catch (IOException e) {
-				System.err.println("[ERROR] failed to create seed info file for sample: " + locus.getPlacementInfo().getAltScafAcc());
+				System.err.println("[ERROR] failed to create seed info file for sample: "
+						+ locus.getPlacementInfo().getAltScafAcc());
 				e.printStackTrace();
 			}
 		}
@@ -108,7 +114,7 @@ public class CreateSeedCommand extends AltLociSelectorCommand {
 		int c = 0;
 
 		for (NCBIgffAlignmentElement match : matches) {
-			if(match.getType() != NCBIgffAlignmentElementType.MATCH)
+			if (match.getType() != NCBIgffAlignmentElementType.MATCH)
 				continue;
 			c++;
 			// extend the first seed to the begin of the region

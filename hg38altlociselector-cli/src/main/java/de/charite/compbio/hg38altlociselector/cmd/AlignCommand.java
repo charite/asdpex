@@ -78,7 +78,8 @@ public class AlignCommand extends AltLociSelectorCommand {
 			System.err.println("[ERROR] option = null");
 		// alt. loci info parsing
 		ImmutableList<AlternativeLocus> loci = new AlternativeLociBuilder(options.altAccessionsPath,
-				options.altScaffoldPlacementPath, options.genomicRegionsDefinitionsPath).build();
+				options.altScaffoldPlacementPath, options.genomicRegionsDefinitionsPath, options.chrAccessionsPath)
+						.build();
 		// Ref fasta File
 		final ReferenceSequenceFile refFile = ReferenceSequenceFileFactory
 				.getReferenceSequenceFile(new File(options.referencePath));

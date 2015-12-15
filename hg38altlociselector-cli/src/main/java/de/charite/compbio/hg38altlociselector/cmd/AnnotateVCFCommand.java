@@ -4,18 +4,22 @@
 package de.charite.compbio.hg38altlociselector.cmd;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.apache.commons.cli.ParseException;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
+import de.charite.compbio.hg38altlociselector.data.MetaLocus;
+import de.charite.compbio.hg38altlociselector.data.PairwiseVariantContextIntersect;
 import de.charite.compbio.hg38altlociselector.data.Region;
 import de.charite.compbio.hg38altlociselector.data.RegionBuilder;
 import de.charite.compbio.hg38altlociselector.exceptions.AltLociSelectorException;
 import de.charite.compbio.hg38altlociselector.exceptions.CommandLineParsingException;
 import de.charite.compbio.hg38altlociselector.exceptions.HelpRequestedException;
-import htsjdk.samtools.util.CloseableIterator;
+import de.charite.compbio.hg38altlociselector.util.VariantContextUtil;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFFileReader;
 
@@ -76,27 +80,38 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
 
 		VCFFileReader inputVCF = new VCFFileReader(new File(this.options.inputVcf));
 
-		CloseableIterator<VariantContext> iter = inputVCF.query("chr1", 1, 50000);
-		iter.close();
-		for (VariantContext variantContext : iter) {
-			
-		}
 		ImmutableList<Region> regions = new RegionBuilder(options.altAccessionsPath, options.altScaffoldPlacementPath,
-				options.genomicRegionsDefinitionsPath).build(); 
+				options.genomicRegionsDefinitionsPath, options.chrAccessionsPath).build();
 		System.out.println(regions.size());
 		int c = 0;
 		for (Region region : regions) {
-			if(region.getLoci() != null)   {
-//				System.out.println(region.getRegionInfo().getRegionName() + ": " + region.getLoci().size());
-				c += region.getLoci().size();
-			}else{
-				System.out.println("[INFO] skip region: "+region.getRegionInfo().getRegionName());
+			if (region.getLoci() == null) {
+				System.out.println("[INFO] skip region: " + region.getRegionInfo().getRegionName());
+				continue;
 			}
+			System.out.println(
+					"[INFO] region: " + region.getRegionInfo().getRegionName() + ": " + region.getLoci().size());
+			ArrayList<VariantContext> refVariantList = Lists
+					.newArrayList(inputVCF.query("chr" + region.getRegionInfo().getChromosomeInfo().getChromosome(),
+							region.getRegionInfo().getStart(), region.getRegionInfo().getStop()));
+
+			ArrayList<PairwiseVariantContextIntersect> intersectList = new ArrayList<>();
+			for (MetaLocus locus : region.getLoci().values()) {
+				VCFFileReader locusVCF = new VCFFileReader(new File(
+						this.options.tempFolder + "/" + locus.getAccessionInfo().createFastaIdentifier() + ".vcf.gz"));
+				ArrayList<VariantContext> locusVariantList = Lists.newArrayList(locusVCF.iterator());
+				PairwiseVariantContextIntersect inter = VariantContextUtil.intersectVariantContext(refVariantList,
+						locusVariantList);
+				System.out.println(inter.toString());
+				// intersectList.add(VariantContextUtil.intersectVariantContext(refVariantList, locusVariantList));
+			}
+			// System.exit(0);
+			c += region.getLoci().size();
 		}
 		System.out.println("total of loci: " + c);
 
-		//------------------------------------------------------------------------------------- //
-		
+		// ------------------------------------------------------------------------------------- //
+
 		// ImmutableList<AlternativeLocus> loci = new AlternativeLociBuilder(options.altAccessionsPath,
 		// options.altScaffoldPlacementPath, options.genomicRegionsDefinitionsPath).build();
 
