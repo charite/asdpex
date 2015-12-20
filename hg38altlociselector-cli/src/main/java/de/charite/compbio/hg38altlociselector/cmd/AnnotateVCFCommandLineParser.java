@@ -35,6 +35,7 @@ public class AnnotateVCFCommandLineParser {
         options.addOption("v", "vcf", true, "VCF file to be annotated");
         options.addOption("a", "alt", true, "VCF file with alt loci information");
         options.addOption("o", "out", true, "VCF output file with the annotations");
+        options.addOption("r", "ref", true, "reference fasta file with index");
         parser = new DefaultParser();
     }
 
@@ -60,8 +61,22 @@ public class AnnotateVCFCommandLineParser {
         if (cmd.hasOption("alt"))
             result.altlociVcf = cmd.getOptionValue("alt");
         else {
-            // result.error = "Missing alt loci VCF file: -a";
-            // printHelp(result);
+            result.error = "Missing alt loci VCF file: -a";
+            printHelp(result);
+        }
+
+        if (cmd.hasOption("out"))
+            result.outputVcf = cmd.getOptionValue("out");
+        else {
+            result.error = "Missing output VCF file: -o";
+            printHelp(result);
+        }
+
+        if (cmd.hasOption("ref"))
+            result.referencePath = cmd.getOptionValue("ref");
+        else {
+            result.error = "Missing indexed reference fasta file: -r";
+            printHelp(result);
         }
 
         return result;
