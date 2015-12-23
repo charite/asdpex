@@ -14,6 +14,9 @@ import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFFilterHeaderLine;
 import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFHeaderLine;
+import htsjdk.variant.vcf.VCFHeaderLineCount;
+import htsjdk.variant.vcf.VCFHeaderLineType;
+import htsjdk.variant.vcf.VCFInfoHeaderLine;
 
 /**
  * Writer for the
@@ -38,8 +41,12 @@ public class AnnotatedVariantWriter {
         header.addMetaDataLine(new VCFHeaderLine("hg38altLociSelectorVersion", options.VERSION));
         header.addMetaDataLine(new VCFHeaderLine("hg38altLociSelectorCommand", "TODO ..."));
         // TODO add line with Commadn line call
-        header.addMetaDataLine(
-                new VCFFilterHeaderLine("ALTLOCI", "Filtered due to a more likely alternative scaffold"));
+        header.addMetaDataLine(new VCFFilterHeaderLine(options.VCFALTLOCISTRING,
+                "Filtered due to a more likely alternative scaffold"));
+        header.addMetaDataLine(new VCFInfoHeaderLine(options.VCFALTLOCISTRING, VCFHeaderLineCount.A,
+                VCFHeaderLineType.String, "moste likely alternative scaffold id replacement"));
+        header.addMetaDataLine(new VCFInfoHeaderLine(options.VCFALTLOCIGENOTYPE, VCFHeaderLineCount.A,
+                VCFHeaderLineType.String, "moste likely alternative scaffold replacement genotype"));
         this.out.writeHeader(header);
     }
 

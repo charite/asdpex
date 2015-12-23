@@ -24,7 +24,9 @@ import de.charite.compbio.hg38altlociselector.util.VariantContextUtil;
 import htsjdk.samtools.reference.ReferenceSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequenceFileFactory;
 import htsjdk.samtools.util.CloseableIterator;
+import htsjdk.variant.variantcontext.GenotypeType;
 import htsjdk.variant.variantcontext.VariantContext;
+import htsjdk.variant.variantcontext.VariantContextBuilder;
 import htsjdk.variant.vcf.VCFFileReader;
 
 /**
@@ -113,18 +115,6 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
 
         CloseableIterator<VariantContext> currentVariants;
 
-        // currentVariants = inputVCF.iterator();
-        // while (currentVariants.hasNext()) {
-        // try {
-        // writerVCF.put(currentVariants.next());
-        // } catch (TribbleException e) {
-        // e.printStackTrace();
-        // }
-        // // writerVCF.put(currentVariants.next());
-        // }
-        // writerVCF.close();
-        // System.out.println("finished");
-        // System.exit(0);
         // TODO find a better way to perform region selection - maybe with the
         // database
         for (String chr : TopLevelChromosomes.getInstance().getToplevel()) {
@@ -137,65 +127,112 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
             if (regionsOnChromosome.isEmpty()) {
                 System.out.println(chr + " w/o region(s)");
                 writeVariants(inputVCF, refFile, writerVCF, chr, 1, refFile.getSequence("chr" + chr).length());
+                // System.out.println(chr + " : 1 - " +
+                // refFile.getSequence("chr" + chr).length());
             } else {
-                // writeVariants(inputVCF, refFile, writerVCF, chr, 1,
-                // regions.get(regionsOnChromosome.get(0)).getRegionInfo().getStart()
-                // - 1);
                 int i;
                 for (i = 0; i < regionsOnChromosome.size(); i++) {
                     // write out block before region
-                    if (i == 0)
+                    if (i == 0) {
                         writeVariants(inputVCF, refFile, writerVCF, chr, 1,
                                 regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart() - 1);
-                    else
+                        // System.out.println(chr + " : 1 - "
+                        // +
+                        // (regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart()
+                        // - 1));
+                    } else {
                         writeVariants(inputVCF, refFile, writerVCF, chr,
                                 regions.get(regionsOnChromosome.get(i - 1)).getRegionInfo().getStop() + 1,
                                 regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart() - 1);
-                    // TODO check with unittesting if the STart AND stop are
-                    // including
 
+                        // System.out.println(chr + " : "
+                        // + (regions.get(regionsOnChromosome.get(i -
+                        // 1)).getRegionInfo().getStop() + 1) + " - "
+                        // +
+                        // (regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart()
+                        // - 1));
+                        // TODO check with unittesting if the STart AND stop are
+                        // including
+                    }
+                    // check and write block with alternative scaffold
+                    ArrayList<VariantContext> refVariantList = Lists.newArrayList(inputVCF.query("chr" + chr,
+                            regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart(),
+                            regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop()));
+
+                    ArrayList<PairwiseVariantContextIntersect> intersectList = new ArrayList<>();
+                    VCFFileReader locusVCF;
+                    ArrayList<VariantContext> locusVariantList;
+                    PairwiseVariantContextIntersect intersect;
+                    for (MetaLocus locus : regions.get(regionsOnChromosome.get(i)).getLoci().values()) {
+                        locusVCF = new VCFFileReader(new File(this.options.tempFolder + "/"
+                                + locus.getAccessionInfo().createFastaIdentifier() + ".vcf.gz"));
+                        locusVariantList = Lists.newArrayList(locusVCF.iterator());
+                        intersect = VariantContextUtil.intersectVariantContext(refVariantList, locusVariantList);
+                        // System.out.println(intersect.toString());
+                        intersectList.add(intersect);
+                        // intersectList.add(VariantContextUtil.intersectVariantContext(refVariantList,
+                        // locusVariantList));
+                    }
+                    // System.out.println("LOCI: " +
+                    // regions.get(regionsOnChromosome.get(i)).getLoci().size());
+                    ArrayList<Integer> mostProbableAlleles = VariantContextUtil
+                            .getMostProbableAlternativeScaffolds(intersectList);
+                    // System.out.println("Intersect: " + intersectList.size());
+                    if (mostProbableAlleles.size() > 0) { // at least one alt.
+                                                          // scaffold identified
+                        if (mostProbableAlleles.size() == 2
+                                && mostProbableAlleles.get(0) == mostProbableAlleles.get(1)) {
+                            // System.out.println("Index: " +
+                            // mostProbableAlleles.get(0));
+                            // System.out.println(regions.get(regionsOnChromosome.get(i)).getLoci().size());
+                            writeModVariants(inputVCF, refFile, writerVCF, chr,
+                                    regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart(),
+                                    regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop(),
+                                    (MetaLocus) regions.get(regionsOnChromosome.get(i)).getLoci().values()
+                                            .toArray()[mostProbableAlleles.get(0)],
+                                    GenotypeType.HOM_VAR);
+                        } else {
+                            writeModVariants(inputVCF, refFile, writerVCF, chr,
+                                    regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart(),
+                                    regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop(),
+                                    (MetaLocus) regions.get(regionsOnChromosome.get(i)).getLoci().values()
+                                            .toArray()[mostProbableAlleles.get(0)],
+                                    GenotypeType.HET);
+                            // System.out.println(chr + " : "
+                            // +
+                            // regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart()
+                            // + " - "
+                            // +
+                            // regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop());
+                        }
+                    } else { // no alt. scaffold identified
+                        writeVariants(inputVCF, refFile, writerVCF, chr,
+                                regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart(),
+                                regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop());
+                        // System.out.println(
+                        // chr + " : " +
+                        // regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart()
+                        // + " - "
+                        // +
+                        // regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop());
+                    }
                 }
                 // write final block up to the end of the chromosome
                 writeVariants(inputVCF, refFile, writerVCF, chr,
                         regions.get(regionsOnChromosome.get(i - 1)).getRegionInfo().getStop() + 1,
                         refFile.getSequence("chr" + chr).length());
+                        // System.out.println(
+                        // chr + " : " + (regions.get(regionsOnChromosome.get(i
+                        // - 1)).getRegionInfo().getStop() + 1)
+                        // + " - " + refFile.getSequence("chr" + chr).length());
 
-                System.out.println(chr + " - " + regionsOnChromosome);
+                // System.out.println(chr + " - " + regionsOnChromosome);
+                // System.exit(0);
             }
         }
 
         // close the variant writer
         writerVCF.close();
-
-        System.exit(0);
-
-        int c = 0;
-        for (Region region : regions) {
-            if (region.getLoci() == null) {
-                System.out.println("[INFO] skip region: " + region.getRegionInfo().getRegionName());
-                continue;
-            }
-            System.out.println(
-                    "[INFO] region: " + region.getRegionInfo().getRegionName() + ": " + region.getLoci().size());
-            ArrayList<VariantContext> refVariantList = Lists
-                    .newArrayList(inputVCF.query("chr" + region.getRegionInfo().getChromosomeInfo().getChromosome(),
-                            region.getRegionInfo().getStart(), region.getRegionInfo().getStop()));
-
-            ArrayList<PairwiseVariantContextIntersect> intersectList = new ArrayList<>();
-            for (MetaLocus locus : region.getLoci().values()) {
-                VCFFileReader locusVCF = new VCFFileReader(new File(
-                        this.options.tempFolder + "/" + locus.getAccessionInfo().createFastaIdentifier() + ".vcf.gz"));
-                ArrayList<VariantContext> locusVariantList = Lists.newArrayList(locusVCF.iterator());
-                PairwiseVariantContextIntersect inter = VariantContextUtil.intersectVariantContext(refVariantList,
-                        locusVariantList);
-                System.out.println(inter.toString());
-                // intersectList.add(VariantContextUtil.intersectVariantContext(refVariantList,
-                // locusVariantList));
-            }
-            // System.exit(0);
-            c += region.getLoci().size();
-        }
-        System.out.println("total of loci: " + c);
 
     }
 
@@ -214,6 +251,51 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
         while (currentVariants.hasNext()) {
             writer.put(currentVariants.next());
         }
+    }
+
+    /**
+     * Writes the Variants out
+     * 
+     * @param reader
+     * @param refFile
+     * @param writer
+     * @param chr
+     */
+    private void writeModVariants(VCFFileReader reader, ReferenceSequenceFile refFile, AnnotatedVariantWriter writer,
+            String chr, int start, int stop, MetaLocus locus, GenotypeType type) {
+        // CloseableIterator<VariantContext> currentVariants =
+        // reader.query("chr" + chr, start, stop);
+        // while (currentVariants.hasNext()) {
+        // writer.put(currentVariants.next());
+        // }
+        // return;
+
+        // System.out.println(locus);
+        // write block before alt scaffold starts
+        writeVariants(reader, refFile, writer, chr, start, locus.getPlacementInfo().getParentStart() - 1);
+        // System.out.println(chr + " : " + start + " - " +
+        // (locus.getPlacementInfo().getParentStart() - 1));
+        // write block covering the alt. scaffold
+        CloseableIterator<VariantContext> currentVariants = reader.query("chr" + chr,
+                locus.getPlacementInfo().getParentStart(), locus.getPlacementInfo().getParentStop());
+
+        // System.out.println(chr + " : " +
+        // locus.getPlacementInfo().getParentStart() + " - "
+        // + locus.getPlacementInfo().getParentStop());
+        VariantContextBuilder builder;
+        VariantContext curVC;
+        while (currentVariants.hasNext()) {
+            builder = new VariantContextBuilder(currentVariants.next());
+            builder.filter(options.VCFALTLOCISTRING);
+            builder.attribute(options.VCFALTLOCISTRING, locus.getAccessionInfo().createFastaIdentifier());
+            builder.attribute(options.VCFALTLOCIGENOTYPE, type.toString());
+            curVC = builder.make();
+            writer.put(curVC);
+        }
+        // write block after alt scaffold ends
+        writeVariants(reader, refFile, writer, chr, locus.getPlacementInfo().getParentStop() + 1, stop);
+        // System.out.println(chr + " : " +
+        // (locus.getPlacementInfo().getParentStop() + 1) + " - " + stop);
     }
 
 }
