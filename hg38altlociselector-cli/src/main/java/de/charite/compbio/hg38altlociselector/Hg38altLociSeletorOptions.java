@@ -15,6 +15,10 @@ public final class Hg38altLociSeletorOptions {
 
     public final static String VERSION = "0.0.1";
 
+    public static final String VCFALTLOCISTRING = "ALTLOCI";
+
+    public static final String VCFALTLOCIGENOTYPE = "ALTGENOTYPE";
+
     /** directory to use for the downloads and the serialized file */
     public String dataPath = "../data";
 
