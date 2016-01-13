@@ -54,8 +54,7 @@ public class AlignCommand extends AltLociSelectorCommand {
     /*
      * (non-Javadoc)
      * 
-     * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#
-     * parseCommandLine(java.lang.String[])
+     * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand# parseCommandLine(java.lang.String[])
      */
     @Override
     protected Hg38altLociSeletorOptions parseCommandLine(String[] args)
@@ -70,8 +69,7 @@ public class AlignCommand extends AltLociSelectorCommand {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#run()
+     * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#run()
      */
     @Override
     public void run() throws AltLociSelectorException {
@@ -192,7 +190,9 @@ public class AlignCommand extends AltLociSelectorCommand {
                 .append(options.tempFolder + "/" + identifier + "_ref_" + block + ".fa").append(" -A ")
                 .append(options.tempFolder + "/" + identifier + "_altLoci_" + block + ".fa").append(" -S ")
                 .append(options.tempFolder + "/" + identifier + "_" + block + ".tab").append(" -V ")
-                .append(options.tempFolder + "/" + identifier + ".vcf").append(" -o ").append(offset);
+                .append(options.tempFolder + "/" + identifier + ".vcf").append(" -N ")
+                .append(options.resultsFolder + "/aln/" + identifier + "_" + block + ".aln").append(" -o ")
+                .append(offset);
         if (block > 1)
             cmd.append(" -a");
 
@@ -243,7 +243,7 @@ public class AlignCommand extends AltLociSelectorCommand {
         }
         // ref
         try {
-            createFastaFile(options.tempFolder + "/" + idALtLoci + "_ref_" + block + ".fa", idALtLoci, ref, false);
+            createFastaFile(options.tempFolder + "/" + idALtLoci + "_ref_" + block + ".fa", idRef, ref, false);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -508,9 +508,8 @@ public class AlignCommand extends AltLociSelectorCommand {
     }
 
     /**
-     * Creates the Fasta identifier from accessionInfo file row in the format
-     * they are used in the reference fasta files: chr<1-22|X|Y|M>_<GenBank
-     * Accession.version with '.'->'v'>_alt<br>
+     * Creates the Fasta identifier from accessionInfo file row in the format they are used in the reference fasta
+     * files: chr<1-22|X|Y|M>_<GenBank Accession.version with '.'->'v'>_alt<br>
      * e.g.: chr21_GL383580v2_alt
      * 
      * @param info
@@ -615,8 +614,7 @@ public class AlignCommand extends AltLociSelectorCommand {
     }
 
     /**
-     * Inner private class, which only contains a tuple of integers to store the
-     * start and stop of sequence blocks.
+     * Inner private class, which only contains a tuple of integers to store the start and stop of sequence blocks.
      * 
      *
      * @author Marten Jäger <marten.jaeger@charite.de>

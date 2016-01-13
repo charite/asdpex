@@ -32,6 +32,8 @@ public final class Hg38altLociSeletorOptions {
 
     public String tempFolder = "../tmp";
 
+    public String resultsFolder = "../results";
+
     public Command command;
     public String error;
 
