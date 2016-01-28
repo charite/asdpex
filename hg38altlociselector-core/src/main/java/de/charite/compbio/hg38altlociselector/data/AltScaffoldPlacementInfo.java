@@ -268,6 +268,12 @@ public class AltScaffoldPlacementInfo implements Serializable {
 		return serialVersionUID;
 	}
 
+	public String createGffIdentifier() {
+		StringBuilder identifier = new StringBuilder();
+		identifier.append(this.getAltScafAcc()).append("_").append(this.getParentAcc());
+		return identifier.toString();
+	}
+
 	/**
 	 * 
 	 */

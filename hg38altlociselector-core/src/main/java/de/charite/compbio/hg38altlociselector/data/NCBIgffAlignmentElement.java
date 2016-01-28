@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @author Marten Jäger <marten.jaeger@charite.de>
  *
  */
-public class NCBIgffAlignmentMatch implements Serializable {
+public class NCBIgffAlignmentElement implements Serializable {
 	/*
 	 * default serial ID
 	 */
@@ -23,6 +23,8 @@ public class NCBIgffAlignmentMatch implements Serializable {
 	private final int alt_start;
 	/* Length of the match */
 	private final int length;
+	/* ELement type */
+	private final NCBIgffAlignmentElementType type;
 
 	/**
 	 * default serial ID
@@ -60,41 +62,59 @@ public class NCBIgffAlignmentMatch implements Serializable {
 		return length;
 	}
 
-	private NCBIgffAlignmentMatch(NCBIgffAlignmentMatchBuilder builder) {
+	public NCBIgffAlignmentElementType getType() {
+		return type;
+	}
+
+	private NCBIgffAlignmentElement(NCBIgffAlignmentElementBuilder builder) {
 		this.ref_start = builder.ref_start;
 		this.alt_start = builder.alt_start;
 		this.length = builder.length;
+		this.type = builder.type;
 	}
 
 	/**
-	 * Nested builder for the {@link NCBIgffAlignmentMatch}s.
+	 * Nested builder for the {@link NCBIgffAlignmentElement}s.
 	 * 
 	 *
 	 * @author Marten Jäger <marten.jaeger@charite.de>
 	 *
 	 */
-	public static class NCBIgffAlignmentMatchBuilder {
+	public static class NCBIgffAlignmentElementBuilder {
 		private int ref_start;
 		private int alt_start;
 		private int length;
+		private NCBIgffAlignmentElementType type;
 
-		public NCBIgffAlignmentMatchBuilder refStart(int value) {
+		public NCBIgffAlignmentElementBuilder refStart(int value) {
 			this.ref_start = value;
 			return this;
 		}
 
-		public NCBIgffAlignmentMatchBuilder altStart(int value) {
+		public NCBIgffAlignmentElementBuilder altStart(int value) {
 			this.alt_start = value;
 			return this;
 		}
 
-		public NCBIgffAlignmentMatchBuilder length(int value) {
+		public NCBIgffAlignmentElementBuilder length(int value) {
 			this.length = value;
 			return this;
 		}
 
-		public NCBIgffAlignmentMatch build() {
-			return new NCBIgffAlignmentMatch(this);
+		public NCBIgffAlignmentElementBuilder type(NCBIgffAlignmentElementType type) {
+			this.type = type;
+			return this;
 		}
+
+		public NCBIgffAlignmentElement build() {
+			return new NCBIgffAlignmentElement(this);
+		}
+	}
+
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(type.toString()).append("\tref: ").append(ref_start).append("\talt: ").append(alt_start)
+				.append("\tlength: ").append(length);
+		return sb.toString();
 	}
 }

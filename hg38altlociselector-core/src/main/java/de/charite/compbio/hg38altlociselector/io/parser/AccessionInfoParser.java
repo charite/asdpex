@@ -80,7 +80,7 @@ public class AccessionInfoParser {
 	private AccessionInfoBuilder createBuilderFromLine(String line) throws AccessionInfoParseException {
 		AccessionInfoBuilder builder = new AccessionInfoBuilder();
 		String[] fields = line.split("\t");
-		if (fields.length != this.NFIELDS) {
+		if (fields.length != AccessionInfoParser.NFIELDS) {
 			String error = String.format(
 					"Malformed line in NCBI alts_accessions_xxx file:\n%s\nExpected %d fields but there were %d", line,
 					NFIELDS, fields.length);

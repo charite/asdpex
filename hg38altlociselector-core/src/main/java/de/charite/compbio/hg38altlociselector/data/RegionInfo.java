@@ -5,8 +5,6 @@ package de.charite.compbio.hg38altlociselector.data;
 
 import java.io.Serializable;
 
-import de.charite.compbio.hg38altlociselector.data.AccessionInfo.AccessionInfoBuilder;
-
 /**
  * @author Marten Jäger <marten.jaeger@charite.de>
  *
@@ -14,12 +12,12 @@ import de.charite.compbio.hg38altlociselector.data.AccessionInfo.AccessionInfoBu
 public class RegionInfo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private final String regionName;
-	private final String chromosome;
+	private final AccessionInfo chromosomeInfo;
 	private final int start;
 	private final int stop;
-	
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -28,8 +26,8 @@ public class RegionInfo implements Serializable {
 		return regionName;
 	}
 
-	public String getChromosome() {
-		return chromosome;
+	public AccessionInfo getChromosomeInfo() {
+		return chromosomeInfo;
 	}
 
 	public int getStart() {
@@ -40,13 +38,13 @@ public class RegionInfo implements Serializable {
 		return stop;
 	}
 
-	private RegionInfo(RegionInfoBuilder builder){
+	private RegionInfo(RegionInfoBuilder builder) {
 		this.regionName = builder.regionName;
-		this.chromosome = builder.chromosome;
+		this.chromosomeInfo = builder.chromosome;
 		this.start = builder.start;
 		this.stop = builder.stop;
 	}
-	
+
 	/**
 	 * Nester builder for the {@link RegionInfo}s.
 	 * 
@@ -54,32 +52,36 @@ public class RegionInfo implements Serializable {
 	 * @author Marten Jäger <marten.jaeger@charite.de>
 	 *
 	 */
-	public static class RegionInfoBuilder{
+	public static class RegionInfoBuilder {
 
 		private int stop;
 		private int start;
-		private String chromosome;
+		private AccessionInfo chromosome;
 		private String regionName;
-		
-		public RegionInfoBuilder chromosome(String chr) {
-			this.chromosome = chr;
+
+		public RegionInfoBuilder chromosome(AccessionInfo accessionInfo) {
+			this.chromosome = accessionInfo;
 			return this;
 		}
+
 		public RegionInfoBuilder regionName(String name) {
 			this.regionName = name;
 			return this;
 		}
+
 		public RegionInfoBuilder start(int value) {
 			this.start = value;
 			return this;
 		}
+
 		public RegionInfoBuilder stop(int value) {
 			this.stop = value;
 			return this;
 		}
+
 		public RegionInfo build() {
 			return new RegionInfo(this);
-		}		
+		}
 	}
 
 }

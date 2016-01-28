@@ -82,7 +82,8 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
 		System.out.println("[INFO] found placement for " + asMap.size() + " alt_loci");
 
 		System.out.println("[INFO] Read region definitions");
-		RegionInfoParser regParser = new RegionInfoParser(options.genomicRegionsDefinitionsPath);
+		RegionInfoParser regParser = new RegionInfoParser(options.genomicRegionsDefinitionsPath,
+				options.chrAccessionsPath);
 		ImmutableMap<String, RegionInfo> regMap = regParser.parse();
 		System.out.println("[INFO] found " + regMap.size() + " regions definitions");
 
@@ -170,7 +171,6 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
 				createFastaFile(options.fastqOutputPath + "/regions/" + currentReg.getRegionName() + ".fa",
 						currentReg.getRegionName(), reg.getBases(), false);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
