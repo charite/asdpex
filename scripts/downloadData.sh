@@ -62,11 +62,17 @@ downloadScaffolds(){
 
 downloadGenome(){
   echo "[INFO] download genome"
-  $GENOME=$DATA/hs38DH.fa
+  if [ ! -d $DATA/genome ]; then
+      mkdir $DATA/genome
+  fi
+  GENOME=$DATA/genome/hs38DH.fa
   if [ ! -f $GENOME ]; then
-    (wget -O- $url38 | gzip -dc; cat $DATA/genome/hs38DH-extra.fa) > $GENOME
+      echo "Downloading $GENOME...."
+      wget --progress=bar -O $GENOME.gz $url38 
+      gzip -dc $GENOME.gz > $GENOME
   fi
   [ ! -f $GENOME.fai ] && echo -e "\nPlease run 'samtools faidx $GENOME'...\n"
+ 
 }
 
 downloadChrInfo(){
@@ -92,6 +98,8 @@ downloadRegions(){
     wget --progress=bar -O $DATA/$FILE $NCBI/chr_context_for_alt_loci/GRCh38.p2/$FILE
   fi
 }
+
+
 
 ## create DATA directory if it not yet exists
 if [ -n "$2" ]; then
