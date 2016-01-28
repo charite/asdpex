@@ -39,8 +39,9 @@ if(!$infile){printUsage()}
 
 
 my $prefix = substr($infile,0,index($infile,".vcf"));
-$outfilevalide = "$prefix.valid.vcf";
-$outfileskipped = "$prefix.skipped.vcf";
+my $parameters = "${windowsize}_${mismatches}";
+$outfilevalide = "$prefix.$parameters.valid.vcf";
+$outfileskipped = "$prefix.$parameters.skipped.vcf";
 
 #print STDERR "$outfilevalide\n";
 #print STDERR "$outfileskipped\n";
@@ -96,10 +97,12 @@ close(IN);
 close(OUT);
 close(OUT2);
 
-print STDERR "skipped: $skipped\n";
-print STDERR "valid: $valid\n";
-print STDERR "combined: $combined\n";
+#print STDERR "skipped: $skipped\n";
+#print STDERR "valid: $valid\n";
+#print STDERR "combined: $combined\n";
 
+print STDERR "window\tmismatch\ttotal\tskipped\tvalid\tcollaped\n";
+printf STDERR "%d\t%d\t%d\t%d\t%d\t%d\n",$windowsize,$mismatches,$skipped+$valid+$combined,$skipped,$valid,$combined;
 
 ### FUNCTIONS
 
