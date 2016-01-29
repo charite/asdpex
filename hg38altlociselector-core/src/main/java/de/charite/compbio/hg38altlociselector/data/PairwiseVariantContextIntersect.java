@@ -9,8 +9,7 @@ import java.util.ArrayList;
 import htsjdk.variant.variantcontext.VariantContext;
 
 /**
- * Object storing the result output after calculating the Intersect of two
- * {@link VariantContext} Lists.
+ * Object storing the result output after calculating the Intersect of two {@link VariantContext} Lists.
  *
  * @author Marten Jäger <marten.jaeger@charite.de>
  *
@@ -21,16 +20,22 @@ public class PairwiseVariantContextIntersect implements Serializable, Comparable
      */
     private static final long serialVersionUID = 1L;
     // private final CloseableIterator<VariantContext> set1;
+    /** SNVs in the first set */
     private final ArrayList<VariantContext> set1SNVs;
+    /** SV in the first set */
     private final ArrayList<VariantContext> set1SVs;
     // private final int onlySet1SNVs;
 
     // private final CloseableIterator<VariantContext> set2;
+    /** SNVs in the second set */
     private final ArrayList<VariantContext> set2SNVs;
+    /** SV in the second set */
     private final ArrayList<VariantContext> set2SVs;
     // private final int onlySet2SNVs;
 
+    /** overlapping SNVs between the first and second set */
     private final ArrayList<VariantContext> intersectSNVs;
+    /** number of overlapping SVs between the first and the second set */
     private final int intersectSVs;
 
     private PairwiseVariantContextIntersect(PairwiseVariantContextIntersectBuilder builder) {
@@ -61,6 +66,12 @@ public class PairwiseVariantContextIntersect implements Serializable, Comparable
         return sb.toString();
     }
 
+    /**
+     * Calculates the left over SNVs which are no ASDPs. This is done by sum up all SNVs from the first and second set
+     * and remove the overlapping SNVs.
+     * 
+     * @return the not explainable SNVs e.g. all SNVs which are no ASDPs
+     */
     public int getFinalSVNs() {
         return this.set1SNVs.size() + this.set2SNVs.size() - (2 * this.intersectSNVs.size());
     }
@@ -206,6 +217,9 @@ public class PairwiseVariantContextIntersect implements Serializable, Comparable
         }
     }
 
+    /**
+     * 
+     */
     @Override
     public int compareTo(PairwiseVariantContextIntersect o) {
         int a = this.set1SNVs.size() + this.set2SNVs.size() - (2 * this.intersectSNVs.size());
