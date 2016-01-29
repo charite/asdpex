@@ -40,7 +40,7 @@ public final class Hg38altLociSeletorOptions {
     public String chrAccessionsPath = dataPath + "/chr_accessions_GRCh38.p2";
     public String altAccessionsPath = dataPath + "/alts_accessions_GRCh38.p2";
     public String altScaffoldPlacementPath = dataPath + "/all_alt_scaffold_placement.txt";
-    public String referencePath = dataPath + "/bwa.kit/hs38DH.fa";
+    public String referencePath = dataPath + "/genome/GRCh38.fa";
     public String genomicRegionsDefinitionsPath = dataPath + "/genomic_regions_definitions.txt";
 
     public boolean singleAltLociFile = false;
