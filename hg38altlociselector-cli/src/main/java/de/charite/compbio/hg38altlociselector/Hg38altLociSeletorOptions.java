@@ -24,7 +24,7 @@ public final class Hg38altLociSeletorOptions {
     /** directory to use for the downloads and the serialized file */
     private String dataPath = "data";
 
-    private String alignmentPath = dataPath + File.separator + "alignments";
+    private String alignmentPath = "alignments";
 
     private String resultsFolder = "../results";
 
@@ -34,16 +34,16 @@ public final class Hg38altLociSeletorOptions {
 
     private String seqanALign = "../seqan/regionalign2bed";
 
-    private String tempFolder = dataPath + File.separator + "tmp";
+    private String tempFolder = "tmp";
 
     public Command command;
     public String error;
 
-    private String chrAccessionsPath = dataPath + "/chr_accessions_GRCh38.p2";
-    private String altAccessionsPath = dataPath + "/alts_accessions_GRCh38.p2";
-    private String altScaffoldPlacementPath = dataPath + "/all_alt_scaffold_placement.txt";
-    private String referencePath = dataPath + "/genome/GRCh38.fa";
-    private String genomicRegionsDefinitionsPath = dataPath + "/genomic_regions_definitions.txt";
+    private String chrAccessionsPath = "chr_accessions_GRCh38.p2";
+    private String altAccessionsPath = "alts_accessions_GRCh38.p2";
+    private String altScaffoldPlacementPath = "all_alt_scaffold_placement.txt";
+    private String referencePath = "genome" + File.separator + "GRCh38.fa";
+    private String genomicRegionsDefinitionsPath = "genomic_regions_definitions.txt";
 
     public boolean singleAltLociFile = false;
 
@@ -102,7 +102,7 @@ public final class Hg38altLociSeletorOptions {
      * @return the alignmentPath
      */
     public String getAlignmentPath() {
-        return alignmentPath;
+        return dataPath + File.separator + alignmentPath;
     }
 
     /**
@@ -177,7 +177,7 @@ public final class Hg38altLociSeletorOptions {
      * @return the tempFolder
      */
     public String getTempFolder() {
-        return tempFolder;
+        return dataPath + File.separator + tempFolder;
     }
 
     /**
@@ -192,7 +192,7 @@ public final class Hg38altLociSeletorOptions {
      * @return the chrAccessionsPath
      */
     public String getChrAccessionsPath() {
-        return chrAccessionsPath;
+        return dataPath + File.separator + chrAccessionsPath;
     }
 
     /**
@@ -207,7 +207,7 @@ public final class Hg38altLociSeletorOptions {
      * @return the altAccessionsPath
      */
     public String getAltAccessionsPath() {
-        return altAccessionsPath;
+        return dataPath + File.separator + altAccessionsPath;
     }
 
     /**
@@ -222,7 +222,7 @@ public final class Hg38altLociSeletorOptions {
      * @return the altScaffoldPlacementPath
      */
     public String getAltScaffoldPlacementPath() {
-        return altScaffoldPlacementPath;
+        return dataPath + File.separator + altScaffoldPlacementPath;
     }
 
     /**
@@ -237,7 +237,7 @@ public final class Hg38altLociSeletorOptions {
      * @return the referencePath
      */
     public String getReferencePath() {
-        return referencePath;
+        return dataPath + File.separator + referencePath;
     }
 
     /**
@@ -252,7 +252,7 @@ public final class Hg38altLociSeletorOptions {
      * @return the genomicRegionsDefinitionsPath
      */
     public String getGenomicRegionsDefinitionsPath() {
-        return genomicRegionsDefinitionsPath;
+        return dataPath + File.separator + genomicRegionsDefinitionsPath;
     }
 
     /**
