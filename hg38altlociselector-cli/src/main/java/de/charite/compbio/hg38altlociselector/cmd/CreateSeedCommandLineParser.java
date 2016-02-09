@@ -20,53 +20,53 @@ import de.charite.compbio.hg38altlociselector.exceptions.HelpRequestedException;
  */
 public class CreateSeedCommandLineParser {
 
-	/** options representation for the Apache commons command line parser */
-	protected Options options;
-	/** the Apache commons command line parser */
-	protected CommandLineParser parser;
+    /** options representation for the Apache commons command line parser */
+    protected Options options;
+    /** the Apache commons command line parser */
+    protected CommandLineParser parser;
 
-	/**
-	 * 
-	 */
-	public CreateSeedCommandLineParser() {
-		initializeParser();
-	}
+    /**
+     * 
+     */
+    public CreateSeedCommandLineParser() {
+        initializeParser();
+    }
 
-	private void initializeParser() {
-		options = new Options();
-		options.addOption("h", "help", false, "show this help");
-		options.addOption("d", "data-dir", true, "folder with NCBI info files, defaults to \"data\"");
-		options.addOption("a", "aln-dir", true,
-				"folder with NCBI alignment gff files, defaults to \"data/alignments\"");
-		options.addOption("s", "seed-dir", true,
-				"folder where the seed info files will be stored, defaults to \"seed\"");
-		parser = new DefaultParser();
-	}
+    private void initializeParser() {
+        options = new Options();
+        options.addOption("h", "help", false, "show this help");
+        options.addOption("d", "data-dir", true, "folder with NCBI info files, defaults to \"data\"");
+        options.addOption("a", "aln-dir", true,
+                "folder with NCBI alignment gff files, defaults to \"data/alignments\"");
+        options.addOption("s", "seed-dir", true,
+                "folder where the seed info files will be stored, defaults to \"seed\"");
+        parser = new DefaultParser();
+    }
 
-	public Hg38altLociSeletorOptions parse(String[] args) throws ParseException, HelpRequestedException {
-		CommandLine cmd = parser.parse(options, args);
+    public Hg38altLociSeletorOptions parse(String[] args) throws ParseException, HelpRequestedException {
+        CommandLine cmd = parser.parse(options, args);
 
-		// Fill the resulting Options.
-		Hg38altLociSeletorOptions result = new Hg38altLociSeletorOptions();
-		result.command = Hg38altLociSeletorOptions.Command.CREATE_SEED;
+        // Fill the resulting Options.
+        Hg38altLociSeletorOptions result = new Hg38altLociSeletorOptions();
+        result.command = Hg38altLociSeletorOptions.Command.CREATE_SEED;
 
-		if (cmd.hasOption("help")) {
-			printHelp();
-			throw new HelpRequestedException();
-		}
+        if (cmd.hasOption("help")) {
+            printHelp();
+            throw new HelpRequestedException();
+        }
 
-		if (cmd.hasOption("data-dir"))
-			result.dataPath = cmd.getOptionValue("data-dir");
-		if (cmd.hasOption("aln-dir"))
-			result.alignmentPath = cmd.getOptionValue("aln-dir");
-		if (cmd.hasOption("seed-dir"))
-			result.seedInfoPath = cmd.getOptionValue("seed-dir");
+        if (cmd.hasOption("data-dir"))
+            result.setDataPath(cmd.getOptionValue("data-dir"));
+        if (cmd.hasOption("aln-dir"))
+            result.setAlignmentPath(cmd.getOptionValue("aln-dir"));
+        if (cmd.hasOption("seed-dir"))
+            result.setSeedInfoPath(cmd.getOptionValue("seed-dir"));
 
-		return result;
-	}
+        return result;
+    }
 
-	private void printHelp() {
-		System.err.println("Here will somewhen be the help ...");
-	}
+    private void printHelp() {
+        System.err.println("Here will somewhen be the help ...");
+    }
 
 }

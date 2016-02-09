@@ -74,14 +74,14 @@ public class AnnotateVCFCommandLineParser {
         }
 
         if (cmd.hasOption("ref"))
-            result.referencePath = cmd.getOptionValue("ref");
+            result.setReferencePath(cmd.getOptionValue("ref"));
         else {
             result.error = "Missing indexed reference fasta file: -r";
             printHelp(result);
         }
 
         if (cmd.hasOption("tmp"))
-            result.tempFolder = cmd.getOptionValue("tmp");
+            result.setTempFolder(cmd.getOptionValue("tmp"));
 
         return result;
     }
