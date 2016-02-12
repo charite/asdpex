@@ -36,6 +36,7 @@ public class AnnotateVCFCommandLineParser {
         options.addOption("a", "alt", true, "VCF file with alt loci information");
         options.addOption("o", "out", true, "VCF output file with the annotations");
         options.addOption("r", "ref", true, "reference fasta file with index");
+        options.addOption(null, "tmp", true, "folder with the temporary files");
         parser = new DefaultParser();
     }
 
@@ -73,11 +74,14 @@ public class AnnotateVCFCommandLineParser {
         }
 
         if (cmd.hasOption("ref"))
-            result.referencePath = cmd.getOptionValue("ref");
+            result.setReferencePath(cmd.getOptionValue("ref"));
         else {
             result.error = "Missing indexed reference fasta file: -r";
             printHelp(result);
         }
+
+        if (cmd.hasOption("tmp"))
+            result.setTempFolder(cmd.getOptionValue("tmp"));
 
         return result;
     }

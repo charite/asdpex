@@ -64,12 +64,11 @@ public class App {
         HelpFormatter.printHeader();
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Command: download    download transcript database  (not yet implemented)").append("\n");
+        sb.append("Command: align       construct fasta and seed files and do the alignments").append("\n");
         sb.append("         annotate    functional annotation of VCF files").append("\n");
         sb.append("         create-fa   construct fasta files for the alignments").append("\n");
         sb.append("         create-seed construct seed files for the alignments from the NCBI alignments").append("\n");
-        sb.append("         align       construct fasta and seed files and do the alignments").append("\n")
-                .append("\n");
+        sb.append("         download    download transcript database  (not yet implemented)").append("\n").append("\n");
         sb.append("Example: java -jar hg38altlociselector.jar download GRCh38").append("\n");
         sb.append("         java -jar hg38altlociselector.jar create-fa -o data/").append("\n").append("\n");
         HelpFormatter.printUsage(sb.toString());

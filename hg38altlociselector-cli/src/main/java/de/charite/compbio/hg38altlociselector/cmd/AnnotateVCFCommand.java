@@ -42,8 +42,7 @@ import htsjdk.variant.vcf.VCFFileReader;
  * <li>select region
  * <li>pick all alt loci for this region
  * <li>get all variants, that are in this region
- * <li>compare the overlaps and decide which allele (ref, alt.loci) is the most
- * probable
+ * <li>compare the overlaps and decide which allele (ref, alt.loci) is the most probable
  * </ol>
  * 
  *
@@ -64,8 +63,7 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
     /*
      * (non-Javadoc)
      * 
-     * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#
-     * parseCommandLine(java.lang.String[])
+     * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand# parseCommandLine(java.lang.String[])
      */
     @Override
     protected Hg38altLociSeletorOptions parseCommandLine(String[] args)
@@ -80,8 +78,7 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#run()
+     * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#run()
      */
     @Override
     public void run() throws AltLociSelectorException {
@@ -89,13 +86,14 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
         final VCFFileReader inputVCF = new VCFFileReader(new File(this.options.inputVcf));
 
         // init regions with alt. scaffolds
-        ImmutableList<Region> regions = new RegionBuilder(options.altAccessionsPath, options.altScaffoldPlacementPath,
-                options.genomicRegionsDefinitionsPath, options.chrAccessionsPath).build();
+        ImmutableList<Region> regions = new RegionBuilder(options.getAltAccessionsPath(),
+                options.getAltScaffoldPlacementPath(), options.getGenomicRegionsDefinitionsPath(),
+                options.getChrAccessionsPath()).build();
                 // System.out.println(regions.size());
 
         // init Reference FastA file e.g. Sequence Dictionary
         final ReferenceSequenceFile refFile = ReferenceSequenceFileFactory
-                .getReferenceSequenceFile(new File(options.referencePath));
+                .getReferenceSequenceFile(new File(options.getReferencePath()));
         if (!refFile.isIndexed()) {
             System.err.println("Reference fasta file is not indexed");
             System.exit(1); // TODO throw exception
@@ -164,7 +162,7 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                     ArrayList<VariantContext> locusVariantList;
                     PairwiseVariantContextIntersect intersect;
                     for (MetaLocus locus : regions.get(regionsOnChromosome.get(i)).getLoci().values()) {
-                        locusVCF = new VCFFileReader(new File(this.options.tempFolder + "/"
+                        locusVCF = new VCFFileReader(new File(this.options.getTempFolder() + "/"
                                 + locus.getAccessionInfo().createFastaIdentifier() + ".vcf.gz"));
                         locusVariantList = Lists.newArrayList(locusVCF.iterator());
                         intersect = VariantContextUtil.intersectVariantContext(refVariantList, locusVariantList);

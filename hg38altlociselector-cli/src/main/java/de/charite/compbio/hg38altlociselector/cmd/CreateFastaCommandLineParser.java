@@ -20,49 +20,49 @@ import de.charite.compbio.hg38altlociselector.exceptions.HelpRequestedException;
  */
 public final class CreateFastaCommandLineParser {
 
-	/** options representation for the Apache commons command line parser */
-	protected Options options;
-	/** the Apache commons command line parser */
-	protected CommandLineParser parser;
+    /** options representation for the Apache commons command line parser */
+    protected Options options;
+    /** the Apache commons command line parser */
+    protected CommandLineParser parser;
 
-	/**
-	 * 
-	 */
-	public CreateFastaCommandLineParser() {
-		initializeParser();
-	}
+    /**
+     * 
+     */
+    public CreateFastaCommandLineParser() {
+        initializeParser();
+    }
 
-	private void initializeParser() {
-		options = new Options();
-		options.addOption("h", "help", false, "show this help");
-		options.addOption("d", "data-dir", true, "target folder for downloaded files, defaults to \"data\"");
-		options.addOption("s", "single", false, "split the extended alternative loci into single files");
-		parser = new DefaultParser();
-	}
+    private void initializeParser() {
+        options = new Options();
+        options.addOption("h", "help", false, "show this help");
+        options.addOption("d", "data-dir", true, "target folder for downloaded files, defaults to \"data\"");
+        options.addOption("s", "single", false, "split the extended alternative loci into single files");
+        parser = new DefaultParser();
+    }
 
-	public Hg38altLociSeletorOptions parse(String[] args) throws ParseException, HelpRequestedException {
-		CommandLine cmd = parser.parse(options, args);
+    public Hg38altLociSeletorOptions parse(String[] args) throws ParseException, HelpRequestedException {
+        CommandLine cmd = parser.parse(options, args);
 
-		// Fill the resulting Options.
-		Hg38altLociSeletorOptions result = new Hg38altLociSeletorOptions();
-		result.command = Hg38altLociSeletorOptions.Command.CREATE_FASTA;
+        // Fill the resulting Options.
+        Hg38altLociSeletorOptions result = new Hg38altLociSeletorOptions();
+        result.command = Hg38altLociSeletorOptions.Command.CREATE_FASTA;
 
-		if (cmd.hasOption("help")) {
-			printHelp();
-			throw new HelpRequestedException();
-		}
+        if (cmd.hasOption("help")) {
+            printHelp();
+            throw new HelpRequestedException();
+        }
 
-		if (cmd.hasOption("data-dir"))
-			result.dataPath = cmd.getOptionValue("data-dir");
+        if (cmd.hasOption("data-dir"))
+            result.setDataPath(cmd.getOptionValue("data-dir"));
 
-		if (cmd.hasOption("single"))
-			result.singleAltLociFile = true;
+        if (cmd.hasOption("single"))
+            result.singleAltLociFile = true;
 
-		return result;
-	}
+        return result;
+    }
 
-	private void printHelp() {
-		System.err.println("Here will somewhen be the help ...");
-	}
+    private void printHelp() {
+        System.err.println("Here will somewhen be the help ...");
+    }
 
 }

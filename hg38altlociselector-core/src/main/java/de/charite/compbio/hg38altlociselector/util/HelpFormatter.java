@@ -10,7 +10,7 @@ package de.charite.compbio.hg38altlociselector.util;
 public class HelpFormatter {
 
     public enum Failure {
-        MISSING_VCF
+        MISSING_VCF, MISSING_DATA_PATH
     }
 
     public static final String VERSION = "0.0.1";
