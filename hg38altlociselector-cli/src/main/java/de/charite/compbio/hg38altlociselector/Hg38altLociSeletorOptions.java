@@ -26,13 +26,13 @@ public final class Hg38altLociSeletorOptions {
 
     private String alignmentPath = "alignments";
 
-    private String resultsFolder = "../results";
+    private String resultsFolder = "results";
 
     private String fastqOutputPath = "../fasta";
 
     private String seedInfoPath = "../seed";
 
-    private String seqanALign = "../seqan/regionalign2bed";
+    private String seqanAlign = "regionalign2bed";
 
     private String tempFolder = "tmp";
 
@@ -161,16 +161,16 @@ public final class Hg38altLociSeletorOptions {
     /**
      * @return the seqanALign
      */
-    public String getSeqanALign() {
-        return seqanALign;
+    public String getSeqanAlign() {
+        return seqanAlign;
     }
 
     /**
      * @param seqanALign
      *            the seqanALign to set
      */
-    public void setSeqanALign(String seqanALign) {
-        this.seqanALign = seqanALign;
+    public void setSeqanAlign(String seqanAlign) {
+        this.seqanAlign = seqanAlign;
     }
 
     /**
