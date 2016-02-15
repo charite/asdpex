@@ -38,7 +38,10 @@ public final class AlignCommandLineParser {
     private void initializeParser() {
         options = new Options();
         options.addOption("h", "help", false, "show this help");
-        options.addOption("d", "data-dir", true, "target folder for downloaded files, defaults to \"data\"");
+        options.addOption("d", "data-dir", true,
+                "target folder for downloaded files, defaults to \"data\" (mandatory)");
+        options.addOption("o", "out-dir", true, "output folder for generated VCF file(s) \"results\" (mandatory)");
+        options.addOption("s", "seqan", true, "path to the SeqAn aligner \"regionalign2bed\" (mandatory) ");
         options.addOption(null, "tmp", true,
                 "temporary folder for seeds, fastA, etc. files, defaults to \"<data-dir>" + File.separator + "tmp\"");
         parser = new DefaultParser();
@@ -58,6 +61,20 @@ public final class AlignCommandLineParser {
 
         if (cmd.hasOption("data-dir"))
             result.setDataPath(cmd.getOptionValue("data-dir"));
+        else {
+            printHelp(result);
+            throw new HelpRequestedException();
+        }
+
+        if (cmd.hasOption("out-dir"))
+            result.setResultsFolder(cmd.getOptionValue("out-dir"));
+        else {
+            printHelp(result);
+            throw new HelpRequestedException();
+        }
+
+        if (cmd.hasOption("seqan"))
+            result.setSeqanAlign(cmd.getOptionValue("seqan"));
         else {
             printHelp(result);
             throw new HelpRequestedException();

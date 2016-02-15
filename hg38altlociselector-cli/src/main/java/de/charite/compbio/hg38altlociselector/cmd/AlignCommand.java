@@ -102,8 +102,8 @@ public class AlignCommand extends AltLociSelectorCommand {
             String identifier = createFastaIdentifier(locus.getAccessionInfo());
 
             // if (!identifier.equals("chr17_GL000258v2_alt"))
-            if (!identifier.equals("chr5_GL949742v1_alt"))
-                continue;
+            // if (!identifier.equals("chr5_GL949742v1_alt"))
+            // continue;
 
             // identifier for the GFF file
             String filenameGFF = createGffIdentifier(locus.getPlacementInfo());
@@ -119,6 +119,10 @@ public class AlignCommand extends AltLociSelectorCommand {
                 continue;
             }
 
+            // create outputfolder
+            checkOutFolder();
+
+            // do the alignments
             int block = 1;
             for (NCBIgffAlignment alignment : alignments) {
                 System.out.println("- process gff alignment: " + block + " | " + alignments.size());
@@ -148,12 +152,12 @@ public class AlignCommand extends AltLociSelectorCommand {
 
                     writeFilesToDisc(identifier, locus.getRegionInfo().getRegionName(), block, altLoci, ref,
                             indelSplitAlignment);
-                            // try {
-                            // runAlignment(identifier, block, altLoci, ref, indelSplitAlignment.getRefStart() - 1);
-                            // } catch (IOException | InterruptedException e) {
-                            // System.err.println("Failed to run align command. That's strange ...");
-                            // e.printStackTrace();
-                            // }
+                    try {
+                        runAlignment(identifier, block, altLoci, ref, indelSplitAlignment.getRefStart() - 1);
+                    } catch (IOException | InterruptedException e) {
+                        System.err.println("Failed to run align command. That's strange ...");
+                        e.printStackTrace();
+                    }
 
                     // ArrayList<Tuple> list =
                     // filterTupleByLength(getNblocks(altLoci), 10);
@@ -187,15 +191,32 @@ public class AlignCommand extends AltLociSelectorCommand {
         System.out.println("*");
     }
 
+    /**
+     * Checks if the outputfolder exists otherwise creates it
+     */
+    private void checkOutFolder() {
+        File out = new File(options.getResultsFolder());
+        if (out.exists()) {
+            System.out.println("[INFO] output folder exists");
+        } else {
+            if (out.mkdirs()) {
+                System.out.println("[INFO] created output folder: " + out.getAbsolutePath());
+            } else {
+                System.err.println("[ERROR] failed to create folder: " + out.getAbsolutePath());
+            }
+        }
+
+    }
+
     private void runAlignment(String identifier, int block, byte[] altLoci, byte[] ref, int offset)
             throws IOException, InterruptedException {
 
         StringBuilder cmd = new StringBuilder();
-        cmd.append(options.getSeqanALign()).append(" -R ")
+        cmd.append(options.getSeqanAlign()).append(" -R ")
                 .append(options.getTempFolder() + "/" + identifier + "_ref_" + block + ".fa").append(" -A ")
                 .append(options.getTempFolder() + "/" + identifier + "_altLoci_" + block + ".fa").append(" -S ")
                 .append(options.getTempFolder() + "/" + identifier + "_" + block + ".tab").append(" -V ")
-                .append(options.getTempFolder() + "/" + identifier + ".vcf").append(" -N ")
+                .append(options.getResultsFolder() + "/" + identifier + ".vcf").append(" -N ")
                 .append(options.getTempFolder() + "/aln/" + identifier + "_" + block + ".aln").append(" -o ")
                 .append(offset);
         if (block > 1)
