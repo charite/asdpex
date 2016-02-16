@@ -1,9 +1,14 @@
-#!/usr/bin/bash
+#!/bin/bash
 #
 # concatenate the VCFs from the prediction tool into a single VCF file
+#
+# command:
+#      bash mergeVCFs.sh <path to VCF folder> <outfile.vcf>
 
-OUT="../all_ASDPs.vcf"
-for i in $(ls ../tmp/*.vcf)
+#OUT="../all_ASDPs.vcf"
+OUT=$2
+
+for i in $(ls ${1}/*.vcf)
 do
   if [ -z $HEADER ]
   then
@@ -14,4 +19,6 @@ do
 done
 
 # extract SNVs and small InDels
-sortBed -header -i ../all_ASDPs.vcf | grep -v "SVLEN=" > ../all_ASDPs.SNV.vcf
+BASE=$(basename $OUT .vcf)
+DIR=$(dirname $OUT)
+sortBed -header -i $OUT | grep -v "SVLEN=" > $DIR/${BASE}.SNV.vcf

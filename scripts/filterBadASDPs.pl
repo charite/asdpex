@@ -185,3 +185,4 @@ OPTIONS:
 	-w 	--window		windowsize
 	-m	--mismatch	allowed mismatches
 	-h	--help		show this help
+        -c      --collapse      collapse neighboring variants
