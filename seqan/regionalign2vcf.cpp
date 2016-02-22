@@ -332,15 +332,15 @@ int main(int argc, char const ** argv)
 		//	    int score = bandedChainAlignment(align, seedChain, scoringScheme, adapt);
 
 		// this one is used for the paper
-//		std::cout << "[INFO] Calculate the seeded and banded alignment." << std::endl;
-//		int score = bandedChainAlignment(align, seedChain, scoringScheme, 10);
+		std::cout << "[INFO] Calculate the seeded and banded alignment." << std::endl;
+		int score = bandedChainAlignment(align, seedChain, scoringScheme, 10);
 
 
 //		std::cout << "[INFO] Calculate the global alignment." << std::endl;
 //		int score = globalAlignment(align, scoringScheme, Hirschberg());
 
-		std::cout << "[INFO] Calculate the banded alignment." << std::endl;
-		int score = globalAlignment(align, Score<int, Simple>(0, -1, -1), -5000, 5000);
+//		std::cout << "[INFO] Calculate the banded alignment." << std::endl;
+//		int score = globalAlignment(align, Score<int, Simple>(0, -1, -1), -5000, 5000);
 
 
 	    int c = findDifferences(align,chrom,region_id,value(it_ids),regionStart,files[VCF],append);
