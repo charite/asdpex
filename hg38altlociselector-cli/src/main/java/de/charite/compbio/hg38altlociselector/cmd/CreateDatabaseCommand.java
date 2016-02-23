@@ -3,8 +3,9 @@
  */
 package de.charite.compbio.hg38altlociselector.cmd;
 
+import org.apache.commons.cli.ParseException;
+
 import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
-import de.charite.compbio.hg38altlociselector.db.DatabaseManger;
 import de.charite.compbio.hg38altlociselector.exceptions.AltLociSelectorException;
 import de.charite.compbio.hg38altlociselector.exceptions.CommandLineParsingException;
 import de.charite.compbio.hg38altlociselector.exceptions.HelpRequestedException;
@@ -15,14 +16,14 @@ import de.charite.compbio.hg38altlociselector.exceptions.HelpRequestedException;
  * @author Marten Jäger <marten.jaeger@charite.de>
  *
  */
-public class DownloadCommand extends AltLociSelectorCommand {
+public class CreateDatabaseCommand extends AltLociSelectorCommand {
 
     /**
      * @param args
      * @throws HelpRequestedException
      * @throws CommandLineParsingException
      */
-    public DownloadCommand(String[] args) throws CommandLineParsingException, HelpRequestedException {
+    public CreateDatabaseCommand(String[] args) throws CommandLineParsingException, HelpRequestedException {
         super(args);
     }
 
@@ -32,9 +33,13 @@ public class DownloadCommand extends AltLociSelectorCommand {
      * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#parseCommandLine(java.lang.String[])
      */
     @Override
-    protected Hg38altLociSeletorOptions parseCommandLine(String[] args) {
-        // TODO Auto-generated method stub
-        return null;
+    protected Hg38altLociSeletorOptions parseCommandLine(String[] args)
+            throws CommandLineParsingException, HelpRequestedException {
+        try {
+            return new CreateDatabaseCommandLineParser().parse(args);
+        } catch (ParseException e) {
+            throw new CommandLineParsingException("Could not parse the command line.", e);
+        }
     }
 
     /*
@@ -44,8 +49,8 @@ public class DownloadCommand extends AltLociSelectorCommand {
      */
     @Override
     public void run() throws AltLociSelectorException {
-        DatabaseManger dbMan = new DatabaseManger("/home/mjaeger/git/hg38altLociSelector/hg38database.sqlite");
-        throw new HelpRequestedException();
+        // TODO Auto-generated method stub
+
     }
 
 }

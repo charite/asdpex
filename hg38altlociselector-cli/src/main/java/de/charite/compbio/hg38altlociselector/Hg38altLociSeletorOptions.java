@@ -58,12 +58,14 @@ public final class Hg38altLociSeletorOptions {
     public String altlociVcf;
     /** path to the annotated output VCF file */
     public String outputVcf;
+    /** path to the SQLite file storing programs data */
+    private String sqlitePath;
 
     /**
      * The command that is to be executed.
      */
     public enum Command {
-        DOWNLOAD, ANNOTATE_VCF, CREATE_FASTA, CREATE_SEED, ALIGN;
+        DOWNLOAD, ANNOTATE_VCF, CREATE_FASTA, CREATE_SEED, ALIGN, CREATE_DB;
 
         public String toString() {
             switch (this) {
@@ -77,6 +79,8 @@ public final class Hg38altLociSeletorOptions {
                 return "create-seed";
             case ALIGN:
                 return "align";
+            case CREATE_DB:
+                return "create-db";
             default:
                 return "unknown";
             }
@@ -261,6 +265,25 @@ public final class Hg38altLociSeletorOptions {
      */
     public void setGenomicRegionsDefinitionsPath(String genomicRegionsDefinitionsPath) {
         this.genomicRegionsDefinitionsPath = genomicRegionsDefinitionsPath;
+    }
+
+    /**
+     * Sets the path to the SQLite database file.
+     * 
+     * @param sqlitePath
+     *            path to the SQLite file
+     */
+    public void setSqlitePath(String sqlitePath) {
+        this.sqlitePath = sqlitePath;
+    }
+
+    /**
+     * Returns the path to the SQLite database file.
+     * 
+     * @return path to SQLite file
+     */
+    public String getSqlitePath() {
+        return (this.sqlitePath);
     }
 
 }

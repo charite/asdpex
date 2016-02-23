@@ -13,6 +13,15 @@ chmod +x downloadData.sh
 After you have downloaded the data, you will need to index the Genome using samtools (the script will produce a message with the command you need, and if samtools is not in your path adjust the command accordingly).
 
 ## Build the executables
+
+First you should compile the aligner, which is written in C using the SeqAn library.
+```
+cd seqan
+make
+cd ..
+```
+This command should result in an executable programm called regionalign2vcf, which is later on needed.
+
 We use the maven build system to compile the code. First cd back to the main folder.
 ```
 cd ..

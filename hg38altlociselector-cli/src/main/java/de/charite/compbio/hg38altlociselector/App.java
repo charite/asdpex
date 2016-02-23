@@ -3,6 +3,7 @@ package de.charite.compbio.hg38altlociselector;
 import de.charite.compbio.hg38altlociselector.cmd.AlignCommand;
 import de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand;
 import de.charite.compbio.hg38altlociselector.cmd.AnnotateVCFCommand;
+import de.charite.compbio.hg38altlociselector.cmd.CreateDatabaseCommand;
 import de.charite.compbio.hg38altlociselector.cmd.CreateFastaCommand;
 import de.charite.compbio.hg38altlociselector.cmd.CreateSeedCommand;
 import de.charite.compbio.hg38altlociselector.cmd.DownloadCommand;
@@ -32,6 +33,8 @@ public class App {
                 cmd = new AlignCommand(args);
             else if (args[0].equals("annotate"))
                 cmd = new AnnotateVCFCommand(args);
+            else if (args[0].equals("create-db"))
+                cmd = new CreateDatabaseCommand(args);
             else if (args[0].equals("create-fa"))
                 cmd = new CreateFastaCommand(args);
             else if (args[0].equals("create-seed"))
@@ -66,6 +69,7 @@ public class App {
         StringBuilder sb = new StringBuilder();
         sb.append("Command: align       construct fasta and seed files and do the alignments").append("\n");
         sb.append("         annotate    functional annotation of VCF files").append("\n");
+        sb.append("         create-db   creates a SQLite database used for the program").append("\n");
         sb.append("         create-fa   construct fasta files for the alignments").append("\n");
         sb.append("         create-seed construct seed files for the alignments from the NCBI alignments").append("\n");
         sb.append("         download    download transcript database  (not yet implemented)").append("\n").append("\n");
