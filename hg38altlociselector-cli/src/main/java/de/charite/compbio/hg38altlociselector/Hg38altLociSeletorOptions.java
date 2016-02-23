@@ -32,7 +32,7 @@ public final class Hg38altLociSeletorOptions {
 
     private String seedInfoPath = "../seed";
 
-    private String seqanAlign = "regionalign2bed";
+    private String seqanAlign = "regionalign2vcf";
 
     private String tempFolder = "tmp";
 
@@ -237,7 +237,7 @@ public final class Hg38altLociSeletorOptions {
      * @return the referencePath
      */
     public String getReferencePath() {
-        return dataPath + File.separator + referencePath;
+        return referencePath;
     }
 
     /**
