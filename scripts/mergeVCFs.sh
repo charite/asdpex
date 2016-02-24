@@ -17,8 +17,12 @@ do
   fi
   grep -v "^#" $i >> $OUT
 done
+sortBed -header -i $OUT | bgzip -c >${OUT}.gz
+tabix ${OUT}.gz
+rm $OUT
 
 # extract SNVs and small InDels
-BASE=$(basename $OUT .vcf)
-DIR=$(dirname $OUT)
-sortBed -header -i $OUT | grep -v "SVLEN=" > $DIR/${BASE}.SNV.vcf
+BASE=$(basename $OUT.gz .vcf.gz)
+DIR=$(dirname $OUT.gz)
+zgrep -v "SVLEN=" ${OUT}.gz | bgzip -c > $DIR/${BASE}.SNV.vcf.gz
+tabix $DIR/${BASE}.SNV.vcf.gz

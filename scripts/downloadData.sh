@@ -1,7 +1,14 @@
 #!/bin/bash
 
-ROOT=`dirname $0`
-DATA="$ROOT/../data"
+if [ ! $2 ]
+then
+  echo "missing data path - set default to ./data"
+  DATA=data
+else
+  DATA=$2
+fi
+#ROOT=`dirname $0`
+#DATA="$ROOT/../data"
 RELEASE=GRCh38
 
 url38="ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_full_analysis_set.fna.gz"
@@ -37,7 +44,7 @@ downloadAlignments(){
   do
     echo $i
     FILE=`basename $i`
-    if [ ! -f $DATA/aln/$FILE ]; then
+    if [ ! -f $DATA/alignments/$FILE ]; then
       wget --progress=bar -O $DATA/alignments/$FILE $NCBI/chr_context_for_alt_loci/GRCh38.p2/$i
     fi
   done

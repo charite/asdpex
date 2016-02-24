@@ -97,6 +97,10 @@ close(IN);
 close(OUT);
 close(OUT2);
 
+print STDERR "[INFO] bgzip & tabix\n";
+system("bgzip -f $outfilevalide; tabix -f ${outfilevalide}.gz");
+system("bgzip -f $outfileskipped; tabix -f ${outfileskipped}.gz");
+
 #print STDERR "skipped: $skipped\n";
 #print STDERR "valid: $valid\n";
 #print STDERR "combined: $combined\n";
