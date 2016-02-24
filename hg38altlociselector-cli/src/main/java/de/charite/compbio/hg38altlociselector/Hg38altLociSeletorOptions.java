@@ -237,7 +237,7 @@ public final class Hg38altLociSeletorOptions {
      * @return the referencePath
      */
     public String getReferencePath() {
-        return referencePath;
+        return dataPath + File.separator + referencePath;
     }
 
     /**
