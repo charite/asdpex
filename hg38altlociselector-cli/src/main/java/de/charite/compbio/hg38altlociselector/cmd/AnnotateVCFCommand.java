@@ -162,9 +162,12 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                     ArrayList<VariantContext> locusVariantList;
                     PairwiseVariantContextIntersect intersect;
                     for (MetaLocus locus : regions.get(regionsOnChromosome.get(i)).getLoci().values()) {
-                        locusVCF = new VCFFileReader(new File(this.options.getTempFolder() + "/"
-                                + locus.getAccessionInfo().createFastaIdentifier() + ".vcf.gz"));
+                        // locusVCF = new VCFFileReader(new File(this.options.getTempFolder() + "/"
+                        // + locus.getAccessionInfo().createFastaIdentifier() + ".vcf.gz"));
+                        locusVCF = new VCFFileReader(new File(this.options.altlociVcf));
                         locusVariantList = Lists.newArrayList(locusVCF.iterator());
+                        for (VariantContext variantContext : locusVariantList) {
+                        }
                         intersect = VariantContextUtil.intersectVariantContext(refVariantList, locusVariantList);
                         // System.out.println(intersect.toString());
                         intersectList.add(intersect);
