@@ -1,7 +1,15 @@
 #!/bin/bash
 
-ROOT=`dirname $0`
-DATA="$ROOT/../data"
+if [ ! $2 ]
+then
+  echo "missing data path - set default to ./data"
+  DATA=data
+else
+  DATA=$2
+fi
+#ROOT=`dirname $0`
+#DATA="$ROOT/../data"
+RELEASE=GRCh38
 
 url38="ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_full_analysis_set.fna.gz"
 NCBI="ftp://ftp.ncbi.nlm.nih.gov/genomes/H_sapiens"
@@ -10,12 +18,13 @@ printHELP(){
 	  echo "Usage: $0 <param> [<datapath>]"
 	  echo "Analysis sets:"
 	  echo "param   file                              description"
-	  echo "hs38DH  hs38DH                            hs38a plus decoy contigs and HLA genes (recommended for GRCh38 mapping)"
+	  echo "grch38  grch38                            primary assembly of GRCh38 (incl. ALT contigs)"
 	  echo "chr     chr_accessions_GRCh38.p2          provides the correspondence between the RefSeq and GenBank records for each chromosome in the assembly"
 	  echo "alt     alts_accessions_GRCh38.p2         provides the correspondence between the RefSeq and GenBank records for each alt. scaffold in the assembly"
 	  echo "alt     all_alt_scaffold_placement.txt    provides the genomic localization for each alt. scaffold"
 	  echo "region  genomic_regions_definitions.txt   defining the regions on the primary assembly for which alternate loci or patch scaffolds are available"
 	  echo "aln     genomic_regions_definitions.txt   defining the regions on the primary assembly for which alternate loci or patch scaffolds are available"
+	  echo "all                                       download the complete dataset - all of the above"
 	  echo ""
 	  echo "Note: This script downloads the human reference genome for GRCh38 (hs38DH),"
 	  echo "      the chromosome, genomic region and alternative scaffold definitions,"
@@ -35,7 +44,7 @@ downloadAlignments(){
   do
     echo $i
     FILE=`basename $i`
-    if [ ! -f $DATA/aln/$FILE ]; then
+    if [ ! -f $DATA/alignments/$FILE ]; then
       wget --progress=bar -O $DATA/alignments/$FILE $NCBI/chr_context_for_alt_loci/GRCh38.p2/$i
     fi
   done
@@ -65,7 +74,7 @@ downloadGenome(){
   if [ ! -d $DATA/genome ]; then
       mkdir $DATA/genome
   fi
-  GENOME=$DATA/genome/hs38DH.fa
+  GENOME=$DATA/genome/$RELEASE.fa
   if [ ! -f $GENOME ]; then
       echo "Downloading $GENOME...."
       wget --progress=bar -O $GENOME.gz $url38 
@@ -118,7 +127,7 @@ elif [ $1 == "all" ]; then
   downloadScaffolds  
   downloadRegions
   downloadAlignments
-elif [ $1 == "hs38DH" ]; then
+elif [ $1 == "grch38" ]; then
 	downloadGenome
 elif [ $1 == "chr" ]; then
 	downloadChrInfo

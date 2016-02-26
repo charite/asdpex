@@ -97,11 +97,15 @@ close(IN);
 close(OUT);
 close(OUT2);
 
+print STDERR "[INFO] bgzip & tabix\n";
+system("bgzip -f $outfilevalide; tabix -f ${outfilevalide}.gz");
+system("bgzip -f $outfileskipped; tabix -f ${outfileskipped}.gz");
+
 #print STDERR "skipped: $skipped\n";
 #print STDERR "valid: $valid\n";
 #print STDERR "combined: $combined\n";
 
-print STDERR "window\tmismatch\ttotal\tskipped\tvalid\tcollaped\n";
+print STDERR "window\tmismatch\ttotal\tskipped\tvalid\tcollapsed\n";
 printf STDERR "%d\t%d\t%d\t%d\t%d\t%d\n",$windowsize,$mismatches,$skipped+$valid+$combined,$skipped,$valid,$combined;
 
 ### FUNCTIONS
@@ -111,6 +115,7 @@ printf STDERR "%d\t%d\t%d\t%d\t%d\t%d\n",$windowsize,$mismatches,$skipped+$valid
 ##
 sub addVariant{
 	my @fieldsCurrent = split(/\t/,$_);
+	my @infoCurrent = split(/;/,$fieldsCurrent[7]);
 	if($collapse){
 		if(scalar(@variants) == 0){
 			push(@positions, $fields[$POS]);
@@ -119,8 +124,9 @@ sub addVariant{
 		}else{
 			my $prevVariant = pop(@variants);
 			my @fieldsPrevious = split(/\t/,$prevVariant);
+			my @infoPrevious = split(/;/,$fieldsPrevious[7]);
 			#print ($fieldsPrevious[$POS] + length($fieldsPrevious[$REF])." - ".$fieldsCurrent[$POS]."\n");
-			if($fieldsPrevious[$POS] + length($fieldsPrevious[$REF]) == $fieldsCurrent[$POS] &&  length($fieldsPrevious[$REF]) ==  length($fieldsPrevious[$ALT]) && length($fieldsCurrent[$REF]) ==  length($fieldsCurrent[$ALT]) ){
+			if($infoCurrent[0] eq $infoPrevious[0] && $fieldsPrevious[$POS] + length($fieldsPrevious[$REF]) == $fieldsCurrent[$POS] &&  length($fieldsPrevious[$REF]) ==  length($fieldsPrevious[$ALT]) && length($fieldsCurrent[$REF]) ==  length($fieldsCurrent[$ALT]) ){
 				$fieldsPrevious[$REF] = "$fieldsPrevious[$REF]$fieldsCurrent[$REF]";
 				$fieldsPrevious[$ALT] = "$fieldsPrevious[$ALT]$fieldsCurrent[$ALT]";
 				push(@variants,join("\t",@fieldsPrevious));
@@ -183,3 +189,4 @@ OPTIONS:
 	-w 	--window		windowsize
 	-m	--mismatch	allowed mismatches
 	-h	--help		show this help
+        -c      --collapse      collapse neighboring variants

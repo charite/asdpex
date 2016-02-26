@@ -77,12 +77,12 @@ public class AlignCommand extends AltLociSelectorCommand {
         if (options == null)
             System.err.println("[ERROR] option = null");
         // alt. loci info parsing
-        ImmutableList<AlternativeLocus> loci = new AlternativeLociBuilder(options.altAccessionsPath,
-                options.altScaffoldPlacementPath, options.genomicRegionsDefinitionsPath, options.chrAccessionsPath)
-                        .build();
+        ImmutableList<AlternativeLocus> loci = new AlternativeLociBuilder(options.getAltAccessionsPath(),
+                options.getAltScaffoldPlacementPath(), options.getGenomicRegionsDefinitionsPath(),
+                options.getChrAccessionsPath()).build();
         // Ref fasta File
         final ReferenceSequenceFile refFile = ReferenceSequenceFileFactory
-                .getReferenceSequenceFile(new File(options.referencePath));
+                .getReferenceSequenceFile(new File(options.getReferencePath()));
         if (!refFile.isIndexed()) {
             System.err.println("The FastA is not index - please index file first and run again.");
             System.exit(1);
@@ -101,7 +101,8 @@ public class AlignCommand extends AltLociSelectorCommand {
             // identifier used for fastA and seed file
             String identifier = createFastaIdentifier(locus.getAccessionInfo());
 
-            // if (!identifier.equals("chr19_GL949753v2_alt"))
+            // if (!identifier.equals("chr17_GL000258v2_alt"))
+            // if (!identifier.equals("chr5_GL949742v1_alt"))
             // continue;
 
             // identifier for the GFF file
@@ -111,13 +112,17 @@ public class AlignCommand extends AltLociSelectorCommand {
             System.out.println("GFF filename: " + filenameGFF);
 
             ImmutableList<NCBIgffAlignment> alignments = null;
-            if (new File(options.alignmentPath, filenameGFF).exists()) {
-                alignments = new NCBIgffAlignmentParser(new File(options.alignmentPath, filenameGFF)).parse();
+            if (new File(options.getAlignmentPath(), filenameGFF).exists()) {
+                alignments = new NCBIgffAlignmentParser(new File(options.getAlignmentPath(), filenameGFF)).parse();
             } else {
                 System.err.println("File is missing: " + filenameGFF);
                 continue;
             }
 
+            // create outputfolder
+            checkOutFolder();
+
+            // do the alignments
             int block = 1;
             for (NCBIgffAlignment alignment : alignments) {
                 System.out.println("- process gff alignment: " + block + " | " + alignments.size());
@@ -133,10 +138,14 @@ public class AlignCommand extends AltLociSelectorCommand {
                 for (NCBIgffAlignment indelSplitAlignment : indelSplitAlignments) {
                     System.out
                             .println("- process Indel split alignment " + splitC + " | " + indelSplitAlignments.size());
+                    // System.out.println("- Ref strand: " + indelSplitAlignment.isRefStrand() + " | alt strand: "
+                    // + indelSplitAlignment.isAltStrand());
+                    // System.out.println(indelSplitAlignment);
                     splitC++;
                     // ALT LOCI
                     byte[] altLoci = extractSequence(refFile, identifier, indelSplitAlignment.getAltStart(),
                             indelSplitAlignment.getAltStop(), indelSplitAlignment.isAltStrand());
+                    // REF
                     byte[] ref = extractSequence(refFile, "chr" + locus.getPlacementInfo().getParentName(),
                             indelSplitAlignment.getRefStart(), indelSplitAlignment.getRefStop(),
                             indelSplitAlignment.isRefStrand());
@@ -182,16 +191,33 @@ public class AlignCommand extends AltLociSelectorCommand {
         System.out.println("*");
     }
 
+    /**
+     * Checks if the outputfolder exists otherwise creates it
+     */
+    private void checkOutFolder() {
+        File out = new File(options.getResultsFolder());
+        if (out.exists()) {
+            System.out.println("[INFO] output folder exists");
+        } else {
+            if (out.mkdirs()) {
+                System.out.println("[INFO] created output folder: " + out.getAbsolutePath());
+            } else {
+                System.err.println("[ERROR] failed to create folder: " + out.getAbsolutePath());
+            }
+        }
+
+    }
+
     private void runAlignment(String identifier, int block, byte[] altLoci, byte[] ref, int offset)
             throws IOException, InterruptedException {
 
         StringBuilder cmd = new StringBuilder();
-        cmd.append(options.seqanALign).append(" -R ")
-                .append(options.tempFolder + "/" + identifier + "_ref_" + block + ".fa").append(" -A ")
-                .append(options.tempFolder + "/" + identifier + "_altLoci_" + block + ".fa").append(" -S ")
-                .append(options.tempFolder + "/" + identifier + "_" + block + ".tab").append(" -V ")
-                .append(options.tempFolder + "/" + identifier + ".vcf").append(" -N ")
-                .append(options.resultsFolder + "/aln/" + identifier + "_" + block + ".aln").append(" -o ")
+        cmd.append(options.getSeqanAlign()).append(" -R ")
+                .append(options.getTempFolder() + "/" + identifier + "_ref_" + block + ".fa").append(" -A ")
+                .append(options.getTempFolder() + "/" + identifier + "_altLoci_" + block + ".fa").append(" -S ")
+                .append(options.getTempFolder() + "/" + identifier + "_" + block + ".tab").append(" -V ")
+                .append(options.getResultsFolder() + "/" + identifier + ".vcf").append(" -N ")
+                .append(options.getTempFolder() + "/aln/" + identifier + "_" + block + ".aln").append(" -o ")
                 .append(offset);
         if (block > 1)
             cmd.append(" -a");
@@ -235,7 +261,7 @@ public class AlignCommand extends AltLociSelectorCommand {
         // FASTA FILES
         // alt loci
         try {
-            createFastaFile(options.tempFolder + "/" + idALtLoci + "_altLoci_" + block + ".fa", idALtLoci, altLoci,
+            createFastaFile(options.getTempFolder() + "/" + idALtLoci + "_altLoci_" + block + ".fa", idALtLoci, altLoci,
                     false);
         } catch (IOException e) {
             e.printStackTrace();
@@ -243,7 +269,7 @@ public class AlignCommand extends AltLociSelectorCommand {
         }
         // ref
         try {
-            createFastaFile(options.tempFolder + "/" + idALtLoci + "_ref_" + block + ".fa", idRef, ref, false);
+            createFastaFile(options.getTempFolder() + "/" + idALtLoci + "_ref_" + block + ".fa", idRef, ref, false);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -251,7 +277,7 @@ public class AlignCommand extends AltLociSelectorCommand {
 
         // SEED FILES
         try {
-            createMatchesFile(options.tempFolder, idALtLoci + "_" + block + ".tab", alignment.getElements(), 0, 0);
+            createMatchesFile(options.getTempFolder(), idALtLoci + "_" + block + ".tab", alignment.getElements(), 0, 0);
         } catch (IOException e) {
             System.err.println("[ERROR] failed to create seed info file for sample: " + idALtLoci);
             e.printStackTrace();
