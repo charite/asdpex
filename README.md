@@ -1,5 +1,15 @@
 # hg38altLociSelector
 
+The application hg38altLociSelector and the scripts in this repository can be used to improve the alignments of the alternate scafoolds provided by NCBI, to search for alignable scaffold-discrepant positions (ASPDs) in the alignments, and to use the resulting ASDP file to screen sample VCF files from whole-genome sequencing for ASPDs (which are likely to be false-positive variant calls).
+
+Prerequisites:
+
+In addition to Java 8, you will need to install the tabix package. If you are on a debian-based system, enter
+
+```
+sudo apt-get install tabix
+```
+
 Tutorial:
 
 ## Download data
