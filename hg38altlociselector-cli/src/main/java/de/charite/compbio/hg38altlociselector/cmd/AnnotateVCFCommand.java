@@ -115,6 +115,17 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
 
         // TODO find a better way to perform region selection - maybe with the
         // database
+        // final VCFFileReader locusVCF = new VCFFileReader(new
+        // File(this.options.altlociVcf));
+        // locusVCF.close();
+        ArrayList<VariantContext> variantList = Lists
+                .newArrayList(new VCFFileReader(new File(this.options.altlociVcf)).iterator());
+        System.out.println("[INFO] used number of variants: " + variantList.size());
+        System.out.println("[INFO] Annotate regions:");
+        System.out.println("0%       50%       100%");
+        System.out.println("|.........|.........|");
+        int c = 1;
+        int limit = 0;
         for (String chr : TopLevelChromosomes.getInstance().getToplevel()) {
             // chrStart = 0;
             ArrayList<Integer> regionsOnChromosome = new ArrayList<>();
@@ -158,18 +169,23 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                             regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop()));
 
                     ArrayList<PairwiseVariantContextIntersect> intersectList = new ArrayList<>();
-                    VCFFileReader locusVCF;
-                    ArrayList<VariantContext> locusVariantList;
+                    // ArrayList<VariantContext> variantList;
+                    ArrayList<VariantContext> locusVariantList = new ArrayList<>();
                     PairwiseVariantContextIntersect intersect;
                     for (MetaLocus locus : regions.get(regionsOnChromosome.get(i)).getLoci().values()) {
-                        locusVCF = new VCFFileReader(new File(this.options.getTempFolder() + "/"
-                                + locus.getAccessionInfo().createFastaIdentifier() + ".vcf.gz"));
-                        locusVariantList = Lists.newArrayList(locusVCF.iterator());
+
+                        if (100.0 * c++ / regions.size() > limit) {
+                            limit += 5;
+                            System.out.print("*");
+                        }
+                        for (VariantContext variantContext : variantList) {
+
+                            if (variantContext.getAttribute("AL")
+                                    .equals(locus.getAccessionInfo().createFastaIdentifier()))
+                                locusVariantList.add(variantContext);
+                        }
                         intersect = VariantContextUtil.intersectVariantContext(refVariantList, locusVariantList);
-                        // System.out.println(intersect.toString());
                         intersectList.add(intersect);
-                        // intersectList.add(VariantContextUtil.intersectVariantContext(refVariantList,
-                        // locusVariantList));
                     }
                     // System.out.println("LOCI: " +
                     // regions.get(regionsOnChromosome.get(i)).getLoci().size());
@@ -186,16 +202,18 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                             writeModVariants(inputVCF, refFile, writerVCF, chr,
                                     regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart(),
                                     regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop(),
-                                    (MetaLocus) regions.get(regionsOnChromosome.get(i)).getLoci().values()
-                                            .toArray()[mostProbableAlleles.get(0)],
-                                    GenotypeType.HOM_VAR);
+                                    ((MetaLocus) regions.get(regionsOnChromosome.get(i)).getLoci().values()
+                                            .toArray()[mostProbableAlleles.get(0)]).getAccessionInfo()
+                                                    .createFastaIdentifier(),
+                                    GenotypeType.HOM_VAR, intersectList.get(mostProbableAlleles.get(0)));
                         } else {
                             writeModVariants(inputVCF, refFile, writerVCF, chr,
                                     regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart(),
                                     regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop(),
-                                    (MetaLocus) regions.get(regionsOnChromosome.get(i)).getLoci().values()
-                                            .toArray()[mostProbableAlleles.get(0)],
-                                    GenotypeType.HET);
+                                    ((MetaLocus) regions.get(regionsOnChromosome.get(i)).getLoci().values()
+                                            .toArray()[mostProbableAlleles.get(0)]).getAccessionInfo()
+                                                    .createFastaIdentifier(),
+                                    GenotypeType.HET, intersectList.get(mostProbableAlleles.get(0)));
                             // System.out.println(chr + " : "
                             // +
                             // regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart()
@@ -258,42 +276,35 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
      * @param refFile
      * @param writer
      * @param chr
+     * @param pairwiseVariantContextIntersect
      */
     private void writeModVariants(VCFFileReader reader, ReferenceSequenceFile refFile, AnnotatedVariantWriter writer,
-            String chr, int start, int stop, MetaLocus locus, GenotypeType type) {
-        // CloseableIterator<VariantContext> currentVariants =
-        // reader.query("chr" + chr, start, stop);
-        // while (currentVariants.hasNext()) {
-        // writer.put(currentVariants.next());
-        // }
-        // return;
+            String chr, int start, int stop, String altLocusID, GenotypeType type,
+            PairwiseVariantContextIntersect pairwiseVariantContextIntersect) {
 
-        // System.out.println(locus);
-        // write block before alt scaffold starts
-        writeVariants(reader, refFile, writer, chr, start, locus.getPlacementInfo().getParentStart() - 1);
-        // System.out.println(chr + " : " + start + " - " +
-        // (locus.getPlacementInfo().getParentStart() - 1));
-        // write block covering the alt. scaffold
+        // write block before alt scaffold starts up to the first ASDP in the alt scaffold
+        writeVariants(reader, refFile, writer, chr, start,
+                pairwiseVariantContextIntersect.getSet2SNVs().get(0).getStart() - 1);
+
+        // write block covering the alt. scaffold ASDPs
         CloseableIterator<VariantContext> currentVariants = reader.query("chr" + chr,
-                locus.getPlacementInfo().getParentStart(), locus.getPlacementInfo().getParentStop());
+                pairwiseVariantContextIntersect.getSet2SNVs().get(0).getStart(), pairwiseVariantContextIntersect
+                        .getSet2SNVs().get(pairwiseVariantContextIntersect.getSet2SNVs().size() - 1).getStart());
 
-        // System.out.println(chr + " : " +
-        // locus.getPlacementInfo().getParentStart() + " - "
-        // + locus.getPlacementInfo().getParentStop());
         VariantContextBuilder builder;
         VariantContext curVC;
         while (currentVariants.hasNext()) {
             builder = new VariantContextBuilder(currentVariants.next());
-            builder.filter(options.VCFALTLOCISTRING);
-            builder.attribute(options.VCFALTLOCISTRING, locus.getAccessionInfo().createFastaIdentifier());
-            builder.attribute(options.VCFALTLOCIGENOTYPE, type.toString());
+            builder.filter(Hg38altLociSeletorOptions.VCFASDP);
+            builder.attribute(Hg38altLociSeletorOptions.VCFALTLOCISTRING, altLocusID);
+            builder.attribute(Hg38altLociSeletorOptions.VCFALTLOCIGENOTYPE, type.toString());
             curVC = builder.make();
             writer.put(curVC);
         }
-        // write block after alt scaffold ends
-        writeVariants(reader, refFile, writer, chr, locus.getPlacementInfo().getParentStop() + 1, stop);
-        // System.out.println(chr + " : " +
-        // (locus.getPlacementInfo().getParentStop() + 1) + " - " + stop);
+        // write block after alt scaffold ASDPs ends
+        writeVariants(reader, refFile, writer, chr, pairwiseVariantContextIntersect.getSet2SNVs()
+                .get(pairwiseVariantContextIntersect.getSet2SNVs().size() - 1).getStart() + 1, stop);
+
     }
 
 }

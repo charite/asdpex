@@ -32,6 +32,9 @@ hs_err_pid*
 /bin/
 
 
-# BACKUP, results, ...
+# SeqAn library
+seqan/seqan*
+
+# BACKUP results
 BACKUP*
 result*

@@ -41,12 +41,12 @@ public class AnnotatedVariantWriter {
         header.addMetaDataLine(new VCFHeaderLine("hg38altLociSelectorVersion", options.VERSION));
         header.addMetaDataLine(new VCFHeaderLine("hg38altLociSelectorCommand", "TODO ..."));
         // TODO add line with Commadn line call
-        header.addMetaDataLine(new VCFFilterHeaderLine(options.VCFALTLOCISTRING,
-                "Filtered due to a more likely alternative scaffold"));
+        header.addMetaDataLine(
+                new VCFFilterHeaderLine(options.VCFASDP, "Filtered due to a more likely alternative scaffold"));
         header.addMetaDataLine(new VCFInfoHeaderLine(options.VCFALTLOCISTRING, VCFHeaderLineCount.A,
-                VCFHeaderLineType.String, "moste likely alternative scaffold id replacement"));
+                VCFHeaderLineType.String, "most likely alternate scaffold id replacement"));
         header.addMetaDataLine(new VCFInfoHeaderLine(options.VCFALTLOCIGENOTYPE, VCFHeaderLineCount.A,
-                VCFHeaderLineType.String, "moste likely alternative scaffold replacement genotype"));
+                VCFHeaderLineType.String, "most likely alternate scaffold replacement genotype"));
         this.out.writeHeader(header);
     }
 
