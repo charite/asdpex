@@ -15,11 +15,13 @@ import java.io.File;
  */
 public final class Hg38altLociSeletorOptions {
 
-    public final static String VERSION = "0.0.1";
+    public final static String VERSION = "0.0.2";
 
     public static final String VCFALTLOCISTRING = "ALTLOCI";
 
     public static final String VCFALTLOCIGENOTYPE = "ALTGENOTYPE";
+
+    public static final String VCFASDP = "ASDP";
 
     /** directory to use for the downloads and the serialized file */
     private String dataPath = "data";

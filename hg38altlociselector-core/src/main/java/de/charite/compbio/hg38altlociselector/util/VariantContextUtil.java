@@ -20,9 +20,8 @@ import htsjdk.variant.variantcontext.VariantContext.Type;
 public class VariantContextUtil {
 
     /**
-     * Compares the entries in set1 to these in set2 and generates a
-     * {@link PairwiseVariantContextIntersect} object with the results. The sets
-     * have to be naturally sorted.
+     * Compares the entries in set1 to these in set2 and generates a {@link PairwiseVariantContextIntersect} object with
+     * the results. The sets have to be naturally sorted.
      * 
      * @param set1
      * @param set2
@@ -32,7 +31,6 @@ public class VariantContextUtil {
             ArrayList<VariantContext> set2) {
         if (set1 == null || set2 == null)
             return null;
-
         PairwiseVariantContextIntersectBuilder builder = new PairwiseVariantContextIntersectBuilder();
         // System.out.println("Compare Variants");
         // System.out.println("set1.size: " + set1.size());
@@ -65,7 +63,9 @@ public class VariantContextUtil {
                 vc2 = set2.get(i);
                 if (vc2.getType() == Type.SYMBOLIC)
                     continue;
-                if (vc1.getContig().equals(vc2.getContig()) && vc1.getStart() == vc2.getStart()
+                String contig1 = vc1.getContig().startsWith("chr") ? vc1.getContig() : "chr" + vc1.getContig();
+                String contig2 = vc2.getContig().startsWith("chr") ? vc2.getContig() : "chr" + vc1.getContig();
+                if (contig1.equals(contig2) && vc1.getStart() == vc2.getStart()
                         && vc1.hasAllele(vc2.getAlleles().get(0))) {
                     intersectSNV.add(vc1);
                     intersect = true;
@@ -89,8 +89,7 @@ public class VariantContextUtil {
     }
 
     /**
-     * Iterate over the list of alternative Scaffolds and check if there are
-     * some with a high probability to be present.
+     * Iterate over the list of alternative Scaffolds and check if there are some with a high probability to be present.
      * 
      * @return
      */
