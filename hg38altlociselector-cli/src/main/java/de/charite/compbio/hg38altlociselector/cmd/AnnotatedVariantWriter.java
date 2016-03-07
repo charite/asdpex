@@ -40,7 +40,7 @@ public class AnnotatedVariantWriter {
         // header.setSequenceDictionary(refFile.getSequenceDictionary());
         header.addMetaDataLine(new VCFHeaderLine("hg38altLociSelectorVersion", options.VERSION));
         header.addMetaDataLine(new VCFHeaderLine("hg38altLociSelectorCommand", "TODO ..."));
-        // TODO add line with Commadn line call
+        // TODO add line with Command line call
         header.addMetaDataLine(
                 new VCFFilterHeaderLine(options.VCFASDP, "Filtered due to a more likely alternative scaffold"));
         header.addMetaDataLine(new VCFInfoHeaderLine(options.VCFALTLOCISTRING, VCFHeaderLineCount.A,
@@ -58,14 +58,7 @@ public class AnnotatedVariantWriter {
      * @throws IOException
      *             when problem with I/O occurs
      */
-    // public void put(VariantContext vc) throws AnnotationException,
-    // IOException {
     public void put(VariantContext vc) {
-        // try {
-        // out.add(vc);
-        // } catch (TribbleException e) {
-        // e.printStackTrace();
-        // }
         out.add(vc);
     }
 
