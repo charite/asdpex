@@ -100,24 +100,13 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
         }
 
         // init Variant file writer
-        // final VariantContextWriter writerVCF = new
-        // VariantContextWriterBuilder()
-        // .setReferenceDictionary(refFile.getSequenceDictionary())
-        // .setOptions(EnumSet.of(Options.INDEX_ON_THE_FLY)).setOutputFile(options.outputVcf).build();
         final AnnotatedVariantWriter writerVCF = new AnnotatedVariantWriter(inputVCF, refFile, options);
 
         // start writing
-
         int regionIdx = 0;
-        // int chrStart;
-
         CloseableIterator<VariantContext> currentVariants;
 
-        // TODO find a better way to perform region selection - maybe with the
-        // database
-        // final VCFFileReader locusVCF = new VCFFileReader(new
-        // File(this.options.altlociVcf));
-        // locusVCF.close();
+        // TODO find a better way to perform region selection - maybe with the database
         ArrayList<VariantContext> variantList = Lists
                 .newArrayList(new VCFFileReader(new File(this.options.altlociVcf)).iterator());
         System.out.println("[INFO] used number of variants: " + variantList.size());
@@ -127,6 +116,10 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
         int c = 1;
         int limit = 0;
         for (String chr : TopLevelChromosomes.getInstance().getToplevel()) {
+            if (100.0 * c++ / TopLevelChromosomes.getInstance().getToplevel().size() > limit) {
+                limit += 5;
+                System.out.print("*");
+            }
             // chrStart = 0;
             ArrayList<Integer> regionsOnChromosome = new ArrayList<>();
             for (int i = 0; i < regions.size(); i++) {
@@ -136,8 +129,6 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
             if (regionsOnChromosome.isEmpty()) {
                 System.out.println(chr + " w/o region(s)");
                 writeVariants(inputVCF, refFile, writerVCF, chr, 1, refFile.getSequence("chr" + chr).length());
-                // System.out.println(chr + " : 1 - " +
-                // refFile.getSequence("chr" + chr).length());
             } else {
                 int i;
                 for (i = 0; i < regionsOnChromosome.size(); i++) {
@@ -145,23 +136,12 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                     if (i == 0) {
                         writeVariants(inputVCF, refFile, writerVCF, chr, 1,
                                 regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart() - 1);
-                        // System.out.println(chr + " : 1 - "
-                        // +
-                        // (regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart()
-                        // - 1));
                     } else {
                         writeVariants(inputVCF, refFile, writerVCF, chr,
                                 regions.get(regionsOnChromosome.get(i - 1)).getRegionInfo().getStop() + 1,
                                 regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart() - 1);
 
-                        // System.out.println(chr + " : "
-                        // + (regions.get(regionsOnChromosome.get(i -
-                        // 1)).getRegionInfo().getStop() + 1) + " - "
-                        // +
-                        // (regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart()
-                        // - 1));
-                        // TODO check with unittesting if the STart AND stop are
-                        // including
+                        // TODO check with unittesting if both start AND stop are included
                     }
                     // check and write block with alternative scaffold
                     ArrayList<VariantContext> refVariantList = Lists.newArrayList(inputVCF.query("chr" + chr,
@@ -173,22 +153,16 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                     ArrayList<VariantContext> locusVariantList = new ArrayList<>();
                     PairwiseVariantContextIntersect intersect;
                     for (MetaLocus locus : regions.get(regionsOnChromosome.get(i)).getLoci().values()) {
-
-                        if (100.0 * c++ / regions.size() > limit) {
-                            limit += 5;
-                            System.out.print("*");
-                        }
+                        // extract variants from alt. loci
                         for (VariantContext variantContext : variantList) {
-
                             if (variantContext.getAttribute("AL")
                                     .equals(locus.getAccessionInfo().createFastaIdentifier()))
                                 locusVariantList.add(variantContext);
                         }
+                        // calculate intersect
                         intersect = VariantContextUtil.intersectVariantContext(refVariantList, locusVariantList);
                         intersectList.add(intersect);
                     }
-                    // System.out.println("LOCI: " +
-                    // regions.get(regionsOnChromosome.get(i)).getLoci().size());
                     ArrayList<Integer> mostProbableAlleles = VariantContextUtil
                             .getMostProbableAlternativeScaffolds(intersectList);
                     // System.out.println("Intersect: " + intersectList.size());
@@ -196,9 +170,6 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                                                           // scaffold identified
                         if (mostProbableAlleles.size() == 2
                                 && mostProbableAlleles.get(0) == mostProbableAlleles.get(1)) {
-                            // System.out.println("Index: " +
-                            // mostProbableAlleles.get(0));
-                            // System.out.println(regions.get(regionsOnChromosome.get(i)).getLoci().size());
                             writeModVariants(inputVCF, refFile, writerVCF, chr,
                                     regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart(),
                                     regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop(),
@@ -214,42 +185,21 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                                             .toArray()[mostProbableAlleles.get(0)]).getAccessionInfo()
                                                     .createFastaIdentifier(),
                                     GenotypeType.HET, intersectList.get(mostProbableAlleles.get(0)));
-                            // System.out.println(chr + " : "
-                            // +
-                            // regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart()
-                            // + " - "
-                            // +
-                            // regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop());
                         }
-                    } else { // no alt. scaffold identified
+                    } else { // no alt. scaffold identified = REF-HAP
                         writeVariants(inputVCF, refFile, writerVCF, chr,
                                 regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart(),
                                 regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop());
-                        // System.out.println(
-                        // chr + " : " +
-                        // regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart()
-                        // + " - "
-                        // +
-                        // regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop());
                     }
                 }
                 // write final block up to the end of the chromosome
                 writeVariants(inputVCF, refFile, writerVCF, chr,
                         regions.get(regionsOnChromosome.get(i - 1)).getRegionInfo().getStop() + 1,
                         refFile.getSequence("chr" + chr).length());
-                        // System.out.println(
-                        // chr + " : " + (regions.get(regionsOnChromosome.get(i
-                        // - 1)).getRegionInfo().getStop() + 1)
-                        // + " - " + refFile.getSequence("chr" + chr).length());
-
-                // System.out.println(chr + " - " + regionsOnChromosome);
-                // System.exit(0);
             }
         }
-
         // close the variant writer
         writerVCF.close();
-
     }
 
     /**
