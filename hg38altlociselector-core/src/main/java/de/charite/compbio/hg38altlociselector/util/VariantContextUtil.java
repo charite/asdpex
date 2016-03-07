@@ -131,17 +131,7 @@ public class VariantContextUtil {
             if (result.size() >= 2)
                 break;
         }
-        // System.out.println("Input: " + intersectList.size());
-        // // first coverage alt. scaffold mind. 90%
-        // ArrayList<Integer> filterAltScaffold = new ArrayList<>();
-        // for (int i = 0; i < intersectList.size(); i++) {
-        // PairwiseVariantContextIntersect inter = intersectList.get(i);
-        // if ((double) inter.getIntersectSNVs().size() /
-        // inter.getSet2SNVs().size() > 0.9)
-        // filterAltScaffold.add(i);
-        // }
-        // System.out.println("alt. scaffold Coverage: " +
-        // filterAltScaffold.size());
+
         return result;
     }
 
