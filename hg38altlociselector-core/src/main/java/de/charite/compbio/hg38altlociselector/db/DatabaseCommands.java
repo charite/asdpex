@@ -17,7 +17,7 @@ public final class DatabaseCommands {
             + "refseq_accession TEXT NOT NULL, " + "start INTEGER NOT NULL," + "stop INTEGER NOT NULL, "
             + "FOREIGN KEY(refseq_accession) REFERENCES accession(refseq_accession))";
     public final static String CREATE_TABLE_PLACEMENT = "CREATE TABLE IF NOT EXISTS placement (alt_scaf_acc TEXT PRIMARY KEY NOT NULL, "
-            + "region_name TEXT NOT NULL, " + "orientation INTEGERE NOT NULL, " + "alt_scaf_start INTEGER NOT NULL, "
+            + "region_name TEXT NOT NULL, " + "orientation INTEGER NOT NULL, " + "alt_scaf_start INTEGER NOT NULL, "
             + "alt_scaf_stop INTEGER NOT NULL, " + "alt_start_tail INTEGER NOT NULL, "
             + "alt_stop_tail INTEGER NOT NULL, " + "parent_start INTEGER NOT NULL, " + "parent_stop INTEGER NOT NULL, "
             + "FOREIGN KEY(region_name) REFERENCES region(name), "
