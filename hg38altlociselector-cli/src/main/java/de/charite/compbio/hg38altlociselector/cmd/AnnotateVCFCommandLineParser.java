@@ -67,21 +67,21 @@ public class AnnotateVCFCommandLineParser {
         }
 
         if (cmd.hasOption("vcf"))
-            result.inputVcf = cmd.getOptionValue("vcf");
+            result.setInputVcf(cmd.getOptionValue("vcf"));
         else {
             result.error = "Missing sample VCF file: -v";
             printHelp(result);
         }
 
         if (cmd.hasOption("alt"))
-            result.altlociVcf = cmd.getOptionValue("alt");
+            result.setAltlociVcf(cmd.getOptionValue("alt"));
         else {
             result.error = "Missing alt loci VCF file: -a";
             printHelp(result);
         }
 
         if (cmd.hasOption("out"))
-            result.outputVcf = cmd.getOptionValue("out");
+            result.setOutputVcf(cmd.getOptionValue("out"));
         else {
             result.error = "Missing output VCF file: -o";
             printHelp(result);

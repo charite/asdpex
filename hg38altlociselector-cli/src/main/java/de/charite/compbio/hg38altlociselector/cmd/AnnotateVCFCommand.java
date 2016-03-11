@@ -83,7 +83,7 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
     @Override
     public void run() throws AltLociSelectorException {
         // init Variant INPUT
-        final VCFFileReader inputVCF = new VCFFileReader(new File(this.options.inputVcf));
+        final VCFFileReader inputVCF = new VCFFileReader(new File(this.options.getInputVcf()));
 
         // init regions with alt. scaffolds
         ImmutableList<Region> regions = new RegionBuilder(options.getAltAccessionsPath(),
@@ -119,7 +119,7 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
         // File(this.options.altlociVcf));
         // locusVCF.close();
         ArrayList<VariantContext> variantList = Lists
-                .newArrayList(new VCFFileReader(new File(this.options.altlociVcf)).iterator());
+                .newArrayList(new VCFFileReader(new File(this.options.getAltlociVcf())).iterator());
         System.out.println("[INFO] used number of variants: " + variantList.size());
         System.out.println("[INFO] Annotate regions:");
         System.out.println("0%       50%       100%");

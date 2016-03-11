@@ -24,7 +24,7 @@ public final class Hg38altLociSeletorOptions {
     public static final String VCFASDP = "ASDP";
 
     /** directory to use for the downloads and the serialized file */
-    private String dataPath = "data";
+    private String dataPath = "";
 
     private String alignmentPath = "alignments";
 
@@ -55,11 +55,11 @@ public final class Hg38altLociSeletorOptions {
     public int fastaLineLength = 70;
 
     /** path to the input VCF file for the annotation */
-    public String inputVcf;
+    private String inputVcf;
     /** path to the alt-loci VCF file(s) */
-    public String altlociVcf;
+    private String altlociVcf;
     /** path to the annotated output VCF file */
-    public String outputVcf;
+    private String outputVcf;
     /** path to the SQLite file storing programs data */
     private String sqlitePath;
 
@@ -286,6 +286,66 @@ public final class Hg38altLociSeletorOptions {
      */
     public String getSqlitePath() {
         return (this.sqlitePath);
+    }
+
+    /**
+     * @return the singleAltLociFile
+     */
+    public boolean isSingleAltLociFile() {
+        return singleAltLociFile;
+    }
+
+    /**
+     * @param singleAltLociFile
+     *            the singleAltLociFile to set
+     */
+    public void setSingleAltLociFile(boolean singleAltLociFile) {
+        this.singleAltLociFile = singleAltLociFile;
+    }
+
+    /**
+     * @return the inputVcf
+     */
+    public String getInputVcf() {
+        return inputVcf;
+    }
+
+    /**
+     * @param inputVcf
+     *            the inputVcf to set
+     */
+    public void setInputVcf(String inputVcf) {
+        this.inputVcf = inputVcf;
+    }
+
+    /**
+     * @return the altlociVcf
+     */
+    public String getAltlociVcf() {
+        return altlociVcf;
+    }
+
+    /**
+     * @param altlociVcf
+     *            the altlociVcf to set
+     */
+    public void setAltlociVcf(String altlociVcf) {
+        this.altlociVcf = altlociVcf;
+    }
+
+    /**
+     * @return the outputVcf
+     */
+    public String getOutputVcf() {
+        return outputVcf;
+    }
+
+    /**
+     * @param outputVcf
+     *            the outputVcf to set
+     */
+    public void setOutputVcf(String outputVcf) {
+        this.outputVcf = outputVcf;
     }
 
 }
