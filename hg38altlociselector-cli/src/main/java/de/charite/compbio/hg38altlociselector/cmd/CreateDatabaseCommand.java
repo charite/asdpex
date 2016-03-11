@@ -3,9 +3,13 @@
  */
 package de.charite.compbio.hg38altlociselector.cmd;
 
+import java.io.File;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.apache.commons.cli.ParseException;
+
+import com.google.common.collect.Lists;
 
 import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
 import de.charite.compbio.hg38altlociselector.db.DatabaseManger;
@@ -15,6 +19,8 @@ import de.charite.compbio.hg38altlociselector.exceptions.HelpRequestedException;
 import de.charite.compbio.hg38altlociselector.io.parser.AccessionInfoParser;
 import de.charite.compbio.hg38altlociselector.io.parser.AltScaffoldPlacementParser;
 import de.charite.compbio.hg38altlociselector.io.parser.RegionInfoParser;
+import htsjdk.variant.variantcontext.VariantContext;
+import htsjdk.variant.vcf.VCFFileReader;
 
 /**
  * 
@@ -60,6 +66,28 @@ public class CreateDatabaseCommand extends AltLociSelectorCommand {
         if (options == null)
             System.err.println("[ERROR] option = null");
         DatabaseManger dbman = new DatabaseManger(options.getSqlitePath());
+        if (!options.getDataPath().equals(""))
+            createAlternativeScaffoldTables(dbman);
+        if (options.getAltlociVcf() != null)
+            createAsdpTable(dbman);
+
+    }
+
+    private void createAsdpTable(DatabaseManger dbman) {
+        // add the additional ASDP table
+        dbman.addAsdpTable();
+        //
+        ArrayList<VariantContext> variantList = Lists
+                .newArrayList(new VCFFileReader(new File(this.options.getAltlociVcf())).iterator());
+        try {
+            dbman.uploadAsdp(variantList);
+            System.out.println("[INFO] Updated ASDPs");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createAlternativeScaffoldTables(DatabaseManger dbman) {
         // check files
         dbman.createDatabase();
 
