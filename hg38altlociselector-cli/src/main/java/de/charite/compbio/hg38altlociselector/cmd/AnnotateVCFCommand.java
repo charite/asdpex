@@ -4,6 +4,7 @@
 package de.charite.compbio.hg38altlociselector.cmd;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.apache.commons.cli.ParseException;
@@ -12,15 +13,17 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
-import de.charite.compbio.hg38altlociselector.data.MetaLocus;
+import de.charite.compbio.hg38altlociselector.data.AltScaffoldPlacementInfo;
 import de.charite.compbio.hg38altlociselector.data.PairwiseVariantContextIntersect;
 import de.charite.compbio.hg38altlociselector.data.Region;
 import de.charite.compbio.hg38altlociselector.data.RegionBuilder;
+import de.charite.compbio.hg38altlociselector.data.RegionInfo;
+import de.charite.compbio.hg38altlociselector.db.DatabaseManger;
 import de.charite.compbio.hg38altlociselector.exceptions.AltLociSelectorException;
 import de.charite.compbio.hg38altlociselector.exceptions.CommandLineParsingException;
 import de.charite.compbio.hg38altlociselector.exceptions.HelpRequestedException;
-import de.charite.compbio.hg38altlociselector.reference.TopLevelChromosomes;
 import de.charite.compbio.hg38altlociselector.util.VariantContextUtil;
+import htsjdk.samtools.reference.ReferenceSequence;
 import htsjdk.samtools.reference.ReferenceSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequenceFileFactory;
 import htsjdk.samtools.util.CloseableIterator;
@@ -82,6 +85,9 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
      */
     @Override
     public void run() throws AltLociSelectorException {
+        // DB Manger
+        final DatabaseManger dbMan = new DatabaseManger(this.options.getSqlitePath());
+
         // init Variant INPUT
         final VCFFileReader inputVCF = new VCFFileReader(new File(this.options.getInputVcf()));
 
@@ -111,7 +117,7 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
         int regionIdx = 0;
         // int chrStart;
 
-        CloseableIterator<VariantContext> currentVariants;
+        // CloseableIterator<VariantContext> currentVariants;
 
         // TODO find a better way to perform region selection - maybe with the
         // database
@@ -120,68 +126,94 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
         // locusVCF.close();
         ArrayList<VariantContext> variantList = Lists
                 .newArrayList(new VCFFileReader(new File(this.options.getAltlociVcf())).iterator());
-        System.out.println("[INFO] used number of variants: " + variantList.size());
+        try {
+            System.out.println("[INFO] number of known (SNV) ASDPs: " + dbMan.getTableSize("asdp"));
+        } catch (SQLException e) {
+            System.err.println("Failed to connect to database: " + options.getSqlitePath());
+            System.err.println("\tand get asdp table");
+            e.printStackTrace();
+            System.exit(0);
+        }
         System.out.println("[INFO] Annotate regions:");
         System.out.println("0%       50%       100%");
         System.out.println("|.........|.........|");
         int c = 1;
         int limit = 0;
-        for (String chr : TopLevelChromosomes.getInstance().getToplevel()) {
-            // chrStart = 0;
-            ArrayList<Integer> regionsOnChromosome = new ArrayList<>();
-            for (int i = 0; i < regions.size(); i++) {
-                if (regions.get(i).getRegionInfo().getChromosomeInfo().getChromosome().compareTo(chr) == 0)
-                    regionsOnChromosome.add(i);
+        // TODO we need a check if the VCF file contains a header or if we have to use the reference sequence
+        ReferenceSequence contig;
+        while ((contig = refFile.nextSequence()) != null) {
+            // TODO should we really skip non toplevel contigs or add extra flag
+            if (contig.getName().contains("_")) {
+                System.out.println("[INFO] Skipping contig: " + contig.getName());
+                continue;
             }
-            if (regionsOnChromosome.isEmpty()) {
-                System.out.println(chr + " w/o region(s)");
-                writeVariants(inputVCF, refFile, writerVCF, chr, 1, refFile.getSequence("chr" + chr).length());
-                // System.out.println(chr + " : 1 - " +
-                // refFile.getSequence("chr" + chr).length());
+
+            // fetch regions on chromosome
+            // ArrayList<Integer> regionsOnChromosome = new ArrayList<>();
+            ImmutableList<RegionInfo> regionsOnChromosome = null;
+            try {
+                regionsOnChromosome = dbMan.getRegionsNamesOnChromosome(contig.getName());
+            } catch (SQLException e) {
+                System.err.println("Failed to connect to database: " + options.getSqlitePath());
+                System.err.println("\tand get regions for chromosome: " + contig.getName());
+                e.printStackTrace();
+                System.exit(0);
+            }
+
+            if (regionsOnChromosome.isEmpty()) { // now regions on chromosome
+                System.out.println("[INFO] " + contig.getName() + " w/o region(s)");
+                writeVariants(inputVCF, refFile, writerVCF, contig.getName(), 1, contig.length());
+
             } else {
                 int i;
                 for (i = 0; i < regionsOnChromosome.size(); i++) {
                     // write out block before region
                     if (i == 0) {
-                        writeVariants(inputVCF, refFile, writerVCF, chr, 1,
-                                regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart() - 1);
-                        // System.out.println(chr + " : 1 - "
-                        // +
-                        // (regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart()
-                        // - 1));
-                    } else {
-                        writeVariants(inputVCF, refFile, writerVCF, chr,
-                                regions.get(regionsOnChromosome.get(i - 1)).getRegionInfo().getStop() + 1,
-                                regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart() - 1);
+                        writeVariants(inputVCF, refFile, writerVCF, contig.getName(), 1,
+                                regionsOnChromosome.get(i).getStart() - 1);
 
-                        // System.out.println(chr + " : "
-                        // + (regions.get(regionsOnChromosome.get(i -
-                        // 1)).getRegionInfo().getStop() + 1) + " - "
-                        // +
-                        // (regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart()
-                        // - 1));
-                        // TODO check with unittesting if the STart AND stop are
-                        // including
+                    } else {
+                        writeVariants(inputVCF, refFile, writerVCF, contig.getName(),
+                                regionsOnChromosome.get(i - 1).getStop() + 1,
+                                regionsOnChromosome.get(i).getStart() - 1);
                     }
                     // check and write block with alternative scaffold
-                    ArrayList<VariantContext> refVariantList = Lists.newArrayList(inputVCF.query("chr" + chr,
-                            regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart(),
-                            regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop()));
+                    ArrayList<VariantContext> refVariantList = Lists.newArrayList(inputVCF.query(contig.getName(),
+                            regionsOnChromosome.get(i).getStart(), regionsOnChromosome.get(i).getStop()));
 
                     ArrayList<PairwiseVariantContextIntersect> intersectList = new ArrayList<>();
                     // ArrayList<VariantContext> variantList;
                     ArrayList<VariantContext> locusVariantList = new ArrayList<>();
                     PairwiseVariantContextIntersect intersect;
-                    for (MetaLocus locus : regions.get(regionsOnChromosome.get(i)).getLoci().values()) {
 
+                    ImmutableList<AltScaffoldPlacementInfo> altScaffolds = null;
+                    try {
+                        altScaffolds = dbMan.getAltScaffoldPlacementInfos(regionsOnChromosome.get(i).getRegionName());
+                    } catch (SQLException e) {
+                        System.err.println("Failed to connect to database: " + options.getSqlitePath());
+                        System.err.println(
+                                "\tand fetch alt. scaffolds for region: " + regionsOnChromosome.get(i).getRegionName());
+                        e.printStackTrace();
+                        System.exit(0);
+                    }
+                    String fastaIdentifier = null;
+                    for (AltScaffoldPlacementInfo info : altScaffolds) {
+
+                        try {
+                            fastaIdentifier = dbMan.getFastaIdentifier(info.getAltScafAcc());
+                        } catch (SQLException e) {
+                            System.err.println("Failed to connect to database: " + options.getSqlitePath());
+                            System.err.println(
+                                    "\tand generate FastA identifier for alt. scaffolds: " + info.getAltScafAcc());
+                            e.printStackTrace();
+                            System.exit(0);
+                        }
                         if (100.0 * c++ / regions.size() > limit) {
                             limit += 5;
                             System.out.print("*");
                         }
                         for (VariantContext variantContext : variantList) {
-
-                            if (variantContext.getAttribute("AL")
-                                    .equals(locus.getAccessionInfo().createFastaIdentifier()))
+                            if (variantContext.getAttribute("AL").equals(fastaIdentifier))
                                 locusVariantList.add(variantContext);
                         }
                         intersect = VariantContextUtil.intersectVariantContext(refVariantList, locusVariantList);
@@ -192,39 +224,32 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                     ArrayList<Integer> mostProbableAlleles = VariantContextUtil
                             .getMostProbableAlternativeScaffolds(intersectList);
                     // System.out.println("Intersect: " + intersectList.size());
-                    if (mostProbableAlleles.size() > 0) { // at least one alt.
-                                                          // scaffold identified
-                        if (mostProbableAlleles.size() == 2
-                                && mostProbableAlleles.get(0) == mostProbableAlleles.get(1)) {
-                            // System.out.println("Index: " +
-                            // mostProbableAlleles.get(0));
-                            // System.out.println(regions.get(regionsOnChromosome.get(i)).getLoci().size());
-                            writeModVariants(inputVCF, refFile, writerVCF, chr,
-                                    regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart(),
-                                    regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop(),
-                                    ((MetaLocus) regions.get(regionsOnChromosome.get(i)).getLoci().values()
-                                            .toArray()[mostProbableAlleles.get(0)]).getAccessionInfo()
-                                                    .createFastaIdentifier(),
-                                    GenotypeType.HOM_VAR, intersectList.get(mostProbableAlleles.get(0)));
-                        } else {
-                            writeModVariants(inputVCF, refFile, writerVCF, chr,
-                                    regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart(),
-                                    regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop(),
-                                    ((MetaLocus) regions.get(regionsOnChromosome.get(i)).getLoci().values()
-                                            .toArray()[mostProbableAlleles.get(0)]).getAccessionInfo()
-                                                    .createFastaIdentifier(),
-                                    GenotypeType.HET, intersectList.get(mostProbableAlleles.get(0)));
-                            // System.out.println(chr + " : "
-                            // +
-                            // regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart()
-                            // + " - "
-                            // +
-                            // regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop());
+                    if (mostProbableAlleles.size() > 0) { // at least one alt.scaffold identified
+                        try {
+                            if (mostProbableAlleles.size() == 2
+                                    && mostProbableAlleles.get(0) == mostProbableAlleles.get(1)) {
+                                writeModVariants(inputVCF, refFile, writerVCF, contig.getName(),
+                                        regionsOnChromosome.get(i).getStart(), regionsOnChromosome.get(i).getStop(),
+                                        dbMan.getFastaIdentifier(
+                                                altScaffolds.get(mostProbableAlleles.get(0)).getAltScafAcc()),
+                                        GenotypeType.HOM_VAR, intersectList.get(mostProbableAlleles.get(0)));
+                            } else {
+                                writeModVariants(inputVCF, refFile, writerVCF, contig.getName(),
+                                        regionsOnChromosome.get(i).getStart(), regionsOnChromosome.get(i).getStop(),
+                                        dbMan.getFastaIdentifier(
+                                                altScaffolds.get(mostProbableAlleles.get(0)).getAltScafAcc()),
+                                        GenotypeType.HET, intersectList.get(mostProbableAlleles.get(0)));
+                            }
+                        } catch (SQLException e) {
+                            System.err.println("Failed to connect to database: " + options.getSqlitePath());
+                            System.err.println("\tand generate FastA identifier for alt. scaffolds: "
+                                    + altScaffolds.get(mostProbableAlleles.get(0)).getAltScafAcc());
+                            e.printStackTrace();
+                            System.exit(0);
                         }
                     } else { // no alt. scaffold identified
-                        writeVariants(inputVCF, refFile, writerVCF, chr,
-                                regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart(),
-                                regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop());
+                        writeVariants(inputVCF, refFile, writerVCF, contig.getName(),
+                                regionsOnChromosome.get(i).getStart(), regionsOnChromosome.get(i).getStop());
                         // System.out.println(
                         // chr + " : " +
                         // regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart()
@@ -234,9 +259,8 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                     }
                 }
                 // write final block up to the end of the chromosome
-                writeVariants(inputVCF, refFile, writerVCF, chr,
-                        regions.get(regionsOnChromosome.get(i - 1)).getRegionInfo().getStop() + 1,
-                        refFile.getSequence("chr" + chr).length());
+                writeVariants(inputVCF, refFile, writerVCF, contig.getName(),
+                        regionsOnChromosome.get(i - 1).getStop() + 1, contig.length());
                         // System.out.println(
                         // chr + " : " + (regions.get(regionsOnChromosome.get(i
                         // - 1)).getRegionInfo().getStop() + 1)
@@ -263,7 +287,7 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
     private void writeVariants(VCFFileReader reader, ReferenceSequenceFile refFile, AnnotatedVariantWriter writer,
             String chr, int start, int stop) {
 
-        CloseableIterator<VariantContext> currentVariants = reader.query("chr" + chr, start, stop);
+        CloseableIterator<VariantContext> currentVariants = reader.query(chr, start, stop);
         while (currentVariants.hasNext()) {
             writer.put(currentVariants.next());
         }
@@ -287,7 +311,7 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                 pairwiseVariantContextIntersect.getSet2SNVs().get(0).getStart() - 1);
 
         // write block covering the alt. scaffold ASDPs
-        CloseableIterator<VariantContext> currentVariants = reader.query("chr" + chr,
+        CloseableIterator<VariantContext> currentVariants = reader.query(chr,
                 pairwiseVariantContextIntersect.getSet2SNVs().get(0).getStart(), pairwiseVariantContextIntersect
                         .getSet2SNVs().get(pairwiseVariantContextIntersect.getSet2SNVs().size() - 1).getStart());
 

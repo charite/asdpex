@@ -69,7 +69,7 @@ public class App {
         StringBuilder sb = new StringBuilder();
         sb.append("Command: align       construct fasta and seed files and do the alignments").append("\n");
         sb.append("         annotate    functional annotation of VCF files").append("\n");
-        sb.append("         create-db   creates a SQLite database used for the program").append("\n");
+        sb.append("         create-db   creates a SQLite database used for this tool").append("\n");
         sb.append("         create-fa   construct fasta files for the alignments").append("\n");
         sb.append("         create-seed construct seed files for the alignments from the NCBI alignments").append("\n");
         sb.append("         download    download transcript database  (not yet implemented)").append("\n").append("\n");

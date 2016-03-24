@@ -186,13 +186,13 @@ public final class Hg38altLociSeletorOptions {
         return dataPath + File.separator + tempFolder;
     }
 
-    /**
-     * @param tempFolder
-     *            the tempFolder to set
-     */
-    public void setTempFolder(String tempFolder) {
-        this.tempFolder = tempFolder;
-    }
+    // /**
+    // * @param tempFolder
+    // * the tempFolder to set
+    // */
+    // public void setTempFolder(String tempFolder) {
+    // this.tempFolder = tempFolder;
+    // }
 
     /**
      * @return the chrAccessionsPath
@@ -201,13 +201,13 @@ public final class Hg38altLociSeletorOptions {
         return dataPath + File.separator + chrAccessionsPath;
     }
 
-    /**
-     * @param chrAccessionsPath
-     *            the chrAccessionsPath to set
-     */
-    public void setChrAccessionsPath(String chrAccessionsPath) {
-        this.chrAccessionsPath = chrAccessionsPath;
-    }
+    // /**
+    // * @param chrAccessionsPath
+    // * the chrAccessionsPath to set
+    // */
+    // public void setChrAccessionsPath(String chrAccessionsPath) {
+    // this.chrAccessionsPath = chrAccessionsPath;
+    // }
 
     /**
      * @return the altAccessionsPath
@@ -216,13 +216,13 @@ public final class Hg38altLociSeletorOptions {
         return dataPath + File.separator + altAccessionsPath;
     }
 
-    /**
-     * @param altAccessionsPath
-     *            the altAccessionsPath to set
-     */
-    public void setAltAccessionsPath(String altAccessionsPath) {
-        this.altAccessionsPath = altAccessionsPath;
-    }
+    // /**
+    // * @param altAccessionsPath
+    // * the altAccessionsPath to set
+    // */
+    // public void setAltAccessionsPath(String altAccessionsPath) {
+    // this.altAccessionsPath = altAccessionsPath;
+    // }
 
     /**
      * @return the altScaffoldPlacementPath
@@ -231,13 +231,13 @@ public final class Hg38altLociSeletorOptions {
         return dataPath + File.separator + altScaffoldPlacementPath;
     }
 
-    /**
-     * @param altScaffoldPlacementPath
-     *            the altScaffoldPlacementPath to set
-     */
-    public void setAltScaffoldPlacementPath(String altScaffoldPlacementPath) {
-        this.altScaffoldPlacementPath = altScaffoldPlacementPath;
-    }
+    // /**
+    // * @param altScaffoldPlacementPath
+    // * the altScaffoldPlacementPath to set
+    // */
+    // public void setAltScaffoldPlacementPath(String altScaffoldPlacementPath) {
+    // this.altScaffoldPlacementPath = altScaffoldPlacementPath;
+    // }
 
     /**
      * @return the referencePath
@@ -246,13 +246,13 @@ public final class Hg38altLociSeletorOptions {
         return dataPath + File.separator + referencePath;
     }
 
-    /**
-     * @param referencePath
-     *            the referencePath to set
-     */
-    public void setReferencePath(String referencePath) {
-        this.referencePath = referencePath;
-    }
+    // /**
+    // * @param referencePath
+    // * the referencePath to set
+    // */
+    // public void setReferencePath(String referencePath) {
+    // this.referencePath = referencePath;
+    // }
 
     /**
      * @return the genomicRegionsDefinitionsPath
@@ -261,13 +261,13 @@ public final class Hg38altLociSeletorOptions {
         return dataPath + File.separator + genomicRegionsDefinitionsPath;
     }
 
-    /**
-     * @param genomicRegionsDefinitionsPath
-     *            the genomicRegionsDefinitionsPath to set
-     */
-    public void setGenomicRegionsDefinitionsPath(String genomicRegionsDefinitionsPath) {
-        this.genomicRegionsDefinitionsPath = genomicRegionsDefinitionsPath;
-    }
+    // /**
+    // * @param genomicRegionsDefinitionsPath
+    // * the genomicRegionsDefinitionsPath to set
+    // */
+    // public void setGenomicRegionsDefinitionsPath(String genomicRegionsDefinitionsPath) {
+    // this.genomicRegionsDefinitionsPath = genomicRegionsDefinitionsPath;
+    // }
 
     /**
      * Sets the path to the SQLite database file.
