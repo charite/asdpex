@@ -279,7 +279,7 @@ public class DatabaseManger {
      * @return
      * @throws SQLException
      */
-    public ImmutableList<RegionInfo> getRegionsNamesOnChromosome(String chromosome) throws SQLException {
+    public ImmutableList<RegionInfo> getRegionNamesOnChromosome(String chromosome) throws SQLException {
         ImmutableList.Builder<RegionInfo> builder = new ImmutableList.Builder<>();
         RegionInfoBuilder regionInfoBuilder;
         PreparedStatement stmt = this.connectionInstance
@@ -349,5 +349,39 @@ public class DatabaseManger {
             return sb.toString();
         } else
             return null;
+    }
+
+    /**
+     * Returns the minimum ASDP position for a specific region.
+     * 
+     * @param region
+     *            name of the region (e.g. REGION108)
+     * @return minimum ASDP position in region
+     * @throws SQLException
+     */
+    public int getRegionMinimumAsdpPosition(String region) throws SQLException {
+
+        PreparedStatement stmt = this.connectionInstance
+                .prepareStatement("SELECT MIN(a.position) AS min FROM asdp a WHERE a.region = ?");
+        stmt.setString(1, region);
+        ResultSet rs = stmt.executeQuery();
+        return (rs.getInt("min"));
+    }
+
+    /**
+     * Returns the maximum ASDP position for a specific region.
+     * 
+     * @param region
+     *            name of the region (e.g. REGION108)
+     * @return maximum ASDP position in region
+     * @throws SQLException
+     */
+    public int getRegionMaximumAsdpPosition(String region) throws SQLException {
+
+        PreparedStatement stmt = this.connectionInstance
+                .prepareStatement("SELECT MAX(a.position) AS max FROM asdp a WHERE a.region = ?");
+        stmt.setString(1, region);
+        ResultSet rs = stmt.executeQuery();
+        return (rs.getInt("max"));
     }
 }

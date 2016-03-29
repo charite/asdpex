@@ -152,7 +152,7 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
             // ArrayList<Integer> regionsOnChromosome = new ArrayList<>();
             ImmutableList<RegionInfo> regionsOnChromosome = null;
             try {
-                regionsOnChromosome = dbMan.getRegionsNamesOnChromosome(contig.getName());
+                regionsOnChromosome = dbMan.getRegionNamesOnChromosome(contig.getName());
             } catch (SQLException e) {
                 System.err.println("Failed to connect to database: " + options.getSqlitePath());
                 System.err.println("\tand get regions for chromosome: " + contig.getName());
@@ -166,20 +166,57 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
 
             } else {
                 int i;
+                int firstASDPonRegionPosition = 0;
+                int lastASDPonRegionPosition = 0;
+                int lastASDPonRegionPositionPrev = 0;
                 for (i = 0; i < regionsOnChromosome.size(); i++) {
+                    try {
+                        firstASDPonRegionPosition = dbMan
+                                .getRegionMinimumAsdpPosition(regionsOnChromosome.get(i).getRegionName());
+                        lastASDPonRegionPosition = dbMan
+                                .getRegionMaximumAsdpPosition(regionsOnChromosome.get(i).getRegionName());
+                        if (i > 0)
+                            lastASDPonRegionPositionPrev = dbMan
+                                    .getRegionMaximumAsdpPosition(regionsOnChromosome.get(i - 1).getRegionName());
+                    } catch (SQLException e1) {
+                        System.err.println("Failed to connect to database: " + options.getSqlitePath());
+                        System.err.println(
+                                "\tand get ASDP position for region: " + regionsOnChromosome.get(i).getRegionName());
+                        e1.printStackTrace();
+                        System.exit(0);
+                    }
+                    if (firstASDPonRegionPosition == 0) {
+                        System.out.println("[WARN] found no 'first' ASDP for region "
+                                + regionsOnChromosome.get(i).getRegionName() + " set to region start.");
+                        firstASDPonRegionPosition = regionsOnChromosome.get(i).getStart();
+                    }
+                    if (lastASDPonRegionPosition == 0) {
+                        System.out.println("[WARN] found no 'last' ASDP for region "
+                                + regionsOnChromosome.get(i).getRegionName() + " set to region stop.");
+                        lastASDPonRegionPosition = regionsOnChromosome.get(i).getStop();
+                    }
+                    if (i > 0 && lastASDPonRegionPositionPrev == 0) {
+                        System.out.println("[WARN] found no 'last' ASDP for region "
+                                + regionsOnChromosome.get(i - 1).getRegionName() + " set to region stop.");
+                        lastASDPonRegionPositionPrev = regionsOnChromosome.get(i - 1).getStop();
+                    }
+                    // System.out.println("region: " + regionsOnChromosome.get(i).getRegionName());
+                    // System.out.println("\trange region:\t" + regionsOnChromosome.get(i).getStart() + " - "
+                    // + regionsOnChromosome.get(i).getStop());
+                    // System.out
+                    // .println("\trange asdps:\t" + firstASDPonRegionPosition + " - " + lastASDPonRegionPosition);
+
                     // write out block before region
                     if (i == 0) {
-                        writeVariants(inputVCF, refFile, writerVCF, contig.getName(), 1,
-                                regionsOnChromosome.get(i).getStart() - 1);
+                        writeVariants(inputVCF, refFile, writerVCF, contig.getName(), 1, firstASDPonRegionPosition - 1);
 
                     } else {
-                        writeVariants(inputVCF, refFile, writerVCF, contig.getName(),
-                                regionsOnChromosome.get(i - 1).getStop() + 1,
-                                regionsOnChromosome.get(i).getStart() - 1);
+                        writeVariants(inputVCF, refFile, writerVCF, contig.getName(), lastASDPonRegionPositionPrev + 1,
+                                firstASDPonRegionPosition - 1);
                     }
                     // check and write block with alternative scaffold
-                    ArrayList<VariantContext> refVariantList = Lists.newArrayList(inputVCF.query(contig.getName(),
-                            regionsOnChromosome.get(i).getStart(), regionsOnChromosome.get(i).getStop()));
+                    ArrayList<VariantContext> refVariantList = Lists.newArrayList(
+                            inputVCF.query(contig.getName(), firstASDPonRegionPosition, lastASDPonRegionPosition));
 
                     ArrayList<PairwiseVariantContextIntersect> intersectList = new ArrayList<>();
                     // ArrayList<VariantContext> variantList;
@@ -219,23 +256,20 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                         intersect = VariantContextUtil.intersectVariantContext(refVariantList, locusVariantList);
                         intersectList.add(intersect);
                     }
-                    // System.out.println("LOCI: " +
-                    // regions.get(regionsOnChromosome.get(i)).getLoci().size());
                     ArrayList<Integer> mostProbableAlleles = VariantContextUtil
                             .getMostProbableAlternativeScaffolds(intersectList);
-                    // System.out.println("Intersect: " + intersectList.size());
                     if (mostProbableAlleles.size() > 0) { // at least one alt.scaffold identified
                         try {
                             if (mostProbableAlleles.size() == 2
                                     && mostProbableAlleles.get(0) == mostProbableAlleles.get(1)) {
                                 writeModVariants(inputVCF, refFile, writerVCF, contig.getName(),
-                                        regionsOnChromosome.get(i).getStart(), regionsOnChromosome.get(i).getStop(),
+                                        firstASDPonRegionPosition, lastASDPonRegionPosition,
                                         dbMan.getFastaIdentifier(
                                                 altScaffolds.get(mostProbableAlleles.get(0)).getAltScafAcc()),
                                         GenotypeType.HOM_VAR, intersectList.get(mostProbableAlleles.get(0)));
                             } else {
                                 writeModVariants(inputVCF, refFile, writerVCF, contig.getName(),
-                                        regionsOnChromosome.get(i).getStart(), regionsOnChromosome.get(i).getStop(),
+                                        firstASDPonRegionPosition, lastASDPonRegionPosition,
                                         dbMan.getFastaIdentifier(
                                                 altScaffolds.get(mostProbableAlleles.get(0)).getAltScafAcc()),
                                         GenotypeType.HET, intersectList.get(mostProbableAlleles.get(0)));
@@ -248,26 +282,13 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                             System.exit(0);
                         }
                     } else { // no alt. scaffold identified
-                        writeVariants(inputVCF, refFile, writerVCF, contig.getName(),
-                                regionsOnChromosome.get(i).getStart(), regionsOnChromosome.get(i).getStop());
-                        // System.out.println(
-                        // chr + " : " +
-                        // regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStart()
-                        // + " - "
-                        // +
-                        // regions.get(regionsOnChromosome.get(i)).getRegionInfo().getStop());
+                        writeVariants(inputVCF, refFile, writerVCF, contig.getName(), firstASDPonRegionPosition,
+                                lastASDPonRegionPosition);
                     }
                 }
                 // write final block up to the end of the chromosome
-                writeVariants(inputVCF, refFile, writerVCF, contig.getName(),
-                        regionsOnChromosome.get(i - 1).getStop() + 1, contig.length());
-                        // System.out.println(
-                        // chr + " : " + (regions.get(regionsOnChromosome.get(i
-                        // - 1)).getRegionInfo().getStop() + 1)
-                        // + " - " + refFile.getSequence("chr" + chr).length());
-
-                // System.out.println(chr + " - " + regionsOnChromosome);
-                // System.exit(0);
+                writeVariants(inputVCF, refFile, writerVCF, contig.getName(), lastASDPonRegionPositionPrev + 1,
+                        contig.length());
             }
         }
 
