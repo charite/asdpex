@@ -19,7 +19,7 @@ import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
 
 /**
- * Writer for the
+ * Writer for the annotated varaints.
  *
  * @author Marten Jäger <marten.jaeger@charite.de>
  */

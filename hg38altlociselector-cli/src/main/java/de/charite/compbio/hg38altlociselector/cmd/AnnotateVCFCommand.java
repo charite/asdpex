@@ -6,6 +6,7 @@ package de.charite.compbio.hg38altlociselector.cmd;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import org.apache.commons.cli.ParseException;
 
@@ -85,6 +86,11 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
      */
     @Override
     public void run() throws AltLociSelectorException {
+        // set locale to US to avoid doulbe poutput problems...
+        if (Locale.getDefault() != Locale.ENGLISH) {
+            System.out.println("[INFO] found locale: " + Locale.getDefault() + " set to: " + Locale.ENGLISH);
+            Locale.setDefault(Locale.ENGLISH);
+        }
         // DB Manger
         final DatabaseManger dbMan = new DatabaseManger(this.options.getSqlitePath());
 
@@ -364,13 +370,19 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
 
         VariantContextBuilder builder;
         VariantContext curVC;
+        int counter = 0;
         while (currentVariants.hasNext()) {
-            builder = new VariantContextBuilder(currentVariants.next());
-            builder.filter(Hg38altLociSeletorOptions.VCFASDP);
-            builder.attribute(Hg38altLociSeletorOptions.VCFALTLOCISTRING, altLocusID);
-            builder.attribute(Hg38altLociSeletorOptions.VCFALTLOCIGENOTYPE, type.toString());
-            curVC = builder.make();
+            if (pairwiseVariantContextIntersect.getSet1flagged()[counter]) {
+                builder = new VariantContextBuilder(currentVariants.next());
+                builder.filter(Hg38altLociSeletorOptions.VCFASDP);
+                builder.attribute(Hg38altLociSeletorOptions.VCFALTLOCISTRING, altLocusID);
+                builder.attribute(Hg38altLociSeletorOptions.VCFALTLOCIGENOTYPE, type.toString());
+                curVC = builder.make();
+            } else {
+                curVC = currentVariants.next();
+            }
             writer.put(curVC);
+            counter++;
         }
         // write block after alt scaffold ASDPs ends
         writeVariants(reader, refFile, writer, chr,

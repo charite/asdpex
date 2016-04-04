@@ -38,6 +38,9 @@ public class PairwiseVariantContextIntersect implements Serializable, Comparable
     /** number of overlapping SVs between the first and the second set */
     private final int intersectSVs;
 
+    /** array with flags of the same size of set1 with true = intersect , false otherwise */
+    private boolean[] set1flagged;
+
     private PairwiseVariantContextIntersect(PairwiseVariantContextIntersectBuilder builder) {
         // this.set1 = builder.set1;
         this.set1SNVs = builder.set1SNVs;
@@ -51,6 +54,8 @@ public class PairwiseVariantContextIntersect implements Serializable, Comparable
 
         this.intersectSNVs = builder.intersectSNVs;
         this.intersectSVs = builder.intersectSVs;
+
+        this.set1flagged = builder.set1flagged;
     }
 
     @Override
@@ -146,6 +151,15 @@ public class PairwiseVariantContextIntersect implements Serializable, Comparable
         return intersectSVs;
     }
 
+    /**
+     * Returns an boolean array with the size of set1 and intersects flagged as true;
+     * 
+     * @return
+     */
+    public boolean[] getSet1flagged() {
+        return set1flagged;
+    }
+
     public static class PairwiseVariantContextIntersectBuilder {
         // private CloseableIterator<VariantContext> set1;
         private ArrayList<VariantContext> set1SNVs;
@@ -159,6 +173,8 @@ public class PairwiseVariantContextIntersect implements Serializable, Comparable
 
         private ArrayList<VariantContext> intersectSNVs;
         private int intersectSVs;
+        /* array with flags of the same size of set1 with true = intersect , false otherwise */
+        private boolean[] set1flagged;
 
         // public PairwiseVariantContextIntersectBuilder
         // set1(CloseableIterator<VariantContext> set) {
@@ -209,6 +225,11 @@ public class PairwiseVariantContextIntersect implements Serializable, Comparable
 
         public PairwiseVariantContextIntersectBuilder intersectSVs(int value) {
             this.intersectSVs = value;
+            return this;
+        }
+
+        public PairwiseVariantContextIntersectBuilder set1flagged(boolean[] flags) {
+            this.set1flagged = flags;
             return this;
         }
 
