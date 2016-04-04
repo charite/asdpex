@@ -369,7 +369,8 @@ public class DatabaseManger {
     }
 
     /**
-     * Returns the maximum ASDP position for a specific region.
+     * Returns the maximum ASDP position + length of the ASDP for a specific region. The length of the ASDP is added to
+     * avoid getting the same variant twice if the ASDP is found and not only one base long.
      * 
      * @param region
      *            name of the region (e.g. REGION108)
@@ -379,9 +380,13 @@ public class DatabaseManger {
     public int getRegionMaximumAsdpPosition(String region) throws SQLException {
 
         PreparedStatement stmt = this.connectionInstance
-                .prepareStatement("SELECT MAX(a.position) AS max FROM asdp a WHERE a.region = ?");
+                .prepareStatement("SELECT * FROM asdp a WHERE a.region = ? ORDER BY a.position DESC LIMIT 1");
         stmt.setString(1, region);
         ResultSet rs = stmt.executeQuery();
-        return (rs.getInt("max"));
+        try {
+            return (rs.getInt("position") + rs.getString("ref").length());
+        } catch (SQLException e) {
+            return 0;
+        }
     }
 }

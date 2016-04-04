@@ -209,10 +209,16 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                     // write out block before region
                     if (i == 0) {
                         writeVariants(inputVCF, refFile, writerVCF, contig.getName(), 1, firstASDPonRegionPosition - 1);
+                        // System.out.println(1 + "\t" + (firstASDPonRegionPosition - 1) + "\t block before first
+                        // region");
 
                     } else {
                         writeVariants(inputVCF, refFile, writerVCF, contig.getName(), lastASDPonRegionPositionPrev + 1,
                                 firstASDPonRegionPosition - 1);
+                        // System.out.println((lastASDPonRegionPositionPrev + 1) + "\t" + (firstASDPonRegionPosition -
+                        // 1)
+                        // + "\t block between regions (" + regionsOnChromosome.get(i - 1).getRegionName() + " & "
+                        // + regionsOnChromosome.get(i).getRegionName() + ")");
                     }
                     // check and write block with alternative scaffold
                     ArrayList<VariantContext> refVariantList = Lists.newArrayList(
@@ -267,12 +273,19 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                                         dbMan.getFastaIdentifier(
                                                 altScaffolds.get(mostProbableAlleles.get(0)).getAltScafAcc()),
                                         GenotypeType.HOM_VAR, intersectList.get(mostProbableAlleles.get(0)));
+
+                                // System.out.println(firstASDPonRegionPosition + "\t" + lastASDPonRegionPosition
+                                // + "\t block with ASDPs in region (" + regionsOnChromosome.get(i).getRegionName()
+                                // + ") HOMO");
                             } else {
                                 writeModVariants(inputVCF, refFile, writerVCF, contig.getName(),
                                         firstASDPonRegionPosition, lastASDPonRegionPosition,
                                         dbMan.getFastaIdentifier(
                                                 altScaffolds.get(mostProbableAlleles.get(0)).getAltScafAcc()),
                                         GenotypeType.HET, intersectList.get(mostProbableAlleles.get(0)));
+                                // System.out.println(firstASDPonRegionPosition + "\t" + lastASDPonRegionPosition
+                                // + "\t block with ASDPs in region (" + regionsOnChromosome.get(i).getRegionName()
+                                // + ") HETERO");
                             }
                         } catch (SQLException e) {
                             System.err.println("Failed to connect to database: " + options.getSqlitePath());
@@ -284,11 +297,16 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                     } else { // no alt. scaffold identified
                         writeVariants(inputVCF, refFile, writerVCF, contig.getName(), firstASDPonRegionPosition,
                                 lastASDPonRegionPosition);
+                        // System.out.println(firstASDPonRegionPosition + "\t" + lastASDPonRegionPosition
+                        // + "\t block without ASDPs in region (" + regionsOnChromosome.get(i).getRegionName()
+                        // + ")");
                     }
                 }
                 // write final block up to the end of the chromosome
-                writeVariants(inputVCF, refFile, writerVCF, contig.getName(), lastASDPonRegionPositionPrev + 1,
+                writeVariants(inputVCF, refFile, writerVCF, contig.getName(), lastASDPonRegionPosition + 1,
                         contig.length());
+                // System.out.println((lastASDPonRegionPosition + 1) + "\t" + contig.length() + "\t block form region ("
+                // + regionsOnChromosome.get(i - 1).getRegionName() + ") to contig end");
             }
         }
 
@@ -332,9 +350,17 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                 pairwiseVariantContextIntersect.getSet2SNVs().get(0).getStart() - 1);
 
         // write block covering the alt. scaffold ASDPs
-        CloseableIterator<VariantContext> currentVariants = reader.query(chr,
-                pairwiseVariantContextIntersect.getSet2SNVs().get(0).getStart(), pairwiseVariantContextIntersect
-                        .getSet2SNVs().get(pairwiseVariantContextIntersect.getSet2SNVs().size() - 1).getStart());
+        CloseableIterator<VariantContext> currentVariants = reader
+                .query(chr,
+                        pairwiseVariantContextIntersect
+                                .getSet2SNVs().get(
+                                        0)
+                                .getStart(),
+                        pairwiseVariantContextIntersect.getSet2SNVs()
+                                .get(pairwiseVariantContextIntersect.getSet2SNVs().size() - 1).getStart()
+                                + pairwiseVariantContextIntersect.getSet2SNVs()
+                                        .get(pairwiseVariantContextIntersect.getSet2SNVs().size() - 1).getReference()
+                                        .getBaseString().length());
 
         VariantContextBuilder builder;
         VariantContext curVC;
@@ -347,8 +373,14 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
             writer.put(curVC);
         }
         // write block after alt scaffold ASDPs ends
-        writeVariants(reader, refFile, writer, chr, pairwiseVariantContextIntersect.getSet2SNVs()
-                .get(pairwiseVariantContextIntersect.getSet2SNVs().size() - 1).getStart() + 1, stop);
+        writeVariants(reader, refFile, writer, chr,
+                pairwiseVariantContextIntersect.getSet2SNVs()
+                        .get(pairwiseVariantContextIntersect.getSet2SNVs().size() - 1).getStart()
+                        + pairwiseVariantContextIntersect.getSet2SNVs()
+                                .get(pairwiseVariantContextIntersect.getSet2SNVs().size() - 1).getReference()
+                                .getBaseString().length()
+                        + 1,
+                stop);
 
     }
 
