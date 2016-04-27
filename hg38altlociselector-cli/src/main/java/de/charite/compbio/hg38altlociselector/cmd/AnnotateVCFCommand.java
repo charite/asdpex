@@ -46,7 +46,8 @@ import htsjdk.variant.vcf.VCFFileReader;
  * <li>select region
  * <li>pick all alt loci for this region
  * <li>get all variants, that are in this region
- * <li>compare the overlaps and decide which allele (ref, alt.loci) is the most probable
+ * <li>compare the overlaps and decide which allele (ref, alt.loci) is the most
+ * probable
  * </ol>
  * 
  *
@@ -67,7 +68,8 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
     /*
      * (non-Javadoc)
      * 
-     * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand# parseCommandLine(java.lang.String[])
+     * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#
+     * parseCommandLine(java.lang.String[])
      */
     @Override
     protected Hg38altLociSeletorOptions parseCommandLine(String[] args)
@@ -82,7 +84,8 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
     /*
      * (non-Javadoc)
      * 
-     * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#run()
+     * @see
+     * de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#run()
      */
     @Override
     public void run() throws AltLociSelectorException {
@@ -101,7 +104,7 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
         ImmutableList<Region> regions = new RegionBuilder(options.getAltAccessionsPath(),
                 options.getAltScaffoldPlacementPath(), options.getGenomicRegionsDefinitionsPath(),
                 options.getChrAccessionsPath()).build();
-                // System.out.println(regions.size());
+        // System.out.println(regions.size());
 
         // init Reference FastA file e.g. Sequence Dictionary
         final ReferenceSequenceFile refFile = ReferenceSequenceFileFactory
@@ -145,7 +148,8 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
         System.out.println("|.........|.........|");
         int c = 1;
         int limit = 0;
-        // TODO we need a check if the VCF file contains a header or if we have to use the reference sequence
+        // TODO we need a check if the VCF file contains a header or if we have
+        // to use the reference sequence
         ReferenceSequence contig;
         while ((contig = refFile.nextSequence()) != null) {
             // TODO should we really skip non toplevel contigs or add extra flag
@@ -206,24 +210,32 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                                 + regionsOnChromosome.get(i - 1).getRegionName() + " set to region stop.");
                         lastASDPonRegionPositionPrev = regionsOnChromosome.get(i - 1).getStop();
                     }
-                    // System.out.println("region: " + regionsOnChromosome.get(i).getRegionName());
-                    // System.out.println("\trange region:\t" + regionsOnChromosome.get(i).getStart() + " - "
+                    // System.out.println("region: " +
+                    // regionsOnChromosome.get(i).getRegionName());
+                    // System.out.println("\trange region:\t" +
+                    // regionsOnChromosome.get(i).getStart() + " - "
                     // + regionsOnChromosome.get(i).getStop());
                     // System.out
-                    // .println("\trange asdps:\t" + firstASDPonRegionPosition + " - " + lastASDPonRegionPosition);
+                    // .println("\trange asdps:\t" + firstASDPonRegionPosition +
+                    // " - " + lastASDPonRegionPosition);
 
                     // write out block before region
                     if (i == 0) {
                         writeVariants(inputVCF, refFile, writerVCF, contig.getName(), 1, firstASDPonRegionPosition - 1);
-                        // System.out.println(1 + "\t" + (firstASDPonRegionPosition - 1) + "\t block before first
+                        // System.out.println(1 + "\t" +
+                        // (firstASDPonRegionPosition - 1) + "\t block before
+                        // first
                         // region");
 
                     } else {
                         writeVariants(inputVCF, refFile, writerVCF, contig.getName(), lastASDPonRegionPositionPrev + 1,
                                 firstASDPonRegionPosition - 1);
-                        // System.out.println((lastASDPonRegionPositionPrev + 1) + "\t" + (firstASDPonRegionPosition -
+                        // System.out.println((lastASDPonRegionPositionPrev + 1)
+                        // + "\t" + (firstASDPonRegionPosition -
                         // 1)
-                        // + "\t block between regions (" + regionsOnChromosome.get(i - 1).getRegionName() + " & "
+                        // + "\t block between regions (" +
+                        // regionsOnChromosome.get(i - 1).getRegionName() + " &
+                        // "
                         // + regionsOnChromosome.get(i).getRegionName() + ")");
                     }
                     // check and write block with alternative scaffold
@@ -270,7 +282,9 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                     }
                     ArrayList<Integer> mostProbableAlleles = VariantContextUtil
                             .getMostProbableAlternativeScaffolds(intersectList);
-                    if (mostProbableAlleles.size() > 0) { // at least one alt.scaffold identified
+                    if (mostProbableAlleles.size() > 0) { // at least one
+                                                          // alt.scaffold
+                                                          // identified
                         try {
                             if (mostProbableAlleles.size() == 2
                                     && mostProbableAlleles.get(0) == mostProbableAlleles.get(1)) {
@@ -280,8 +294,10 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                                                 altScaffolds.get(mostProbableAlleles.get(0)).getAltScafAcc()),
                                         GenotypeType.HOM_VAR, intersectList.get(mostProbableAlleles.get(0)));
 
-                                // System.out.println(firstASDPonRegionPosition + "\t" + lastASDPonRegionPosition
-                                // + "\t block with ASDPs in region (" + regionsOnChromosome.get(i).getRegionName()
+                                // System.out.println(firstASDPonRegionPosition
+                                // + "\t" + lastASDPonRegionPosition
+                                // + "\t block with ASDPs in region (" +
+                                // regionsOnChromosome.get(i).getRegionName()
                                 // + ") HOMO");
                             } else {
                                 writeModVariants(inputVCF, refFile, writerVCF, contig.getName(),
@@ -289,8 +305,10 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                                         dbMan.getFastaIdentifier(
                                                 altScaffolds.get(mostProbableAlleles.get(0)).getAltScafAcc()),
                                         GenotypeType.HET, intersectList.get(mostProbableAlleles.get(0)));
-                                // System.out.println(firstASDPonRegionPosition + "\t" + lastASDPonRegionPosition
-                                // + "\t block with ASDPs in region (" + regionsOnChromosome.get(i).getRegionName()
+                                // System.out.println(firstASDPonRegionPosition
+                                // + "\t" + lastASDPonRegionPosition
+                                // + "\t block with ASDPs in region (" +
+                                // regionsOnChromosome.get(i).getRegionName()
                                 // + ") HETERO");
                             }
                         } catch (SQLException e) {
@@ -303,16 +321,20 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                     } else { // no alt. scaffold identified
                         writeVariants(inputVCF, refFile, writerVCF, contig.getName(), firstASDPonRegionPosition,
                                 lastASDPonRegionPosition);
-                        // System.out.println(firstASDPonRegionPosition + "\t" + lastASDPonRegionPosition
-                        // + "\t block without ASDPs in region (" + regionsOnChromosome.get(i).getRegionName()
+                        // System.out.println(firstASDPonRegionPosition + "\t" +
+                        // lastASDPonRegionPosition
+                        // + "\t block without ASDPs in region (" +
+                        // regionsOnChromosome.get(i).getRegionName()
                         // + ")");
                     }
                 }
                 // write final block up to the end of the chromosome
                 writeVariants(inputVCF, refFile, writerVCF, contig.getName(), lastASDPonRegionPosition + 1,
                         contig.length());
-                // System.out.println((lastASDPonRegionPosition + 1) + "\t" + contig.length() + "\t block form region ("
-                // + regionsOnChromosome.get(i - 1).getRegionName() + ") to contig end");
+                // System.out.println((lastASDPonRegionPosition + 1) + "\t" +
+                // contig.length() + "\t block form region ("
+                // + regionsOnChromosome.get(i - 1).getRegionName() + ") to
+                // contig end");
             }
         }
 
@@ -351,26 +373,32 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
             String chr, int start, int stop, String altLocusID, GenotypeType type,
             PairwiseVariantContextIntersect pairwiseVariantContextIntersect) {
 
-        // write block before alt scaffold starts up to the first ASDP in the alt scaffold
-        writeVariants(reader, refFile, writer, chr, start,
+        int counter = 0;
+
+        // write block before alt scaffold starts up to the first ASDP in the
+        // alt scaffold
+        // writeVariants(reader, refFile, writer, chr, start,
+        // pairwiseVariantContextIntersect.getSet2SNVs().get(0).getStart() - 1);
+        CloseableIterator<VariantContext> leadingVariants = reader.query(chr, start,
                 pairwiseVariantContextIntersect.getSet2SNVs().get(0).getStart() - 1);
 
+        while (leadingVariants.hasNext()) {
+            writer.put(leadingVariants.next());
+            counter++;
+        }
+
         // write block covering the alt. scaffold ASDPs
-        CloseableIterator<VariantContext> currentVariants = reader
-                .query(chr,
-                        pairwiseVariantContextIntersect
-                                .getSet2SNVs().get(
-                                        0)
-                                .getStart(),
-                        pairwiseVariantContextIntersect.getSet2SNVs()
-                                .get(pairwiseVariantContextIntersect.getSet2SNVs().size() - 1).getStart()
-                                + pairwiseVariantContextIntersect.getSet2SNVs()
-                                        .get(pairwiseVariantContextIntersect.getSet2SNVs().size() - 1).getReference()
-                                        .getBaseString().length());
+        CloseableIterator<VariantContext> currentVariants = reader.query(chr,
+                pairwiseVariantContextIntersect.getSet2SNVs().get(0).getStart(),
+                pairwiseVariantContextIntersect.getSet2SNVs()
+                        .get(pairwiseVariantContextIntersect.getSet2SNVs().size() - 1).getStart()
+                        + pairwiseVariantContextIntersect.getSet2SNVs()
+                                .get(pairwiseVariantContextIntersect.getSet2SNVs().size() - 1).getReference()
+                                .getBaseString().length());
 
         VariantContextBuilder builder;
         VariantContext curVC;
-        int counter = 0;
+        // int counter = 0;
         while (currentVariants.hasNext()) {
             if (pairwiseVariantContextIntersect.getSet1flagged()[counter]) {
                 builder = new VariantContextBuilder(currentVariants.next());
