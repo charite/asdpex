@@ -1,6 +1,6 @@
-# hg38altLociSelector
+# ASDPex
 
-The application hg38altLociSelector and the scripts in this repository can be used to improve the alignments of the alternate scafoolds provided by NCBI, to search for alignable scaffold-discrepant positions (ASPDs) in the alignments, and to use the resulting ASDP file to screen sample VCF files from whole-genome sequencing for ASPDs (which are likely to be false-positive variant calls).
+The application ASDPex and the scripts in this repository can be used to improve the alignments of the alternate scafoolds provided by NCBI, to search for alignable scaffold-discrepant positions (ASPDs) in the alignments, and to use the resulting ASDP file to screen sample VCF files from whole-genome sequencing for ASPDs (which are likely to be false-positive variant calls).
 
 Prerequisites:
 
@@ -39,15 +39,16 @@ mvn package
 ```
 If everything goes well, you will see a message including the words BUILD SUCCESS.
 
-## hg38altlociselector
-The jar file hg38altlociselector-cli-0.0.1-SNAPSHOT.jar contains the main code used in this project. YOu can view the main commands with the following command.
+## asdpex
+The jar file asdpex-cli-0.1.jar contains the main code used in this project. YOu can view the main commands with the following command.
 ```
-java -jar hg38altlociselector-cli/target/hg38altlociselector-cli-0.0.1-SNAPSHOT.jar
-Program: de.charite.compbio.hg38altlociselector (functional annotation of VCF files)
+java -jar asdpex-cli/target/asdpex-cli-0.1-SNAPSHOT.jar
+Program: de.charite.compbio.asdpex (functional annotation of VCF files)
 Version: 0.0.1
 Contact: Marten Jäger <marten.jaeger@charite.de>
+         Peter N. Robinson <peter.robinson@jax.org>
 
-Usage: java -jar hg38altlociselector.jar <command> [options]
+Usage: java -jar asdpex.jar <command> [options]
 
 Command: download    download transcript database  (not yet implemented)
          annotate    functional annotation of VCF files
@@ -55,8 +56,8 @@ Command: download    download transcript database  (not yet implemented)
          create-seed construct seed files for the alignments from the NCBI alignments
          align       construct fasta and seed files and do the alignments
 
-Example: java -jar hg38altlociselector.jar download GRCh38
-         java -jar hg38altlociselector.jar create-fa -o data/
+Example: java -jar asdpex.jar download GRCh38
+         java -jar asdpex.jar create-fa -o data/
 
 ```
 
@@ -71,7 +72,7 @@ cd ..
 ## Alignment and variant detection
 Now since we have all tools and data we run the alignment and look up the variants.
 ```
-java -jar hg38altlociselector-cli/target/hg38altlociselector-cli-0.0.1-SNAPSHOT.jar \
+java -jar asdpex-cli/target/asdpex-cli-0.1.jar \
   align -d data/ -s seqan/regionalign2bed -o alignresults
 ```
 
@@ -89,7 +90,7 @@ This command will iterate aver all SNV ASDPs and merge them into MNV ASDPs. The 
 
 Finally we can annotate a VCF file with the information from the filtered ASDPs.
 ```
-java -jar hg38altlociselector-cli/target/hg38altlociselector-cli-0.0.1-SNAPSHOT.jar \
+java -jar asdpex-cli/target/asdpex-cli-0.1.jar \
   annotate -a allASDPs.SNV.50_10.valid.vcf.gz -d data/ -v <infile>.vcf.gz \
   -o <annot>.vcf.gz
 ```
