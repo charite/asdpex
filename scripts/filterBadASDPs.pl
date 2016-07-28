@@ -7,6 +7,7 @@ use Getopt::Long;
 use IO::Zlib;
 
 my $infile;
+my $outfolder;
 my $outfilevalide;
 my $outfileskipped;
 my $help;
@@ -32,6 +33,7 @@ GetOptions(	'vcfin|i=s'	=> \$infile,
 		'window|w=i'		=> \$windowsize,
 		'mismatch|m=i'		=> \$mismatches,
 		'collapse|c'		=> \$collapse,
+    'out|o=s'       => \$outfolder,
 		'help|h'	=> \$help);
 
 if($help){printUsage()}
@@ -39,6 +41,10 @@ if(!$infile){printUsage()}
 
 
 my $prefix = substr($infile,0,index($infile,".vcf"));
+if($outfolder){
+  if(! -d $outfolder){system("mkdir -p $outfolder")}
+  $prefix = "$outfolder/$prefix";
+}
 my $parameters = "${windowsize}_${mismatches}";
 $outfilevalide = "$prefix.$parameters.valid.vcf";
 $outfileskipped = "$prefix.$parameters.skipped.vcf";
@@ -97,7 +103,7 @@ close(IN);
 close(OUT);
 close(OUT2);
 
-print STDERR "[INFO] bgzip & tabix\n";
+#print STDERR "[INFO] bgzip & tabix\n";
 system("bgzip -f $outfilevalide; tabix -f ${outfilevalide}.gz");
 system("bgzip -f $outfileskipped; tabix -f ${outfileskipped}.gz");
 
@@ -105,7 +111,7 @@ system("bgzip -f $outfileskipped; tabix -f ${outfileskipped}.gz");
 #print STDERR "valid: $valid\n";
 #print STDERR "combined: $combined\n";
 
-print STDERR "window\tmismatch\ttotal\tskipped\tvalid\tcollapsed\n";
+#print STDERR "window\tmismatch\ttotal\tskipped\tvalid\tcollapsed\n";
 printf STDERR "%d\t%d\t%d\t%d\t%d\t%d\n",$windowsize,$mismatches,$skipped+$valid+$combined,$skipped,$valid,$combined;
 
 ### FUNCTIONS
@@ -186,7 +192,8 @@ DESCRIPTION
 
 OPTIONS:
 	-i 	--vcfin		<path to VCF file>
-	-w 	--window		windowsize
+	-w 	--window	windowsize
 	-m	--mismatch	allowed mismatches
 	-h	--help		show this help
-        -c      --collapse      collapse neighboring variants
+	-c	--collapse	collapse neighboring variants
+	-o	--out		<path to outfolder> (optional)
