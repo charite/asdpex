@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>de.charite.compbio</groupId>
-	<artifactId>hg38altlociselector</artifactId>
-	<version>0.0.1</version>
+	<artifactId>asdpex</artifactId>
+	<version>0.1</version>
 	<packaging>pom</packaging>
 
-	<name>hg38altlociselector</name>
+	<name>asdpex</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -23,7 +23,7 @@
 		</dependency>
 	</dependencies>
 	<modules>
-		<module>hg38altlociselector-core</module>
-		<module>hg38altlociselector-cli</module>
+		<module>asdpex-core</module>
+		<module>asdpex-cli</module>
 	</modules>
 </project>
