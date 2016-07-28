@@ -41,6 +41,7 @@ public class VariantContextUtil {
         ArrayList<VariantContext> set2SV = new ArrayList<>();
         ArrayList<VariantContext> set2SNV = new ArrayList<>();
         ArrayList<VariantContext> intersectSNV = new ArrayList<>();
+        boolean[] set1IntersectFlag = new boolean[set1.size()];
 
         // calc SVs
         for (VariantContext variantContext : set2) {
@@ -51,6 +52,7 @@ public class VariantContextUtil {
         }
         int offset = 0;
         boolean intersect;
+        int index = 0;
         for (VariantContext vc1 : set1) {
             if (vc1.getType() == Type.SYMBOLIC) {
                 set1SV.add(vc1);
@@ -69,13 +71,18 @@ public class VariantContextUtil {
                         && vc1.hasAllele(vc2.getAlleles().get(0))) {
                     intersectSNV.add(vc1);
                     intersect = true;
+                    set1IntersectFlag[index] = true;
                     offset = i;
                     break;
                 }
                 if (intersect)
                     break;
-            }
 
+                // if (vc1.getStart() > vc2.getStart()) {
+                // break;
+                // }
+            }
+            index++;
         }
         builder.set1SNVs(set1SNV);
         builder.set1SVs(set1SV);
@@ -84,6 +91,7 @@ public class VariantContextUtil {
         builder.intersectSNVs(intersectSNV);
         builder.onlySet1SNVs(set1.size() - set1SV.size() - intersectSNV.size());
         builder.onlySet2SNVs(set2.size() - set2SV.size() - intersectSNV.size());
+        builder.set1flagged(set1IntersectFlag);
 
         return builder.build();
     }

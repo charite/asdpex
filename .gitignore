@@ -31,6 +31,7 @@ dependency-reduced-pom.xml
 hs_err_pid*
 /bin/
 
+
 # SeqAn library
 seqan/seqan*
 

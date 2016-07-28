@@ -91,7 +91,6 @@ public final class AlignCommandLineParser {
     }
 
     private void printHelp(Hg38altLociSeletorOptions options) {
-        StringBuilder sb = new StringBuilder();
         org.apache.commons.cli.HelpFormatter formatter = new org.apache.commons.cli.HelpFormatter();
         formatter.printHelp("java -jar hg38altlociselector.jar " + options.command.toString(), "options:", this.options,
                 options.error, true);

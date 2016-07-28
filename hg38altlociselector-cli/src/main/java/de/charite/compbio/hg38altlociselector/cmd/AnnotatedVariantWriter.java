@@ -19,7 +19,7 @@ import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
 
 /**
- * Writer for the
+ * Writer for the annotated varaints.
  *
  * @author Marten Jäger <marten.jaeger@charite.de>
  */
@@ -31,7 +31,7 @@ public class AnnotatedVariantWriter {
             Hg38altLociSeletorOptions options) {
         VariantContextWriterBuilder builder = new VariantContextWriterBuilder()
                 .setReferenceDictionary(refFile.getSequenceDictionary())
-                .setOptions(EnumSet.of(Options.INDEX_ON_THE_FLY)).setOutputFile(options.outputVcf);
+                .setOptions(EnumSet.of(Options.INDEX_ON_THE_FLY)).setOutputFile(options.getOutputVcf());
         if (refFile.getSequenceDictionary() == null)
             builder.unsetOption(Options.INDEX_ON_THE_FLY);
         this.out = builder.build();

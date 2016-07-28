@@ -24,7 +24,7 @@ public final class Hg38altLociSeletorOptions {
     public static final String VCFASDP = "ASDP";
 
     /** directory to use for the downloads and the serialized file */
-    private String dataPath = "data";
+    private String dataPath = "";
 
     private String alignmentPath = "alignments";
 
@@ -55,17 +55,19 @@ public final class Hg38altLociSeletorOptions {
     public int fastaLineLength = 70;
 
     /** path to the input VCF file for the annotation */
-    public String inputVcf;
+    private String inputVcf;
     /** path to the alt-loci VCF file(s) */
-    public String altlociVcf;
+    private String altlociVcf;
     /** path to the annotated output VCF file */
-    public String outputVcf;
+    private String outputVcf;
+    /** path to the SQLite file storing programs data */
+    private String sqlitePath;
 
     /**
      * The command that is to be executed.
      */
     public enum Command {
-        DOWNLOAD, ANNOTATE_VCF, CREATE_FASTA, CREATE_SEED, ALIGN;
+        DOWNLOAD, ANNOTATE_VCF, CREATE_FASTA, CREATE_SEED, ALIGN, CREATE_DB;
 
         public String toString() {
             switch (this) {
@@ -79,6 +81,8 @@ public final class Hg38altLociSeletorOptions {
                 return "create-seed";
             case ALIGN:
                 return "align";
+            case CREATE_DB:
+                return "create-db";
             default:
                 return "unknown";
             }
@@ -182,13 +186,13 @@ public final class Hg38altLociSeletorOptions {
         return dataPath + File.separator + tempFolder;
     }
 
-    /**
-     * @param tempFolder
-     *            the tempFolder to set
-     */
-    public void setTempFolder(String tempFolder) {
-        this.tempFolder = tempFolder;
-    }
+    // /**
+    // * @param tempFolder
+    // * the tempFolder to set
+    // */
+    // public void setTempFolder(String tempFolder) {
+    // this.tempFolder = tempFolder;
+    // }
 
     /**
      * @return the chrAccessionsPath
@@ -197,13 +201,13 @@ public final class Hg38altLociSeletorOptions {
         return dataPath + File.separator + chrAccessionsPath;
     }
 
-    /**
-     * @param chrAccessionsPath
-     *            the chrAccessionsPath to set
-     */
-    public void setChrAccessionsPath(String chrAccessionsPath) {
-        this.chrAccessionsPath = chrAccessionsPath;
-    }
+    // /**
+    // * @param chrAccessionsPath
+    // * the chrAccessionsPath to set
+    // */
+    // public void setChrAccessionsPath(String chrAccessionsPath) {
+    // this.chrAccessionsPath = chrAccessionsPath;
+    // }
 
     /**
      * @return the altAccessionsPath
@@ -212,13 +216,13 @@ public final class Hg38altLociSeletorOptions {
         return dataPath + File.separator + altAccessionsPath;
     }
 
-    /**
-     * @param altAccessionsPath
-     *            the altAccessionsPath to set
-     */
-    public void setAltAccessionsPath(String altAccessionsPath) {
-        this.altAccessionsPath = altAccessionsPath;
-    }
+    // /**
+    // * @param altAccessionsPath
+    // * the altAccessionsPath to set
+    // */
+    // public void setAltAccessionsPath(String altAccessionsPath) {
+    // this.altAccessionsPath = altAccessionsPath;
+    // }
 
     /**
      * @return the altScaffoldPlacementPath
@@ -227,13 +231,13 @@ public final class Hg38altLociSeletorOptions {
         return dataPath + File.separator + altScaffoldPlacementPath;
     }
 
-    /**
-     * @param altScaffoldPlacementPath
-     *            the altScaffoldPlacementPath to set
-     */
-    public void setAltScaffoldPlacementPath(String altScaffoldPlacementPath) {
-        this.altScaffoldPlacementPath = altScaffoldPlacementPath;
-    }
+    // /**
+    // * @param altScaffoldPlacementPath
+    // * the altScaffoldPlacementPath to set
+    // */
+    // public void setAltScaffoldPlacementPath(String altScaffoldPlacementPath) {
+    // this.altScaffoldPlacementPath = altScaffoldPlacementPath;
+    // }
 
     /**
      * @return the referencePath
@@ -242,13 +246,13 @@ public final class Hg38altLociSeletorOptions {
         return dataPath + File.separator + referencePath;
     }
 
-    /**
-     * @param referencePath
-     *            the referencePath to set
-     */
-    public void setReferencePath(String referencePath) {
-        this.referencePath = referencePath;
-    }
+    // /**
+    // * @param referencePath
+    // * the referencePath to set
+    // */
+    // public void setReferencePath(String referencePath) {
+    // this.referencePath = referencePath;
+    // }
 
     /**
      * @return the genomicRegionsDefinitionsPath
@@ -257,12 +261,91 @@ public final class Hg38altLociSeletorOptions {
         return dataPath + File.separator + genomicRegionsDefinitionsPath;
     }
 
+    // /**
+    // * @param genomicRegionsDefinitionsPath
+    // * the genomicRegionsDefinitionsPath to set
+    // */
+    // public void setGenomicRegionsDefinitionsPath(String genomicRegionsDefinitionsPath) {
+    // this.genomicRegionsDefinitionsPath = genomicRegionsDefinitionsPath;
+    // }
+
     /**
-     * @param genomicRegionsDefinitionsPath
-     *            the genomicRegionsDefinitionsPath to set
+     * Sets the path to the SQLite database file.
+     * 
+     * @param sqlitePath
+     *            path to the SQLite file
      */
-    public void setGenomicRegionsDefinitionsPath(String genomicRegionsDefinitionsPath) {
-        this.genomicRegionsDefinitionsPath = genomicRegionsDefinitionsPath;
+    public void setSqlitePath(String sqlitePath) {
+        this.sqlitePath = sqlitePath;
+    }
+
+    /**
+     * Returns the path to the SQLite database file.
+     * 
+     * @return path to SQLite file
+     */
+    public String getSqlitePath() {
+        return (this.sqlitePath);
+    }
+
+    /**
+     * @return the singleAltLociFile
+     */
+    public boolean isSingleAltLociFile() {
+        return singleAltLociFile;
+    }
+
+    /**
+     * @param singleAltLociFile
+     *            the singleAltLociFile to set
+     */
+    public void setSingleAltLociFile(boolean singleAltLociFile) {
+        this.singleAltLociFile = singleAltLociFile;
+    }
+
+    /**
+     * @return the inputVcf
+     */
+    public String getInputVcf() {
+        return inputVcf;
+    }
+
+    /**
+     * @param inputVcf
+     *            the inputVcf to set
+     */
+    public void setInputVcf(String inputVcf) {
+        this.inputVcf = inputVcf;
+    }
+
+    /**
+     * @return the altlociVcf
+     */
+    public String getAltlociVcf() {
+        return altlociVcf;
+    }
+
+    /**
+     * @param altlociVcf
+     *            the altlociVcf to set
+     */
+    public void setAltlociVcf(String altlociVcf) {
+        this.altlociVcf = altlociVcf;
+    }
+
+    /**
+     * @return the outputVcf
+     */
+    public String getOutputVcf() {
+        return outputVcf;
+    }
+
+    /**
+     * @param outputVcf
+     *            the outputVcf to set
+     */
+    public void setOutputVcf(String outputVcf) {
+        this.outputVcf = outputVcf;
     }
 
 }
