@@ -1,6 +1,8 @@
 # ASDPex
 
-The application ASDPex and the scripts in this repository can be used to improve the alignments of the alternate scafoolds provided by NCBI, to search for alignable scaffold-discrepant positions (ASPDs) in the alignments, and to use the resulting ASDP file to screen sample VCF files from whole-genome sequencing for ASPDs (which are likely to be false-positive variant calls).
+## Introduction
+
+The application ASDPex and the scripts in this repository can be used to improve the alignments of the alternate loci provided by GRC, to search for alignable scaffold-discrepant positions (ASDPs) in the alignments, and to use the resulting ASDP file to screen sample VCF files from whole-genome sequencing for ASDPs (which are likely to be false-positive variant calls).
 
 Prerequisites:
 
@@ -10,7 +12,13 @@ In addition to Java 8, you will need to install the tabix package. If you are on
 sudo apt-get install tabix
 ```
 
-Tutorial:
+## Getting started
+
+```
+git clone https://github.com/charite/asdpex.git
+cd asdpex
+```
+
 
 ## Download data
 cd to the 'scripts' directory, make the "downloadData.sh" executable, and execute the following command to download all the data we will need.
@@ -42,7 +50,7 @@ If everything goes well, you will see a message including the words BUILD SUCCES
 ## asdpex
 The jar file asdpex-cli-0.1.jar contains the main code used in this project. YOu can view the main commands with the following command.
 ```
-java -jar asdpex-cli/target/asdpex-cli-0.1-SNAPSHOT.jar
+java -jar asdpex-cli/target/asdpex-cli-0.1.jar
 Program: de.charite.compbio.asdpex (functional annotation of VCF files)
 Version: 0.0.1
 Contact: Marten Jäger <marten.jaeger@charite.de>
@@ -76,7 +84,7 @@ java -jar asdpex-cli/target/asdpex-cli-0.1.jar \
   align -d data/ -s seqan/regionalign2bed -o alignresults
 ```
 
-Right now the variants are saved in a separate file per alternative scaffold and even for the alignment blocks in the scaffolds. We merge the VCF files into a single file __allASDPs.vcf.gz__ and filter for SNVs. This and the following scripts
+Right now the variants are saved in a separate file per alternate loci and even for the alignment blocks in the scaffolds. We merge the VCF files into a single file __allASDPs.vcf.gz__ and filter for SNVs. This and the following scripts
 presume [BGZIP](https://github.com/samtools/htslib "htslib repository") and [TABIX](https://github.com/samtools/htslib "htslib repository") to be defined in the environment variable.
 ```
 ./scripts/mergeVCFs.sh alignresults/ allASDPs.vcf
