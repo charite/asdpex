@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.charite.compbio.hg38altlociselector.cmd;
+package de.charite.compbio.asdpex.cmd;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -9,16 +9,16 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
-import de.charite.compbio.hg38altlociselector.exceptions.HelpRequestedException;
+import de.charite.compbio.asdpex.Hg38altLociSeletorOptions;
+import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
 
 /**
- * Parser for the create-seed command arguments
+ * Helper class for parsing the commandline of the create-fasta command.
  *
  * @author Marten Jäger <marten.jaeger@charite.de>
  *
  */
-public class CreateSeedCommandLineParser {
+public final class CreateFastaCommandLineParser {
 
     /** options representation for the Apache commons command line parser */
     protected Options options;
@@ -28,18 +28,15 @@ public class CreateSeedCommandLineParser {
     /**
      * 
      */
-    public CreateSeedCommandLineParser() {
+    public CreateFastaCommandLineParser() {
         initializeParser();
     }
 
     private void initializeParser() {
         options = new Options();
         options.addOption("h", "help", false, "show this help");
-        options.addOption("d", "data-dir", true, "folder with NCBI info files, defaults to \"data\"");
-        options.addOption("a", "aln-dir", true,
-                "folder with NCBI alignment gff files, defaults to \"data/alignments\"");
-        options.addOption("s", "seed-dir", true,
-                "folder where the seed info files will be stored, defaults to \"seed\"");
+        options.addOption("d", "data-dir", true, "target folder for downloaded files, defaults to \"data\"");
+        options.addOption("s", "single", false, "split the extended alternative loci into single files");
         parser = new DefaultParser();
     }
 
@@ -48,7 +45,7 @@ public class CreateSeedCommandLineParser {
 
         // Fill the resulting Options.
         Hg38altLociSeletorOptions result = new Hg38altLociSeletorOptions();
-        result.command = Hg38altLociSeletorOptions.Command.CREATE_SEED;
+        result.command = Hg38altLociSeletorOptions.Command.CREATE_FASTA;
 
         if (cmd.hasOption("help")) {
             printHelp();
@@ -57,10 +54,9 @@ public class CreateSeedCommandLineParser {
 
         if (cmd.hasOption("data-dir"))
             result.setDataPath(cmd.getOptionValue("data-dir"));
-        if (cmd.hasOption("aln-dir"))
-            result.setAlignmentPath(cmd.getOptionValue("aln-dir"));
-        if (cmd.hasOption("seed-dir"))
-            result.setSeedInfoPath(cmd.getOptionValue("seed-dir"));
+
+        if (cmd.hasOption("single"))
+            result.singleAltLociFile = true;
 
         return result;
     }

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.charite.compbio.hg38altlociselector.cmd;
+package de.charite.compbio.asdpex.cmd;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -11,14 +11,14 @@ import org.apache.commons.cli.ParseException;
 
 import com.google.common.collect.Lists;
 
+import de.charite.compbio.asdpex.Hg38altLociSeletorOptions;
 import de.charite.compbio.asdpex.db.DatabaseManger;
 import de.charite.compbio.asdpex.exceptions.AltLociSelectorException;
+import de.charite.compbio.asdpex.exceptions.CommandLineParsingException;
+import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
 import de.charite.compbio.asdpex.io.parser.AccessionInfoParser;
 import de.charite.compbio.asdpex.io.parser.AltScaffoldPlacementParser;
 import de.charite.compbio.asdpex.io.parser.RegionInfoParser;
-import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
-import de.charite.compbio.hg38altlociselector.exceptions.CommandLineParsingException;
-import de.charite.compbio.hg38altlociselector.exceptions.HelpRequestedException;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFFileReader;
 

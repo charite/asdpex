@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.charite.compbio.hg38altlociselector.cmd;
+package de.charite.compbio.asdpex.cmd;
 
 import java.io.File;
 
@@ -11,9 +11,9 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import de.charite.compbio.asdpex.Hg38altLociSeletorOptions;
+import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
 import de.charite.compbio.asdpex.util.HelpFormatter;
-import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
-import de.charite.compbio.hg38altlociselector.exceptions.HelpRequestedException;
 
 /**
  * Helper class for parsing the commandline of the align command.

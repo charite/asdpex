@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.charite.compbio.hg38altlociselector;
+package de.charite.compbio.asdpex;
 
 import java.io.File;
 
