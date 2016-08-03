@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.charite.compbio.hg38altlociselector.exceptions;
+package de.charite.compbio.asdpex.exceptions;
 
 import de.charite.compbio.asdpex.exceptions.AltLociSelectorException;
 

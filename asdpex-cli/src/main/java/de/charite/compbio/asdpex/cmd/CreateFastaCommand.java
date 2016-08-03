@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.charite.compbio.hg38altlociselector.cmd;
+package de.charite.compbio.asdpex.cmd;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,17 +13,17 @@ import org.apache.commons.lang.ArrayUtils;
 
 import com.google.common.collect.ImmutableMap;
 
+import de.charite.compbio.asdpex.Hg38altLociSeletorOptions;
 import de.charite.compbio.asdpex.data.AccessionInfo;
 import de.charite.compbio.asdpex.data.AltScaffoldPlacementInfo;
 import de.charite.compbio.asdpex.data.RegionInfo;
 import de.charite.compbio.asdpex.exceptions.AltLociSelectorException;
+import de.charite.compbio.asdpex.exceptions.CommandLineParsingException;
+import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
 import de.charite.compbio.asdpex.io.parser.AccessionInfoParser;
 import de.charite.compbio.asdpex.io.parser.AltScaffoldPlacementParser;
 import de.charite.compbio.asdpex.io.parser.RegionInfoParser;
 import de.charite.compbio.asdpex.util.IOUtil;
-import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
-import de.charite.compbio.hg38altlociselector.exceptions.CommandLineParsingException;
-import de.charite.compbio.hg38altlociselector.exceptions.HelpRequestedException;
 import htsjdk.samtools.reference.ReferenceSequence;
 import htsjdk.samtools.reference.ReferenceSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequenceFileFactory;

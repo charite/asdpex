@@ -1,16 +1,16 @@
-package de.charite.compbio.hg38altlociselector;
+package de.charite.compbio.asdpex;
 
+import de.charite.compbio.asdpex.cmd.AlignCommand;
+import de.charite.compbio.asdpex.cmd.AltLociSelectorCommand;
+import de.charite.compbio.asdpex.cmd.AnnotateVCFCommand;
+import de.charite.compbio.asdpex.cmd.CreateDatabaseCommand;
+import de.charite.compbio.asdpex.cmd.CreateFastaCommand;
+import de.charite.compbio.asdpex.cmd.CreateSeedCommand;
+import de.charite.compbio.asdpex.cmd.DownloadCommand;
 import de.charite.compbio.asdpex.exceptions.AltLociSelectorException;
+import de.charite.compbio.asdpex.exceptions.CommandLineParsingException;
+import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
 import de.charite.compbio.asdpex.util.HelpFormatter;
-import de.charite.compbio.hg38altlociselector.cmd.AlignCommand;
-import de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand;
-import de.charite.compbio.hg38altlociselector.cmd.AnnotateVCFCommand;
-import de.charite.compbio.hg38altlociselector.cmd.CreateDatabaseCommand;
-import de.charite.compbio.hg38altlociselector.cmd.CreateFastaCommand;
-import de.charite.compbio.hg38altlociselector.cmd.CreateSeedCommand;
-import de.charite.compbio.hg38altlociselector.cmd.DownloadCommand;
-import de.charite.compbio.hg38altlociselector.exceptions.CommandLineParsingException;
-import de.charite.compbio.hg38altlociselector.exceptions.HelpRequestedException;
 
 /**
  * Hello world!
