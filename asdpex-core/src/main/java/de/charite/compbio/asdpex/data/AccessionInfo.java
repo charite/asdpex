@@ -24,35 +24,45 @@ public class AccessionInfo implements Serializable, Comparable<AccessionInfo> {
     private final int genbankGi;
 
     /**
-     * @return the chromosome
+     * Return the chromosome (e.g. 1,2,3,...X).
+     * 
+     * @return the chromosome Chromosome identifier
      */
     public String getChromosome() {
         return chromosome;
     }
 
     /**
-     * @return the refseqAccessionVersion
+     * Return the RefSeq accession version (e.g. NC_000001.11).
+     * 
+     * @return the refseqAccessionVersion RefSeq accession version
      */
     public String getRefseqAccessionVersion() {
         return refseqAccessionVersion;
     }
 
     /**
-     * @return the refseqGi
+     * Return the RefSeq GI number (e.g. 568815597)
+     * 
+     * @return the refseqGi RefSeq GI number
      */
     public int getRefseqGi() {
         return refseqGi;
     }
 
     /**
-     * @return the genbankAccessionVersion
+     * Return the GenBank accession version (e.g. CM000663.2).
+     * 
+     * @return the genbankAccessionVersion GenBank accession version
      */
     public String getGenbankAccessionVersion() {
         return genbankAccessionVersion;
     }
 
     /**
-     * @return the genbankGi
+     * Return the GenBank GI number (e.g. 568336023).
+     * 
+     * @return the genbankGi GenBank GI number
      */
     public int getGenbankGi() {
         return genbankGi;
@@ -67,9 +77,8 @@ public class AccessionInfo implements Serializable, Comparable<AccessionInfo> {
     }
 
     /**
-     * Creates the Fasta identifier from accessionInfo file row in the format
-     * they are used in the reference fasta files: chr<1-22|X|Y|M>_<GenBank
-     * Accession.version with '.'->'v'>_alt<br>
+     * Creates the Fasta identifier from accessionInfo file row in the format they are used in the reference fasta
+     * files: chr<1-22|X|Y|M>_<GenBank Accession.version with '.'->'v'>_alt<br>
      * e.g.: chr21_GL383580v2_alt
      * 
      * @param info
@@ -83,7 +92,7 @@ public class AccessionInfo implements Serializable, Comparable<AccessionInfo> {
     }
 
     /**
-     * Nester builder for the {@link AccessionInfo}s.
+     * Nested builder for the {@link AccessionInfo}s.
      * 
      *
      * @author Marten Jäger <marten.jaeger@charite.de>
@@ -96,11 +105,6 @@ public class AccessionInfo implements Serializable, Comparable<AccessionInfo> {
         private String genbankAccessionVersion;
         private int genbankGi;
 
-        /**
-         * @param chr
-         *            the chromosome
-         * @return
-         */
         public AccessionInfoBuilder chromosome(String chr) {
             this.chromosome = chr;
             return this;

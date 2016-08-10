@@ -155,11 +155,11 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
 
             try {
                 if (options.singleAltLociFile)
-                    createFastaFile(options.getFastqOutputPath() + "/altLoci_single/" + identifier + "_extended.fa",
+                    createFastaFile(options.getFastaOutputPath() + "/altLoci_single/" + identifier + "_extended.fa",
                             identifier, altExtended, false);
                 else
                     createFastaFile(
-                            options.getFastqOutputPath() + "/altLoci/" + currentReg.getRegionName() + "_altLoci.fa",
+                            options.getFastaOutputPath() + "/altLoci/" + currentReg.getRegionName() + "_altLoci.fa",
                             identifier, altExtended, true);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -169,7 +169,7 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
             ReferenceSequence reg = refFile.getSubsequenceAt("chr" + scaffold.getParentName(), currentReg.getStart(),
                     currentReg.getStop());
             try {
-                createFastaFile(options.getFastqOutputPath() + "/regions/" + currentReg.getRegionName() + ".fa",
+                createFastaFile(options.getFastaOutputPath() + "/regions/" + currentReg.getRegionName() + ".fa",
                         currentReg.getRegionName(), reg.getBases(), false);
             } catch (IOException e) {
                 e.printStackTrace();

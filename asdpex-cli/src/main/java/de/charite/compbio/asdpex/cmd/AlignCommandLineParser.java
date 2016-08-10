@@ -51,48 +51,46 @@ public final class AlignCommandLineParser {
         CommandLine cmd = parser.parse(options, args);
 
         // Fill the resulting Options.
-        Hg38altLociSeletorOptions result = new Hg38altLociSeletorOptions();
-        result.command = Hg38altLociSeletorOptions.Command.ALIGN;
+        Hg38altLociSeletorOptions asdpexOptions = new Hg38altLociSeletorOptions();
+        asdpexOptions.command = Hg38altLociSeletorOptions.Command.ALIGN;
 
         if (cmd.hasOption("help")) {
-            printHelp();
+            printHelp(asdpexOptions);
             throw new HelpRequestedException();
         }
 
         if (cmd.hasOption("data-dir"))
-            result.setDataPath(cmd.getOptionValue("data-dir"));
+            asdpexOptions.setDataPath(cmd.getOptionValue("data-dir"));
         else {
-            printHelp(result);
+            printHelp(asdpexOptions);
             throw new HelpRequestedException();
         }
 
         if (cmd.hasOption("out-dir"))
-            result.setResultsFolder(cmd.getOptionValue("out-dir"));
+            asdpexOptions.setResultsFolder(cmd.getOptionValue("out-dir"));
         else {
-            printHelp(result);
+            printHelp(asdpexOptions);
             throw new HelpRequestedException();
         }
 
         if (cmd.hasOption("seqan"))
-            result.setSeqanAlign(cmd.getOptionValue("seqan"));
+            asdpexOptions.setSeqanAlign(cmd.getOptionValue("seqan"));
         else {
-            printHelp(result);
+            printHelp(asdpexOptions);
             throw new HelpRequestedException();
         }
 
         if (cmd.hasOption("single"))
-            result.singleAltLociFile = true;
+            asdpexOptions.singleAltLociFile = true;
 
-        return result;
-    }
-
-    private void printHelp() {
-        System.err.println("The 'align' command will do most of ");
+        return asdpexOptions;
     }
 
     private void printHelp(Hg38altLociSeletorOptions options) {
+        System.err.println(
+                "The 'align' command will do all the stuff and create a complete ready for analysis dataset. Will take forever ;)");
         org.apache.commons.cli.HelpFormatter formatter = new org.apache.commons.cli.HelpFormatter();
-        formatter.printHelp("java -jar hg38altlociselector.jar " + options.command.toString(), "options:", this.options,
+        formatter.printHelp("java -jar asdpex.jar " + options.command.toString(), "options:", this.options,
                 options.error, true);
         // HelpFormatter.printUsage(options.command.toString(), "wie das alles
         // funzt", options);

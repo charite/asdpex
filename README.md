@@ -48,11 +48,11 @@ mvn package
 If everything goes well, you will see a message including the words BUILD SUCCESS.
 
 ## asdpex
-The jar file asdpex-cli-0.1.jar contains the main code used in this project. YOu can view the main commands with the following command.
+The jar file asdpex-cli-0.1.jar contains the main code used in this project. An overview of available command are shown with the following command.
 ```
 java -jar asdpex-cli/target/asdpex-cli-0.1.jar
 Program: de.charite.compbio.asdpex (functional annotation of VCF files)
-Version: 0.0.1
+Version: 0.1
 Contact: Marten Jäger <marten.jaeger@charite.de>
          Peter N. Robinson <peter.robinson@jax.org>
 

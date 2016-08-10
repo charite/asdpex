@@ -30,7 +30,7 @@ public final class Hg38altLociSeletorOptions {
 
     private String resultsFolder = "results";
 
-    private String fastqOutputPath = "../fasta";
+    private String fastaOutputPath = "../fasta";
 
     private String seedInfoPath = "../seed";
 
@@ -135,18 +135,18 @@ public final class Hg38altLociSeletorOptions {
     }
 
     /**
-     * @return the fastqOutputPath
+     * @return the fastaOutputPath
      */
-    public String getFastqOutputPath() {
-        return fastqOutputPath;
+    public String getFastaOutputPath() {
+        return fastaOutputPath;
     }
 
     /**
-     * @param fastqOutputPath
-     *            the fastqOutputPath to set
+     * @param fastaOutputPath
+     *            the fastaOutputPath to set
      */
-    public void setFastqOutputPath(String fastqOutputPath) {
-        this.fastqOutputPath = fastqOutputPath;
+    public void setFastaOutputPath(String fastaOutputPath) {
+        this.fastaOutputPath = fastaOutputPath;
     }
 
     /**
