@@ -26,20 +26,22 @@ cd to the 'scripts' directory, make the "downloadData.sh" executable, and execut
 ```
 cd scripts
 chmod +x downloadData.sh
-./downloadData all
+./downloadData all data
 cd ..
 ```
 After you have downloaded the data, you will need to index the Genome using samtools (the script will produce a message with the command you need, and if samtools is not in your path adjust the command accordingly).
 
 ## Build the executables
 
-First you should compile the aligner, which is written in C using the SeqAn library.
+#### regionalign2vcf
+The aligner was written using the SeqAn C++ library. Therfore the library has to be downloaded and the tool compiled. We have to change to the `seqan` folder and run the Makefile.
 ```
 cd seqan
 make
 ```
 This command should result in an executable programm called regionalign2vcf, which is later on needed.
 
+#### asdpex
 We use the maven build system to compile the code. First cd back to the main folder.
 ```
 cd ..
@@ -47,7 +49,6 @@ mvn package
 ```
 If everything goes well, you will see a message including the words BUILD SUCCESS.
 
-## asdpex
 The jar file asdpex-cli-0.1.jar contains the main code used in this project. An overview of available command are shown with the following command.
 ```
 java -jar asdpex-cli/target/asdpex-cli-0.1.jar
@@ -58,14 +59,16 @@ Contact: Marten Jäger <marten.jaeger@charite.de>
 
 Usage: java -jar asdpex.jar <command> [options]
 
-Command: download    download transcript database  (not yet implemented)
+Command: align       construct fasta and seed files and do the alignments
          annotate    functional annotation of VCF files
+         create-db   creates a SQLite database used for this tool
          create-fa   construct fasta files for the alignments
          create-seed construct seed files for the alignments from the NCBI alignments
-         align       construct fasta and seed files and do the alignments
+         download    download transcript database  (not yet implemented)
 
-Example: java -jar asdpex.jar download GRCh38
-         java -jar asdpex.jar create-fa -o data/
+Example: java -jar asdpex.jar create-db -s asdpex.sqlite -d data
+         java -jar asdpex.jar create-fa -o data
+
 
 ```
 
