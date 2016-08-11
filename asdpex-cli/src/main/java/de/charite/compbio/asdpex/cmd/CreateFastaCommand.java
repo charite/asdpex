@@ -3,10 +3,8 @@
  */
 package de.charite.compbio.asdpex.cmd;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang.ArrayUtils;
@@ -23,14 +21,14 @@ import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
 import de.charite.compbio.asdpex.io.parser.AccessionInfoParser;
 import de.charite.compbio.asdpex.io.parser.AltScaffoldPlacementParser;
 import de.charite.compbio.asdpex.io.parser.RegionInfoParser;
-import de.charite.compbio.asdpex.util.IOUtil;
+import de.charite.compbio.asdpex.io.writer.FastaFileWriter;
 import htsjdk.samtools.reference.ReferenceSequence;
 import htsjdk.samtools.reference.ReferenceSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequenceFileFactory;
 import htsjdk.samtools.util.SequenceUtil;
 
 /**
- * 
+ * This command will create the fasta files later on used for the alignments.
  *
  * @author Marten Jäger <marten.jaeger@charite.de>
  *
@@ -99,12 +97,12 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
         for (AltScaffoldPlacementInfo scaffold : asMap.values()) {
             AccessionInfo currentAI = aiMap.get(scaffold.getAltScafAcc());
             RegionInfo currentReg = regMap.get(scaffold.getRegion());
-            System.out.println();
-            System.out.println(createFastaIdentifier(currentAI));
+            // System.out.println();
+            // System.out.println(createFastaIdentifier(currentAI));
             // break;
 
-            System.out.println(currentReg.getStart() + "\t" + currentReg.getStop());
-            System.out.println(scaffold.getParentStart() + "\t" + scaffold.getParentStop());
+            // System.out.println(currentReg.getStart() + "\t" + currentReg.getStop());
+            // System.out.println(scaffold.getParentStart() + "\t" + scaffold.getParentStop());
 
             // ALT_LOCI
             // ReferenceSequence alt = refFile.getSequence(createFastaIdentifier(currentAI));
@@ -125,7 +123,7 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
             int threeprimeFillingStop = currentReg.getStop();
 
             byte[] altExtended = new byte[0];
-            System.out.println(altExtended.length);
+            // System.out.println(altExtended.length);
 
             // add 5' Tail
             if (fiveprimeFillingStart < fiveprimeFillingStop) {
@@ -133,7 +131,7 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
                         fiveprimeFillingStart, fiveprimeFillingStop);
                 altExtended = ArrayUtils.addAll(altExtended, ref.getBases());
             }
-            System.out.println(altExtended.length);
+            // System.out.println(altExtended.length);
 
             String identifier = createFastaIdentifier(currentAI);
             // add alt_loci
@@ -143,7 +141,7 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
                 SequenceUtil.reverseComplement(bases);
 
             altExtended = ArrayUtils.addAll(altExtended, bases);
-            System.out.println(altExtended.length);
+            // System.out.println(altExtended.length);
 
             // add 3' tail
             if (threeprimeFillingStart < threeprimeFillingStop) {
@@ -151,16 +149,18 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
                         threeprimeFillingStart, threeprimeFillingStop);
                 altExtended = ArrayUtils.addAll(altExtended, ref.getBases());
             }
-            System.out.println(altExtended.length + "\t" + (currentReg.getStop() - currentReg.getStart() + 1));
+            // System.out.println(altExtended.length + "\t" + (currentReg.getStop() - currentReg.getStart() + 1));
 
             try {
                 if (options.singleAltLociFile)
-                    createFastaFile(options.getFastaOutputPath() + "/altLoci_single/" + identifier + "_extended.fa",
-                            identifier, altExtended, false);
+                    FastaFileWriter.createFastaFile(
+                            options.getFastaOutputPath() + "/altLoci_single/" + identifier + "_extended.fa", identifier,
+                            altExtended, false);
                 else
-                    createFastaFile(
+                    FastaFileWriter.createFastaFile(
                             options.getFastaOutputPath() + "/altLoci/" + currentReg.getRegionName() + "_altLoci.fa",
                             identifier, altExtended, true);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -169,7 +169,8 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
             ReferenceSequence reg = refFile.getSubsequenceAt("chr" + scaffold.getParentName(), currentReg.getStart(),
                     currentReg.getStop());
             try {
-                createFastaFile(options.getFastaOutputPath() + "/regions/" + currentReg.getRegionName() + ".fa",
+                FastaFileWriter.createFastaFile(
+                        options.getFastaOutputPath() + "/regions/" + currentReg.getRegionName() + ".fa",
                         currentReg.getRegionName(), reg.getBases(), false);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -190,36 +191,6 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
         identifier.append("chr").append(info.getChromosome()).append("_")
                 .append(info.getGenbankAccessionVersion().replace('.', 'v')).append("_alt");
         return identifier.toString();
-    }
-
-    private void createFastaFile(String path, String name, byte[] bases, boolean multiFasta)
-            throws UnsupportedEncodingException, IOException {
-        File file = new File(path);
-
-        final BufferedWriter out;
-        if (file.exists()) {
-            if (options.singleAltLociFile) {
-                System.out.println("[INFO] file already exists. Skipping.");
-                return;
-            }
-        }
-        file.getParentFile().mkdirs();
-        if (multiFasta)
-            out = IOUtil.getBufferedFileWriter(file, true);
-        else
-            out = IOUtil.getBufferedFileWriter(file);
-        out.write(">");
-        out.write(name);
-        out.write("\n");
-
-        for (int i = 0; i < bases.length; ++i) {
-            if (i > 0 && i % options.fastaLineLength == 0)
-                out.write("\n");
-            out.write(bases[i]);
-        }
-
-        out.write("\n");
-        IOUtil.close(out);
     }
 
 }

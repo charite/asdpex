@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import org.apache.commons.cli.ParseException;
@@ -29,6 +28,7 @@ import de.charite.compbio.asdpex.exceptions.AltLociSelectorException;
 import de.charite.compbio.asdpex.exceptions.CommandLineParsingException;
 import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
 import de.charite.compbio.asdpex.io.parser.NCBIgffAlignmentParser;
+import de.charite.compbio.asdpex.io.writer.FastaFileWriter;
 import de.charite.compbio.asdpex.util.IOUtil;
 import htsjdk.samtools.reference.ReferenceSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequenceFileFactory;
@@ -261,15 +261,16 @@ public class AlignCommand extends AltLociSelectorCommand {
         // FASTA FILES
         // alt loci
         try {
-            createFastaFile(options.getTempFolder() + "/" + idALtLoci + "_altLoci_" + block + ".fa", idALtLoci, altLoci,
-                    false);
+            FastaFileWriter.createFastaFile(options.getTempFolder() + "/" + idALtLoci + "_altLoci_" + block + ".fa",
+                    idALtLoci, altLoci, false);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
         }
         // ref
         try {
-            createFastaFile(options.getTempFolder() + "/" + idALtLoci + "_ref_" + block + ".fa", idRef, ref, false);
+            FastaFileWriter.createFastaFile(options.getTempFolder() + "/" + idALtLoci + "_ref_" + block + ".fa", idRef,
+                    ref, false);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -552,51 +553,6 @@ public class AlignCommand extends AltLociSelectorCommand {
         StringBuilder identifier = new StringBuilder();
         identifier.append(info.getAltScafAcc()).append("_").append(info.getParentAcc()).append(".gff");
         return identifier.toString();
-    }
-
-    /**
-     * Ẃrites out a new Fasta file
-     * 
-     * @param path
-     *            Path+name of the outputfile
-     * @param name
-     *            fasta identifier (e.g. ">name")
-     * @param bases
-     *            bases to be written
-     * @param multiFasta
-     *            is this a multifasta? append don't overwrite
-     * @throws UnsupportedEncodingException
-     * @throws IOException
-     *             TODO move to CORE in the IOutils
-     */
-    private void createFastaFile(String path, String name, byte[] bases, boolean multiFasta)
-            throws UnsupportedEncodingException, IOException {
-        File file = new File(path);
-
-        final BufferedWriter out;
-        if (file.exists()) {
-            if (options.singleAltLociFile) {
-                System.out.println("[INFO] file already exists. Skipping.");
-                return;
-            }
-        }
-        file.getParentFile().mkdirs();
-        if (multiFasta)
-            out = IOUtil.getBufferedFileWriter(file, true);
-        else
-            out = IOUtil.getBufferedFileWriter(file);
-        out.write(">");
-        out.write(name);
-        out.write("\n");
-
-        for (int i = 0; i < bases.length; ++i) {
-            if (i > 0 && i % options.fastaLineLength == 0)
-                out.write("\n");
-            out.write(bases[i]);
-        }
-
-        out.write("\n");
-        IOUtil.close(out);
     }
 
     private void createMatchesFile(String path, String filename, ImmutableList<NCBIgffAlignmentElement> matches,
