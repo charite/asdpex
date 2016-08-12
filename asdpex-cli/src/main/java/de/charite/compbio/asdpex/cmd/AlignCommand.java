@@ -24,6 +24,7 @@ import de.charite.compbio.asdpex.data.AlternativeLocus;
 import de.charite.compbio.asdpex.data.NCBIgffAlignment;
 import de.charite.compbio.asdpex.data.NCBIgffAlignmentElement;
 import de.charite.compbio.asdpex.data.NCBIgffAlignmentElementType;
+import de.charite.compbio.asdpex.db.DatabaseManger;
 import de.charite.compbio.asdpex.exceptions.AltLociSelectorException;
 import de.charite.compbio.asdpex.exceptions.CommandLineParsingException;
 import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
@@ -73,6 +74,25 @@ public class AlignCommand extends AltLociSelectorCommand {
      */
     @Override
     public void run() throws AltLociSelectorException {
+
+        // check the reference file
+        final ReferenceSequenceFile refFile = ReferenceSequenceFileFactory
+                .getReferenceSequenceFile(new File(options.getReferencePath()));
+        if (!refFile.isIndexed()) {
+            System.err.println("[ERROR] The FastA is not index - please index file first and run again.");
+            System.exit(1);
+        } else
+            System.out.println("[INFO] Reference fastA filed checked: " + options.getReferencePath());
+
+        // Database access
+        DatabaseManger dbman = new DatabaseManger(options.getSqlitePath());
+
+        // load regions
+        // db
+
+        System.exit(0);
+        // END
+
         System.out.println("[INFO] Creating seed files");
         if (options == null)
             System.err.println("[ERROR] option = null");
@@ -81,8 +101,8 @@ public class AlignCommand extends AltLociSelectorCommand {
                 options.getAltScaffoldPlacementPath(), options.getGenomicRegionsDefinitionsPath(),
                 options.getChrAccessionsPath()).build();
         // Ref fasta File
-        final ReferenceSequenceFile refFile = ReferenceSequenceFileFactory
-                .getReferenceSequenceFile(new File(options.getReferencePath()));
+        // final ReferenceSequenceFile refFile = ReferenceSequenceFileFactory
+        // .getReferenceSequenceFile(new File(options.getReferencePath()));
         if (!refFile.isIndexed()) {
             System.err.println("The FastA is not index - please index file first and run again.");
             System.exit(1);

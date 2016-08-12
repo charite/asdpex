@@ -56,28 +56,28 @@ public final class CreateDatabaseCommandLineParser {
         }
 
         // Fill the resulting Options.
-        Hg38altLociSeletorOptions result = new Hg38altLociSeletorOptions();
-        result.command = Hg38altLociSeletorOptions.Command.CREATE_DB;
+        Hg38altLociSeletorOptions asdpexOptions = new Hg38altLociSeletorOptions();
+        asdpexOptions.command = Hg38altLociSeletorOptions.Command.CREATE_DB;
 
         if (cmd.hasOption("help")) {
-            printHelp(result);
+            printHelp(asdpexOptions);
             throw new HelpRequestedException();
         }
         if (cmd.hasOption("sql")) {
-            result.setSqlitePath(cmd.getOptionValue("sql"));
+            asdpexOptions.setSqlitePath(cmd.getOptionValue("sql"));
         } else {
-            result.error = "Missing path to SQLite database: -s";
-            printHelp(result);
+            asdpexOptions.error = "Missing path to SQLite database: -s";
+            printHelp(asdpexOptions);
         }
         if (cmd.hasOption("data-dir")) {
-            result.setDataPath(cmd.getOptionValue("data-dir"));
+            asdpexOptions.setDataPath(cmd.getOptionValue("data-dir"));
         } else if (cmd.hasOption("asdp")) {
-            result.setAltlociVcf(cmd.getOptionValue("asdp"));
+            asdpexOptions.setAltlociVcf(cmd.getOptionValue("asdp"));
         } else {
-            result.error = "Missing path to data folder: -d\nor ASDP file: -a";
-            printHelp(result);
+            asdpexOptions.error = "Missing path to data folder: -d\nor ASDP file: -a";
+            printHelp(asdpexOptions);
         }
-        return result;
+        return asdpexOptions;
 
     }
 

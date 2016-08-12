@@ -10,6 +10,8 @@ import java.io.File;
  * 
  * Most of the parameters are only used by one or several but not all commands.
  * 
+ * TODO init all pathes with: System.out.println("Working Directory = " + System.getProperty("user.dir"));
+ * 
  * @author Marten Jäger <marten.jaeger@charite.de>
  *
  */

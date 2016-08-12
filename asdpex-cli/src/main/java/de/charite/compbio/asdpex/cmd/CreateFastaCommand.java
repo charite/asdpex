@@ -89,24 +89,9 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
                 .getReferenceSequenceFile(new File(options.getReferencePath()));
         System.out.println(refFile.isIndexed());
 
-        // ReferenceSequence seq;
-        // while ((seq = refFile.nextSequence()) != null) {
-        // System.out.println(seq.getName() + "\t" + seq.getBases().length);
-        // }
-
         for (AltScaffoldPlacementInfo scaffold : asMap.values()) {
             AccessionInfo currentAI = aiMap.get(scaffold.getAltScafAcc());
             RegionInfo currentReg = regMap.get(scaffold.getRegion());
-            // System.out.println();
-            // System.out.println(createFastaIdentifier(currentAI));
-            // break;
-
-            // System.out.println(currentReg.getStart() + "\t" + currentReg.getStop());
-            // System.out.println(scaffold.getParentStart() + "\t" + scaffold.getParentStop());
-
-            // ALT_LOCI
-            // ReferenceSequence alt = refFile.getSequence(createFastaIdentifier(currentAI));
-            // System.out.println(scaffold.getAltScafStop() + scaffold.getAltStopTail() + "\t" + alt.getBases().length);
 
             // TODO ALL OF THIS SHOULD BE PUT INTO A FASTA-FACTORY
 

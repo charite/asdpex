@@ -20,8 +20,8 @@ import com.google.common.collect.ImmutableMap;
 
 import de.charite.compbio.asdpex.data.AccessionInfo;
 import de.charite.compbio.asdpex.data.AltScaffoldPlacementInfo;
-import de.charite.compbio.asdpex.data.RegionInfo;
 import de.charite.compbio.asdpex.data.AltScaffoldPlacementInfo.AltScaffoldPlacementInfoBuilder;
+import de.charite.compbio.asdpex.data.RegionInfo;
 import de.charite.compbio.asdpex.data.RegionInfo.RegionInfoBuilder;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.VariantContext.Type;
@@ -296,6 +296,20 @@ public class DatabaseManger {
             regionInfoBuilder.stop(rs.getInt(3));
             builder.add(regionInfoBuilder.build());
         }
+        return (builder.build());
+    }
+
+    public ImmutableList<RegionInfo> getRegionInfos() throws SQLException {
+        ImmutableList.Builder<RegionInfo> builder = new ImmutableList.Builder<>();
+
+        RegionInfoBuilder regionInfoBuilder;
+        PreparedStatement stmt = this.connectionInstance.prepareStatement("SELECT * FROM region");
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            regionInfoBuilder = new RegionInfoBuilder();
+            regionInfoBuilder.regionName(rs.getString("name"));
+        }
+
         return (builder.build());
     }
 
