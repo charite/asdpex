@@ -47,7 +47,7 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
     /*
      * (non-Javadoc)
      * 
-     * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#parseCommandLine(java.lang.String[])
+     * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand# parseCommandLine(java.lang.String[])
      */
     @Override
     protected Hg38altLociSeletorOptions parseCommandLine(String[] args)
@@ -80,8 +80,7 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
         System.out.println("[INFO] found placement for " + asMap.size() + " alt_loci");
 
         System.out.println("[INFO] Read region definitions");
-        RegionInfoParser regParser = new RegionInfoParser(options.getGenomicRegionsDefinitionsPath(),
-                options.getChrAccessionsPath());
+        RegionInfoParser regParser = new RegionInfoParser(options.getGenomicRegionsDefinitionsPath());
         ImmutableMap<String, RegionInfo> regMap = regParser.parse();
         System.out.println("[INFO] found " + regMap.size() + " regions definitions");
 
@@ -95,16 +94,22 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
 
             // TODO ALL OF THIS SHOULD BE PUT INTO A FASTA-FACTORY
 
-            // sequence between region start and alt_loci start - to take from reference
+            // sequence between region start and alt_loci start - to take from
+            // reference
             int fiveprimeFillingStart = currentReg.getStart();
-            int fiveprimeFillingStop = scaffold.getParentStart() - 1; // since its inclusive
+            int fiveprimeFillingStop = scaffold.getParentStart() - 1; // since
+                                                                      // its
+                                                                      // inclusive
 
             // sequence inserted from the alt loci - w/o the tails
             int altLociStart = scaffold.getAltScafStart();
             int altLociStop = scaffold.getAltScafStop();
 
-            // sequence between alt_loci stop and region stop - to take from reference
-            int threeprimeFillingStart = scaffold.getParentStop() + 1; // since its inclusive
+            // sequence between alt_loci stop and region stop - to take from
+            // reference
+            int threeprimeFillingStart = scaffold.getParentStop() + 1; // since
+                                                                       // its
+                                                                       // inclusive
             int threeprimeFillingStop = currentReg.getStop();
 
             byte[] altExtended = new byte[0];
@@ -134,7 +139,8 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
                         threeprimeFillingStart, threeprimeFillingStop);
                 altExtended = ArrayUtils.addAll(altExtended, ref.getBases());
             }
-            // System.out.println(altExtended.length + "\t" + (currentReg.getStop() - currentReg.getStart() + 1));
+            // System.out.println(altExtended.length + "\t" +
+            // (currentReg.getStop() - currentReg.getStart() + 1));
 
             try {
                 if (options.singleAltLociFile)

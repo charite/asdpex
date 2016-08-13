@@ -9,7 +9,6 @@ import java.io.IOException;
 
 import com.google.common.collect.ImmutableMap;
 
-import de.charite.compbio.asdpex.data.AccessionInfo;
 import de.charite.compbio.asdpex.data.RegionInfo;
 import de.charite.compbio.asdpex.data.RegionInfo.RegionInfoBuilder;
 import de.charite.compbio.asdpex.exceptions.AccessionInfoParseException;
@@ -23,86 +22,82 @@ import de.charite.compbio.asdpex.util.IOUtil;
  */
 public class RegionInfoParser {
 
-	private File regionFile;
-	private File chromosomeFile;
+    private File regionFile;
 
-	/**
-	 * Number of tab-separated fields in then NCBI genomic_regions_definitions.txt file
-	 */
-	private static final int NFIELDS = 4;
+    /**
+     * Number of tab-separated fields in then NCBI
+     * genomic_regions_definitions.txt file
+     */
+    private static final int NFIELDS = 4;
 
-	/**
-	 * Dummy to prevent from using
-	 */
-	@SuppressWarnings("unused")
-	private RegionInfoParser() {
-	}
+    /**
+     * Dummy to prevent from using
+     */
+    @SuppressWarnings("unused")
+    private RegionInfoParser() {
+    }
 
-	/**
-	 * 
-	 * @param filepath
-	 */
-	public RegionInfoParser(String regionPath, String chromosomePath) {
-		this.regionFile = new File(regionPath);
-		this.chromosomeFile = new File(chromosomePath);
-	}
+    /**
+     * 
+     * @param filepath
+     */
+    public RegionInfoParser(String regionPath) {
+        this.regionFile = new File(regionPath);
+    }
 
-	/**
-	 * Parse the file with the {@link RegionInfo}s.
-	 * 
-	 * @return an immutable map with the 'region_name' column ids as keys.
-	 */
-	public ImmutableMap<String, RegionInfo> parse() {
-		ImmutableMap.Builder<String, RegionInfo> result = new ImmutableMap.Builder<String, RegionInfo>();
-		ImmutableMap<String, AccessionInfo> chromosomMap = (new AccessionInfoParser(
-				this.chromosomeFile.getAbsolutePath())).parse();
-		BufferedReader reader = null;
-		// reader = this.open();
-		String line;
-		try {
-			reader = IOUtil.getBufferedReaderFromFileName(this.regionFile);
-			while ((line = reader.readLine()) != null) {
-				try {
-					if (line.startsWith("#"))
-						continue;
-					RegionInfoBuilder builder = createBuilderFromLine(line, chromosomMap);
-					RegionInfo info = builder.build();
-					result.put(info.getRegionName(), info);
-				} catch (AccessionInfoParseException e) {
-					e.printStackTrace();
-				}
-			}
-		} catch (IOException e) {
-			// LOGGER.error("failed to read line from file: " + this.file.getAbsolutePath());
-			e.printStackTrace();
-		}
-		IOUtil.close(reader);
-		return result.build();
-	}
+    /**
+     * Parse the file with the {@link RegionInfo}s.
+     * 
+     * @return an immutable map with the 'region_name' column ids as keys.
+     */
+    public ImmutableMap<String, RegionInfo> parse() {
+        ImmutableMap.Builder<String, RegionInfo> result = new ImmutableMap.Builder<String, RegionInfo>();
+        BufferedReader reader = null;
+        String line;
+        try {
+            reader = IOUtil.getBufferedReaderFromFileName(this.regionFile);
+            while ((line = reader.readLine()) != null) {
+                try {
+                    if (line.startsWith("#"))
+                        continue;
+                    RegionInfoBuilder builder = createBuilderFromLine(line);
+                    RegionInfo info = builder.build();
+                    result.put(info.getRegionName(), info);
+                } catch (AccessionInfoParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (IOException e) {
+            // LOGGER.error("failed to read line from file: " +
+            // this.file.getAbsolutePath());
+            e.printStackTrace();
+        }
+        IOUtil.close(reader);
+        return result.build();
+    }
 
-	private RegionInfoBuilder createBuilderFromLine(String line, ImmutableMap<String, AccessionInfo> chromosomMap)
-			throws AccessionInfoParseException {
-		RegionInfoBuilder builder = new RegionInfoBuilder();
-		String[] fields = line.split("\t");
-		if (fields.length != RegionInfoParser.NFIELDS) {
-			String error = String.format(
-					"Malformed line in NCBI genomic_regions_definitions.txt file:\n%s\nExpected %d fields but there were %d",
-					line, NFIELDS, fields.length);
-			throw new AccessionInfoParseException(error);
-		}
-		builder.regionName(fields[0]);
-		builder.chromosome(chromosomMap.get(fields[1]));
-		try {
-			builder.start(Integer.parseInt(fields[2]));
-		} catch (NumberFormatException e) {
-			throw new AccessionInfoParseException("Failed to parse Integer from start field entry: " + fields[2]);
-		}
-		try {
-			builder.stop(Integer.parseInt(fields[3]));
-		} catch (NumberFormatException e) {
-			throw new AccessionInfoParseException("Failed to parse Integer from stop field entry: " + fields[3]);
-		}
+    private RegionInfoBuilder createBuilderFromLine(String line) throws AccessionInfoParseException {
+        RegionInfoBuilder builder = new RegionInfoBuilder();
+        String[] fields = line.split("\t");
+        if (fields.length != RegionInfoParser.NFIELDS) {
+            String error = String.format(
+                    "Malformed line in NCBI genomic_regions_definitions.txt file:\n%s\nExpected %d fields but there were %d",
+                    line, NFIELDS, fields.length);
+            throw new AccessionInfoParseException(error);
+        }
+        builder.regionName(fields[0]);
+        builder.chromosome(fields[1]);
+        try {
+            builder.start(Integer.parseInt(fields[2]));
+        } catch (NumberFormatException e) {
+            throw new AccessionInfoParseException("Failed to parse Integer from start field entry: " + fields[2]);
+        }
+        try {
+            builder.stop(Integer.parseInt(fields[3]));
+        } catch (NumberFormatException e) {
+            throw new AccessionInfoParseException("Failed to parse Integer from stop field entry: " + fields[3]);
+        }
 
-		return builder;
-	}
+        return builder;
+    }
 }

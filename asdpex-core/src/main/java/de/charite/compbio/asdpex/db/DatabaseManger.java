@@ -186,7 +186,7 @@ public class DatabaseManger {
                 continue;
             }
             stmt.setString(1, region.getRegionName());
-            stmt.setString(2, region.getChromosomeInfo().getRefseqAccessionVersion());
+            stmt.setString(2, region.getChromosomeInfo());
             stmt.setInt(3, region.getStart());
             stmt.setInt(4, region.getStop());
             stmt.execute();

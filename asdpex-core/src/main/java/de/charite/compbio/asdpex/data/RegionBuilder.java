@@ -54,7 +54,7 @@ public class RegionBuilder {
         System.out.println("found placement for " + asMap.size() + " alt_loci");
 
         System.out.print("[INFO] Read region definitions ... ");
-        RegionInfoParser regParser = new RegionInfoParser(genomicRegionsDefinitionsPath, chrAccessionsPath);
+        RegionInfoParser regParser = new RegionInfoParser(genomicRegionsDefinitionsPath);
         ImmutableMap<String, RegionInfo> regMap = regParser.parse();
         System.out.println("found " + regMap.size() + " regions definitions");
 
