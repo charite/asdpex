@@ -321,6 +321,35 @@ public class DatabaseManger {
      * @return list of {@link AltScaffoldPlacementInfo}s in the region
      * @throws SQLException
      */
+    public ImmutableList<AltScaffoldPlacementInfo> getAltScaffoldPlacementInfos() throws SQLException {
+        ImmutableList.Builder<AltScaffoldPlacementInfo> builder = new ImmutableList.Builder<>();
+        AltScaffoldPlacementInfoBuilder aspBuilder;
+        PreparedStatement stmt = this.connectionInstance.prepareStatement("SELECT * FROM placement");
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            aspBuilder = new AltScaffoldPlacementInfoBuilder();
+            aspBuilder.altScafAcc(rs.getString(1));
+            aspBuilder.region(rs.getString(2));
+            aspBuilder.strand(rs.getInt(3) == 1 ? true : false);
+            aspBuilder.altScafStart(rs.getInt(4));
+            aspBuilder.altScafStop(rs.getInt(5));
+            aspBuilder.altStartTail(rs.getInt(6));
+            aspBuilder.altStopTail(rs.getInt(7));
+            aspBuilder.parentStart(rs.getInt(8));
+            aspBuilder.parentStop(rs.getInt(9));
+            builder.add(aspBuilder.build());
+        }
+        return (builder.build());
+    }
+
+    /**
+     * Returns a list of {@link AltScaffoldPlacementInfo}s in the region with the given name.
+     * 
+     * @param regionName
+     *            name of the region
+     * @return list of {@link AltScaffoldPlacementInfo}s in the region
+     * @throws SQLException
+     */
     public ImmutableList<AltScaffoldPlacementInfo> getAltScaffoldPlacementInfos(String regionName) throws SQLException {
         ImmutableList.Builder<AltScaffoldPlacementInfo> builder = new ImmutableList.Builder<>();
         AltScaffoldPlacementInfoBuilder aspBuilder;
@@ -360,6 +389,27 @@ public class DatabaseManger {
         StringBuilder sb = new StringBuilder();
         if (rs.next()) {
             sb.append("chr").append(rs.getInt(1)).append("_").append(rs.getString(2).replace(".", "v")).append("_alt");
+            return sb.toString();
+        } else
+            return null;
+    }
+
+    /**
+     * Returns the alt. scaffold identifier used in the GFF file (e.g NT_187514.1_NC_000001.11)
+     * 
+     * @param altScaffoldAccession
+     *            alt. scaffold refseq identifier (e.g. NT_187514.1)
+     * @return
+     * @throws SQLException
+     */
+    public String getGffIdentifier(String altScaffoldAccession) throws SQLException {
+        PreparedStatement stmt = this.connectionInstance.prepareStatement(
+                "SELECT r.refseq_accession FROM placement p, region r WHERE p.region_name = r.name AND  p.alt_scaf_acc = ?");
+        stmt.setString(1, altScaffoldAccession);
+        ResultSet rs = stmt.executeQuery();
+        StringBuilder sb = new StringBuilder();
+        if (rs.next()) {
+            sb.append(altScaffoldAccession).append("_").append(rs.getString(1));
             return sb.toString();
         } else
             return null;

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.apache.commons.cli.ParseException;
@@ -74,6 +75,7 @@ public class AlignCommand extends AltLociSelectorCommand {
      */
     @Override
     public void run() throws AltLociSelectorException {
+        // TODO not simple kill app but show again the help if terminated by missing file/path
 
         // check the reference file
         final ReferenceSequenceFile refFile = ReferenceSequenceFileFactory
@@ -82,13 +84,58 @@ public class AlignCommand extends AltLociSelectorCommand {
             System.err.println("[ERROR] The FastA is not index - please index file first and run again.");
             System.exit(1);
         } else
-            System.out.println("[INFO] Reference fastA filed checked: " + options.getReferencePath());
+            System.out.println("[INFO] Reference fastA file checked: " + options.getReferencePath());
+
+        // check the SeQan aligner does exists
+        if (!new File(options.getSeqanAlign()).exists()) {
+            System.err.println("[ERROR] The SeQan aligner could not be found at position: " + options.getSeqanAlign());
+            System.exit(0);
+        } else
+            System.out.println("[INFO] SeQan aligner checked: " + options.getSeqanAlign());
 
         // Database access
         DatabaseManger dbman = new DatabaseManger(options.getSqlitePath());
 
-        // load regions
-        // db
+        // load placement of the scaffolds
+        ImmutableList<AltScaffoldPlacementInfo> placements = null;
+        try {
+            placements = dbman.getAltScaffoldPlacementInfos();
+            System.out.println("[INFO] loaded " + placements.size() + " alternate loci placements");
+        } catch (SQLException e1) {
+            System.err.println(
+                    "[ERROR] Failed to load the alt_scaffold_placements from database: " + options.getSqlitePath());
+            e1.printStackTrace();
+        }
+
+        // visualisation
+        System.out.println("[INFO] processing alt. loci");
+        System.out.println("0%       50%       100%");
+        System.out.println("|.........|.........|");
+        int c = 1;
+        int limit = 0;
+        for (AltScaffoldPlacementInfo placement : placements) {
+            // progress
+            if (100.0 * c++ / placements.size() > limit) {
+                limit += 5;
+                System.out.print("*");
+            }
+
+            // identifier used for fastA and seed file
+            String identifierFastA;
+            try {
+                identifierFastA = dbman.getFastaIdentifier(placement.getAltScafAcc());
+            } catch (SQLException e) {
+                System.out.println("[WARN] skipping - failed to generate the fastA identifier for alternate locus: "
+                        + placement.getAltScafAcc());
+                // e.printStackTrace();
+                continue;
+            }
+
+            ImmutableList<NCBIgffAlignment> alignments = getAlignments(placement, dbman);
+            System.out.println("n alignments: " + alignments.size());
+
+        }
+        System.out.println("*");
 
         System.exit(0);
         // END
@@ -111,8 +158,8 @@ public class AlignCommand extends AltLociSelectorCommand {
         System.out.println("[INFO] processing alt. loci");
         System.out.println("0%       50%       100%");
         System.out.println("|.........|.........|");
-        int c = 1;
-        int limit = 0;
+        // int c = 1;
+        // int limit = 0;
         for (AlternativeLocus locus : loci) {
             if (100.0 * c++ / loci.size() > limit) {
                 limit += 5;
@@ -209,6 +256,27 @@ public class AlignCommand extends AltLociSelectorCommand {
 
         }
         System.out.println("*");
+    }
+
+    private ImmutableList<NCBIgffAlignment> getAlignments(AltScaffoldPlacementInfo placement, DatabaseManger dbman) {
+        // identifier for the GFF file
+        String identifierGFF;
+        try {
+            identifierGFF = dbman.getGffIdentifier(placement.getAltScafAcc());
+        } catch (SQLException e) {
+            System.out.println("[WARN] skipping - failed to generate the GFF identifier for alternate locus: "
+                    + placement.getAltScafAcc());
+            // e.printStackTrace();
+            return null;
+        }
+
+        File gff = new File(options.getAlignmentPath(), identifierGFF + ".gff");
+        if (gff.exists()) {
+            return new NCBIgffAlignmentParser(gff).parse();
+        } else {
+            System.err.println("File is missing: " + gff);
+            return null;
+        }
     }
 
     /**
