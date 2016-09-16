@@ -40,7 +40,11 @@ public final class AlignCommandLineParser {
     private void initializeParser() {
 
         options = new Options();
-        options.addOption(Option.builder("h").longOpt("help").desc("show this help").hasArg().build());
+        options.addOption(Option.builder("h").longOpt("help").desc("show this help").build());
+        options.addOption(
+                Option.builder("n").longOpt("non").desc("do not split the alignments at 'N' stretches").build());
+        options.addOption(
+                Option.builder("i").longOpt("noindel").desc("do not split the alignments at large InDels").build());
         options.addOption(Option.builder("t").longOpt("tmp").desc(
                 "temporary folder for seeds, fastA, etc. files, defaults to \"<data-dir>" + File.separator + "tmp\"")
                 .hasArg().build());
@@ -73,6 +77,12 @@ public final class AlignCommandLineParser {
             printHelp(asdpexOptions);
             throw new HelpRequestedException();
         }
+
+        if (cmd.hasOption("non"))
+            asdpexOptions.setAlignmentSplitNs(false);
+
+        if (cmd.hasOption("noindel"))
+            asdpexOptions.setAlignmentSplitIndels(false);
 
         if (cmd.hasOption("out-dir"))
             asdpexOptions.setResultsFolder(cmd.getOptionValue("out-dir"));

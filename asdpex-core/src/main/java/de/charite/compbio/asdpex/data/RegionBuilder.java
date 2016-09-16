@@ -23,7 +23,20 @@ public class RegionBuilder {
     private final String altAccessionsPath;
     private final String altScaffoldPlacementPath;
     private final String genomicRegionsDefinitionsPath;
-    private final String chrAccessionsPath;
+    // private final String chrAccessionsPath;
+
+    /**
+     * 
+     * @param altAccessionsPath
+     * @param altScaffoldPlacementPath
+     * @param genomicRegionsDefinitionsPath
+     */
+    public RegionBuilder(String altAccessionsPath, String altScaffoldPlacementPath,
+            String genomicRegionsDefinitionsPath) {
+        this.altAccessionsPath = altAccessionsPath;
+        this.altScaffoldPlacementPath = altScaffoldPlacementPath;
+        this.genomicRegionsDefinitionsPath = genomicRegionsDefinitionsPath;
+    }
 
     /**
      * 
@@ -36,7 +49,7 @@ public class RegionBuilder {
         this.altAccessionsPath = altAccessionsPath;
         this.altScaffoldPlacementPath = altScaffoldPlacementPath;
         this.genomicRegionsDefinitionsPath = genomicRegionsDefinitionsPath;
-        this.chrAccessionsPath = chrAccessionsPath;
+        // this.chrAccessionsPath = chrAccessionsPath;
     }
 
     public ImmutableList<Region> build() {

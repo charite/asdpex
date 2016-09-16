@@ -381,7 +381,7 @@ public class DatabaseManger {
      * @return
      * @throws SQLException
      */
-    public String getFastaIdentifier(String altScaffoldAccession) throws SQLException {
+    public String getFastaIdentifierAltLocus(String altScaffoldAccession) throws SQLException {
         PreparedStatement stmt = this.connectionInstance.prepareStatement(
                 "SELECT a.chromosome, a.genbank_accession FROM accession a WHERE a.refseq_accession = ?");
         stmt.setString(1, altScaffoldAccession);
@@ -389,6 +389,27 @@ public class DatabaseManger {
         StringBuilder sb = new StringBuilder();
         if (rs.next()) {
             sb.append("chr").append(rs.getInt(1)).append("_").append(rs.getString(2).replace(".", "v")).append("_alt");
+            return sb.toString();
+        } else
+            return null;
+    }
+
+    /**
+     * Returns the reference identifier used in the reference fasta file (e.g chr1)
+     * 
+     * @param altScaffoldAccession
+     *            alt. scaffold refseq identifier (e.g. NT_187514.1)
+     * @return
+     * @throws SQLException
+     */
+    public String getFastaIdentifierReference(String altScaffoldAccession) throws SQLException {
+        PreparedStatement stmt = this.connectionInstance
+                .prepareStatement("SELECT a.chromosome FROM accession a WHERE a.refseq_accession = ?");
+        stmt.setString(1, altScaffoldAccession);
+        ResultSet rs = stmt.executeQuery();
+        StringBuilder sb = new StringBuilder();
+        if (rs.next()) {
+            sb.append("chr").append(rs.getString(1));
             return sb.toString();
         } else
             return null;
@@ -453,4 +474,5 @@ public class DatabaseManger {
             return 0;
         }
     }
+
 }

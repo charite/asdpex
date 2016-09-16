@@ -17,7 +17,7 @@ import java.io.File;
  */
 public final class Hg38altLociSeletorOptions {
 
-    public final static String VERSION = "0.0.2";
+    public final static String VERSION = "0.2";
 
     public static final String VCFALTLOCISTRING = "ALTLOCI";
 
@@ -49,12 +49,23 @@ public final class Hg38altLociSeletorOptions {
     private String referencePath = "genome" + File.separator + "GRCh38.fa";
     private String genomicRegionsDefinitionsPath = "genomic_regions_definitions.txt";
 
-    public boolean singleAltLociFile = false;
+    // +++++++++++++ boolean parameters given by program call +++++++++++++++++++//
 
-    /**
-     * Line length of output fasta files.
-     */
-    public int fastaLineLength = 70;
+    /** return alternate Loci fastA as single file or in separate files (default) */
+    private boolean singleAltLociFile = false;
+
+    /** split alignments at large indels = possible inversions etc. */
+    private boolean alignmentSplitIndels = true;
+
+    /** split alignments at stretches of multiple 'N's */
+    private boolean alignmentSplitNs = true;
+
+    // ++++++++++++++ predefined numbers used as default values +++++++++++++++++++//
+
+    /** Line length of output fasta files. */
+    private int fastaLineLength = 70;
+
+    // +++++++++++++ file paths used by the program +++++++++++++++++++//
 
     /** path to the input VCF file for the annotation */
     private String inputVcf;
@@ -348,6 +359,56 @@ public final class Hg38altLociSeletorOptions {
      */
     public void setOutputVcf(String outputVcf) {
         this.outputVcf = outputVcf;
+    }
+
+    /**
+     * @return the alignmentSplitIndels
+     */
+    public boolean isAlignmentSplitIndels() {
+        return alignmentSplitIndels;
+    }
+
+    /**
+     * Set if alignments should be split at large InDels.
+     * 
+     * @param alignmentSplitIndels
+     *            <code>true</code>=split, <code>false</code>=keep
+     */
+    public void setAlignmentSplitIndels(boolean alignmentSplitIndels) {
+        this.alignmentSplitIndels = alignmentSplitIndels;
+    }
+
+    /**
+     * 
+     * @return the alignmentSplitNs
+     */
+    public boolean isAlignmentSplitNs() {
+        return alignmentSplitNs;
+    }
+
+    /**
+     * Set if alignments should be split at stretches of multiple 'N's.
+     * 
+     * @param alignmentSplitNs
+     *            <code>true</code>=split, <code>false</code>=keep
+     */
+    public void setAlignmentSplitNs(boolean alignmentSplitNs) {
+        this.alignmentSplitNs = alignmentSplitNs;
+    }
+
+    /**
+     * @return the fastaLineLength
+     */
+    public int getFastaLineLength() {
+        return fastaLineLength;
+    }
+
+    /**
+     * @param fastaLineLength
+     *            the fastaLineLength to set
+     */
+    public void setFastaLineLength(int fastaLineLength) {
+        this.fastaLineLength = fastaLineLength;
     }
 
 }

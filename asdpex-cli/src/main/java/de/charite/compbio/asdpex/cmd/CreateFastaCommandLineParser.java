@@ -40,7 +40,8 @@ public final class CreateFastaCommandLineParser {
         options.addOption("h", "help", false, "show this help");
         options.addOption("d", "data-dir", true, "target folder for downloaded files, defaults to \"data\"");
         options.addOption("o", "out-dir", true, "output folder for created fastA files, defaults to \"../fasta\"");
-        options.addOption("s", "single", false, "split the extended alternative loci into single files");
+        options.addOption("s", "single", false,
+                "split the extended alternative loci into single files (default: true)");
         parser = new DefaultParser();
     }
 
@@ -67,7 +68,7 @@ public final class CreateFastaCommandLineParser {
             asdpexOptions.setFastaOutputPath(cmd.getOptionValue("out-dir"));
 
         if (cmd.hasOption("single"))
-            asdpexOptions.singleAltLociFile = true;
+            asdpexOptions.setSingleAltLociFile(true);
 
         return asdpexOptions;
     }

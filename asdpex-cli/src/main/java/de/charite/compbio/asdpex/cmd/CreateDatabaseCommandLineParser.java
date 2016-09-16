@@ -16,7 +16,7 @@ import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
 import de.charite.compbio.asdpex.util.HelpFormatter;
 
 /**
- * Helper class for parsing the commandline of the create-fasta command.
+ * Helper class for parsing the commandline of the create-db command.
  *
  * @author Marten Jäger <marten.jaeger@charite.de>
  *
@@ -38,8 +38,6 @@ public final class CreateDatabaseCommandLineParser {
     private void initializeParser() {
         options = new Options();
         options.addOption(Option.builder("h").longOpt("help").desc("show this help").hasArg().build());
-        options.addOption(
-                Option.builder("a").longOpt("asdp").desc("path the the VCF file with the ASDPs").hasArg().build());
         options.addOption(
                 Option.builder("d").longOpt("data-dir").desc("folder with the downloaded data files").hasArg().build());
         options.addOption(Option.builder("s").longOpt("sql").desc("path to the final SQLite database").hasArg()

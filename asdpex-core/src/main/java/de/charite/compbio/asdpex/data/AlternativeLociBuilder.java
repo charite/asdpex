@@ -20,7 +20,20 @@ public class AlternativeLociBuilder {
     private final String altAccessionsPath;
     private final String altScaffoldPlacementPath;
     private final String genomicRegionsDefinitionsPath;
-    private final String chrAccessionsPath;
+    // private final String chrAccessionsPath;
+
+    /**
+     * 
+     * @param altAccessionsPath
+     * @param altScaffoldPlacementPath
+     * @param genomicRegionsDefinitionsPath
+     */
+    public AlternativeLociBuilder(String altAccessionsPath, String altScaffoldPlacementPath,
+            String genomicRegionsDefinitionsPath) {
+        this.altAccessionsPath = altAccessionsPath;
+        this.altScaffoldPlacementPath = altScaffoldPlacementPath;
+        this.genomicRegionsDefinitionsPath = genomicRegionsDefinitionsPath;
+    }
 
     /**
      * 
@@ -33,7 +46,7 @@ public class AlternativeLociBuilder {
         this.altAccessionsPath = altAccessionsPath;
         this.altScaffoldPlacementPath = altScaffoldPlacementPath;
         this.genomicRegionsDefinitionsPath = genomicRegionsDefinitionsPath;
-        this.chrAccessionsPath = chrAccessionsPath;
+        // this.chrAccessionsPath = chrAccessionsPath;
     }
 
     public ImmutableList<AlternativeLocus> build() {

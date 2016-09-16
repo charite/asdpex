@@ -6,12 +6,14 @@ package de.charite.compbio.asdpex.cmd;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.cli.ParseException;
 
@@ -31,6 +33,7 @@ import de.charite.compbio.asdpex.exceptions.CommandLineParsingException;
 import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
 import de.charite.compbio.asdpex.io.parser.NCBIgffAlignmentParser;
 import de.charite.compbio.asdpex.io.writer.FastaFileWriter;
+import de.charite.compbio.asdpex.util.AlignmentUtil;
 import de.charite.compbio.asdpex.util.IOUtil;
 import htsjdk.samtools.reference.ReferenceSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequenceFileFactory;
@@ -86,12 +89,12 @@ public class AlignCommand extends AltLociSelectorCommand {
         } else
             System.out.println("[INFO] Reference fastA file checked: " + options.getReferencePath());
 
-        // check the SeQan aligner does exists
+        // check that the SeqAn aligner does exists
         if (!new File(options.getSeqanAlign()).exists()) {
-            System.err.println("[ERROR] The SeQan aligner could not be found at position: " + options.getSeqanAlign());
+            System.err.println("[ERROR] The SeqAn aligner could not be found at position: " + options.getSeqanAlign());
             System.exit(0);
         } else
-            System.out.println("[INFO] SeQan aligner checked: " + options.getSeqanAlign());
+            System.out.println("[INFO] SeqAn aligner checked: " + options.getSeqanAlign());
 
         // Database access
         DatabaseManger dbman = new DatabaseManger(options.getSqlitePath());
@@ -108,9 +111,9 @@ public class AlignCommand extends AltLociSelectorCommand {
         }
 
         // visualisation
-        System.out.println("[INFO] processing alt. loci");
-        System.out.println("0%       50%       100%");
-        System.out.println("|.........|.........|");
+        System.out.println("\t[INFO] processing alt. loci");
+        System.out.println("\t0%       50%       100%");
+        System.out.print("\t|.........|.........|\n\t");
         int c = 1;
         int limit = 0;
         for (AltScaffoldPlacementInfo placement : placements) {
@@ -120,29 +123,77 @@ public class AlignCommand extends AltLociSelectorCommand {
                 System.out.print("*");
             }
 
-            // identifier used for fastA and seed file
-            String identifierFastA;
+            // 1. check GFF: file exists and get alignments
+            ArrayList<NCBIgffAlignment> alignments;
             try {
-                identifierFastA = dbman.getFastaIdentifier(placement.getAltScafAcc());
+                ImmutableList<NCBIgffAlignment> originalAlignments = getAlignments(placement, dbman);
+                // System.out.println("[INFO] no. of original alignments: " + originalAlignments.size());
+                alignments = AlignmentUtil.splitupAlignmentAtLargeIndels(
+                        originalAlignments.toArray(new NCBIgffAlignment[originalAlignments.size()]));
+                // System.out.println("[INFO] no. of split alignments: " + alignments.size());
+            } catch (FileNotFoundException e1) {
+                System.out.println("[WARN] skipping - missing GFF file");
+                e1.printStackTrace();
+                continue;
+            }
+            // System.out.println("n alignments: " + alignments.size());
+
+            // 2. FastA
+            // 2.1 generate identifier used for alt locus fastA and seed file
+            String identifierALtLocusFasta;
+            try {
+                identifierALtLocusFasta = dbman.getFastaIdentifierAltLocus(placement.getAltScafAcc());
             } catch (SQLException e) {
                 System.out.println("[WARN] skipping - failed to generate the fastA identifier for alternate locus: "
                         + placement.getAltScafAcc());
-                // e.printStackTrace();
                 continue;
             }
 
-            ImmutableList<NCBIgffAlignment> alignments = getAlignments(placement, dbman);
-            System.out.println("n alignments: " + alignments.size());
+            // 2.2 generate identifier used for ref fastA
+            String identifierRefFasta;
+            try {
+                identifierRefFasta = dbman.getFastaIdentifierReference(placement.getAltScafAcc());
+            } catch (SQLException e) {
+                System.out.println("[WARN] skipping - failed to generate the fastA identifier for reference: "
+                        + placement.getAltScafAcc());
+                continue;
+            }
 
+            // 3. iterate over the NCBIAlignments
+            int block = 1;
+            for (NCBIgffAlignment alignment : alignments) {
+                // ALT LOCI
+                byte[] altLoci = extractSequence(refFile, identifierALtLocusFasta, alignment.getAltStart(),
+                        alignment.getAltStop(), alignment.isAltStrand());
+                // REF
+                byte[] ref = extractSequence(refFile, identifierRefFasta, alignment.getRefStart(),
+                        alignment.getRefStop(), alignment.isRefStrand());
+                System.out.println("identifierALtLocusFasta: " + identifierALtLocusFasta);
+                System.out.println("identifierRefFasta: " + identifierRefFasta);
+                writeFilesToDisc(identifierALtLocusFasta, placement.getRegion(), block, altLoci, ref, alignment);
+
+                try {
+                    runAlignment(identifierALtLocusFasta, block, altLoci, ref, alignment.getRefStart() - 1);
+                } catch (IOException | InterruptedException e) {
+                    System.err.println("Failed to run align command. That's strange ...");
+                    e.printStackTrace();
+                }
+
+                block++;
+            }
+
+            // System.exit(0);
         }
         System.out.println("*");
 
         System.exit(0);
         // END
+        /***************************************************************************************************************/
 
         System.out.println("[INFO] Creating seed files");
         if (options == null)
             System.err.println("[ERROR] option = null");
+
         // alt. loci info parsing
         ImmutableList<AlternativeLocus> loci = new AlternativeLociBuilder(options.getAltAccessionsPath(),
                 options.getAltScaffoldPlacementPath(), options.getGenomicRegionsDefinitionsPath(),
@@ -151,7 +202,7 @@ public class AlignCommand extends AltLociSelectorCommand {
         // final ReferenceSequenceFile refFile = ReferenceSequenceFileFactory
         // .getReferenceSequenceFile(new File(options.getReferencePath()));
         if (!refFile.isIndexed()) {
-            System.err.println("The FastA is not index - please index file first and run again.");
+            System.err.println("The FastA file is not indexed - please index file first and run again.");
             System.exit(1);
         }
         // visualisation
@@ -194,7 +245,8 @@ public class AlignCommand extends AltLociSelectorCommand {
             for (NCBIgffAlignment alignment : alignments) {
                 System.out.println("- process gff alignment: " + block + " | " + alignments.size());
 
-                ArrayList<NCBIgffAlignment> indelSplitAlignments = splitupAlignmentAtLargeIndels(alignment);
+                ArrayList<NCBIgffAlignment> indelSplitAlignments = AlignmentUtil
+                        .splitupAlignmentAtLargeIndels(alignment);
                 // System.out.println(alignment.getAltId() + ":\t" +
                 // alignment.getAltStart() + "\t"
                 // + alignment.getAltStop() + "\t" + alignment.isAltStrand());
@@ -258,7 +310,19 @@ public class AlignCommand extends AltLociSelectorCommand {
         System.out.println("*");
     }
 
-    private ImmutableList<NCBIgffAlignment> getAlignments(AltScaffoldPlacementInfo placement, DatabaseManger dbman) {
+    /**
+     * Parse the {@link NCBIgffAlignment}s from the file for the specific alternate loci.<br>
+     * A {@link FileNotFoundException} is thrown if the GFF file could not be found at the specified location.
+     * 
+     * @param placement
+     *            {@link AltScaffoldPlacementInfo} for the alternate loci
+     * @param dbman
+     *            {@link DatabaseManger} to get the additional infos
+     * @return {@link List} of {@link NCBIgffAlignment}s
+     * @throws FileNotFoundException
+     */
+    private ImmutableList<NCBIgffAlignment> getAlignments(AltScaffoldPlacementInfo placement, DatabaseManger dbman)
+            throws FileNotFoundException {
         // identifier for the GFF file
         String identifierGFF;
         try {
@@ -266,7 +330,6 @@ public class AlignCommand extends AltLociSelectorCommand {
         } catch (SQLException e) {
             System.out.println("[WARN] skipping - failed to generate the GFF identifier for alternate locus: "
                     + placement.getAltScafAcc());
-            // e.printStackTrace();
             return null;
         }
 
@@ -274,8 +337,8 @@ public class AlignCommand extends AltLociSelectorCommand {
         if (gff.exists()) {
             return new NCBIgffAlignmentParser(gff).parse();
         } else {
-            System.err.println("File is missing: " + gff);
-            return null;
+            // return null;
+            throw new FileNotFoundException("Missing file: " + gff);
         }
     }
 
@@ -309,8 +372,12 @@ public class AlignCommand extends AltLociSelectorCommand {
                 .append(offset);
         if (block > 1)
             cmd.append(" -a");
+        // check output folders exist
+        System.out.println("[INFO] create outputfolder for 'aln' and 'vcf' files");
+        new File(options.getResultsFolder(), "dummy.txt").getParentFile().mkdirs();
+        new File(options.getTempFolder() + System.getProperty("file.separator") + "aln", "dummy.txt").getParentFile()
+                .mkdirs();
 
-        System.out.println(cmd.toString());
         Process p = Runtime.getRuntime().exec(cmd.toString());
         p.waitFor();
         OutputStream stdin = p.getOutputStream();
@@ -374,182 +441,184 @@ public class AlignCommand extends AltLociSelectorCommand {
         return true;
     }
 
-    /**
-     * Split the alignment into blocks at 'N'-Stretches.
-     * 
-     * @param alignment
-     * @param tuples
-     *            sorted list with non-overlapping
-     * @return
-     */
-    private ArrayList<NCBIgffAlignment> splitupAlignmentAtNstrech(NCBIgffAlignment alignment, ArrayList<Tuple> tuples) {
-        ArrayList<NCBIgffAlignment> alignments = new ArrayList<>();
-        if (tuples.size() < 1) {
-            alignments.add(alignment);
-            return alignments;
-        }
+    // /**
+    // * Split the alignment into blocks at 'N'-Stretches.
+    // *
+    // * @param alignment
+    // * @param tuples
+    // * sorted list with non-overlapping
+    // * @return
+    // */
+    // private ArrayList<NCBIgffAlignment> splitupAlignmentAtNstrech(NCBIgffAlignment alignment, ArrayList<Tuple>
+    // tuples) {
+    // ArrayList<NCBIgffAlignment> alignments = new ArrayList<>();
+    // if (tuples.size() < 1) {
+    // alignments.add(alignment);
+    // return alignments;
+    // }
+    //
+    // System.out.println("!!! size elements: " + alignment.getElements().size());
+    // ImmutableList.Builder<NCBIgffAlignmentElement> myElementsBuilder = new
+    // ImmutableList.Builder<NCBIgffAlignmentElement>();
+    // ImmutableList<NCBIgffAlignmentElement> myElements;
+    // int refLength = 0;
+    // int altLength = 0;
+    // int curRefOffset = refLength;
+    // int curAltOffset = altLength;
+    // int tupleIdx = 0;
+    // for (NCBIgffAlignmentElement element : alignment.getElements()) {
+    // // element before 'N'-stretch
+    // if (element.getAlt_start() + element.getLength() <= tuples.get(tupleIdx).start) {
+    // myElementsBuilder.add(element); // TODO update starts!!!
+    // continue;
+    // }
+    //
+    // // small 'N'-stretches
+    // if (tuples.get(tupleIdx).end - tuples.get(tupleIdx).start < 10) {
+    // myElementsBuilder.add(element); // TODO update starts!!!
+    // continue;
+    // }
+    //
+    // switch (element.getType()) {
+    // case MATCH:
+    // if (element.getAlt_start() <= tuples.get(tupleIdx).start) {
+    // System.err.println("Split inside Match");
+    // // if (element.getAlt_start() + element.getLength() >=
+    // // tuples.get(tupleIdx).end) {
+    // System.err.println("\tin element: " + element);
+    // System.err.println("\t--> 'N'-Stretch range: " + tuples.get(tupleIdx).start + " - "
+    // + tuples.get(tupleIdx).end);
+    // // }
+    // tupleIdx++;
+    // }
+    // refLength += element.getLength();
+    // altLength += element.getLength();
+    // break;
+    // case INSERTION:
+    // if (element.getAlt_start() <= tuples.get(tupleIdx).start) {
+    // System.err.println("Split inside Insertion");
+    // // if (element.getAlt_start() > tuples.get(tupleIdx).start)
+    // // {
+    // System.err.println("\tin element: " + element);
+    // System.err.println("\t--> 'N'-Stretch range: " + tuples.get(tupleIdx).start + " - "
+    // + tuples.get(tupleIdx).end);
+    // // }
+    // myElements = myElementsBuilder.build();
+    // alignments.add(new NCBIgffAlignment(alignment.getRefId(), alignment.getAltId(),
+    // alignment.getRefStart(), alignment.getRefStart() + curRefOffset, alignment.isRefStrand(),
+    // alignment.getAltStart(), alignment.getAltStart() + curAltOffset, alignment.isAltStrand(),
+    // myElements));
+    // curRefOffset = refLength;
+    // curAltOffset = altLength + element.getLength();
+    // tupleIdx++;
+    // }
+    // altLength += element.getLength();
+    // break;
+    // case DELETION:
+    // if (element.getAlt_start() <= tuples.get(tupleIdx).start) {
+    // System.err.println("Split inside deletion");
+    // // if (element.getAlt_start() > tuples.get(tupleIdx).start)
+    // // {
+    // System.err.println("\tin element: " + element);
+    // System.err.println("\t--> 'N'-Stretch range: " + tuples.get(tupleIdx).start + " - "
+    // + tuples.get(tupleIdx).end);
+    // // }
+    // tupleIdx++;
+    // }
+    // refLength += element.getLength();
+    // break;
+    //
+    // default:
+    // System.out.println("Was denn hier los?!");
+    // break;
+    // }
+    // if (tupleIdx >= tuples.size())
+    // break;
+    // }
+    //
+    // // int elemIdx = 0;
+    // // int refLength = 0;
+    // // int altLength = 0;
+    // // int tupleIdx = 0;
+    // // for (NCBIgffAlignmentElement element : alignment.getElements()) {
+    // // switch (element.getType()) {
+    // // case MATCH:
+    // // if (altLength + element.getLength() >= tuples.get(tupleIdx).end) {
+    // // System.err.println("Split inside Match");
+    // // tupleIdx++;
+    // // }
+    // // refLength += element.getLength();
+    // // altLength += element.getLength();
+    // // break;
+    // // case INSERTION:
+    // // if (altLength + element.getLength() >= tuples.get(tupleIdx).end) {
+    // // System.err.println("Split inside Insertion");
+    // // tupleIdx++;
+    // // }
+    // // altLength += element.getLength();
+    // // break;
+    // // case DELETION:
+    // // refLength += element.getLength();
+    // // break;
+    // //
+    // // default:
+    // // System.out.println("Was denn hier los?!");
+    // // break;
+    // // }
+    // // if (tupleIdx >= tuples.size())
+    // // break;
+    // // }
+    // return alignments;
+    // }
 
-        System.out.println("!!! size elements: " + alignment.getElements().size());
-        ImmutableList.Builder<NCBIgffAlignmentElement> myElementsBuilder = new ImmutableList.Builder<NCBIgffAlignmentElement>();
-        ImmutableList<NCBIgffAlignmentElement> myElements;
-        int refLength = 0;
-        int altLength = 0;
-        int curRefOffset = refLength;
-        int curAltOffset = altLength;
-        int tupleIdx = 0;
-        for (NCBIgffAlignmentElement element : alignment.getElements()) {
-            // element before 'N'-stretch
-            if (element.getAlt_start() + element.getLength() <= tuples.get(tupleIdx).start) {
-                myElementsBuilder.add(element); // TODO update starts!!!
-                continue;
-            }
-
-            // small 'N'-stretches
-            if (tuples.get(tupleIdx).end - tuples.get(tupleIdx).start < 10) {
-                myElementsBuilder.add(element); // TODO update starts!!!
-                continue;
-            }
-
-            switch (element.getType()) {
-            case MATCH:
-                if (element.getAlt_start() <= tuples.get(tupleIdx).start) {
-                    System.err.println("Split inside Match");
-                    // if (element.getAlt_start() + element.getLength() >=
-                    // tuples.get(tupleIdx).end) {
-                    System.err.println("\tin element: " + element);
-                    System.err.println("\t--> 'N'-Stretch range: " + tuples.get(tupleIdx).start + " - "
-                            + tuples.get(tupleIdx).end);
-                    // }
-                    tupleIdx++;
-                }
-                refLength += element.getLength();
-                altLength += element.getLength();
-                break;
-            case INSERTION:
-                if (element.getAlt_start() <= tuples.get(tupleIdx).start) {
-                    System.err.println("Split inside Insertion");
-                    // if (element.getAlt_start() > tuples.get(tupleIdx).start)
-                    // {
-                    System.err.println("\tin element: " + element);
-                    System.err.println("\t--> 'N'-Stretch range: " + tuples.get(tupleIdx).start + " - "
-                            + tuples.get(tupleIdx).end);
-                    // }
-                    myElements = myElementsBuilder.build();
-                    alignments.add(new NCBIgffAlignment(alignment.getRefId(), alignment.getAltId(),
-                            alignment.getRefStart(), alignment.getRefStart() + curRefOffset, alignment.isRefStrand(),
-                            alignment.getAltStart(), alignment.getAltStart() + curAltOffset, alignment.isAltStrand(),
-                            myElements));
-                    curRefOffset = refLength;
-                    curAltOffset = altLength + element.getLength();
-                    tupleIdx++;
-                }
-                altLength += element.getLength();
-                break;
-            case DELETION:
-                if (element.getAlt_start() <= tuples.get(tupleIdx).start) {
-                    System.err.println("Split inside deletion");
-                    // if (element.getAlt_start() > tuples.get(tupleIdx).start)
-                    // {
-                    System.err.println("\tin element: " + element);
-                    System.err.println("\t--> 'N'-Stretch range: " + tuples.get(tupleIdx).start + " - "
-                            + tuples.get(tupleIdx).end);
-                    // }
-                    tupleIdx++;
-                }
-                refLength += element.getLength();
-                break;
-
-            default:
-                System.out.println("Was denn hier los?!");
-                break;
-            }
-            if (tupleIdx >= tuples.size())
-                break;
-        }
-
-        // int elemIdx = 0;
-        // int refLength = 0;
-        // int altLength = 0;
-        // int tupleIdx = 0;
-        // for (NCBIgffAlignmentElement element : alignment.getElements()) {
-        // switch (element.getType()) {
-        // case MATCH:
-        // if (altLength + element.getLength() >= tuples.get(tupleIdx).end) {
-        // System.err.println("Split inside Match");
-        // tupleIdx++;
-        // }
-        // refLength += element.getLength();
-        // altLength += element.getLength();
-        // break;
-        // case INSERTION:
-        // if (altLength + element.getLength() >= tuples.get(tupleIdx).end) {
-        // System.err.println("Split inside Insertion");
-        // tupleIdx++;
-        // }
-        // altLength += element.getLength();
-        // break;
-        // case DELETION:
-        // refLength += element.getLength();
-        // break;
-        //
-        // default:
-        // System.out.println("Was denn hier los?!");
-        // break;
-        // }
-        // if (tupleIdx >= tuples.size())
-        // break;
-        // }
-        return alignments;
-    }
-
-    /**
-     * SPlit up the alignment at these curious large Insert/Deletions.
-     * 
-     * @param alignment
-     * @return
-     */
-    private ArrayList<NCBIgffAlignment> splitupAlignmentAtLargeIndels(NCBIgffAlignment alignment) {
-        ArrayList<NCBIgffAlignment> alignments = new ArrayList<>();
-        final int LIMIT = 5000;
-        int start = 0;
-        int stop = start;
-        int obacht = 0;
-        // tmp
-        // int ref = alignment.getRefStart() - 1;
-        // int alt = alignment.getAltStart() - 1;
-        for (NCBIgffAlignmentElement element : alignment.getElements()) {
-            if (element.getType() == NCBIgffAlignmentElementType.INSERTION && element.getLength() >= LIMIT)
-                obacht++;
-            else if (element.getType() == NCBIgffAlignmentElementType.DELETION && element.getLength() >= LIMIT)
-                obacht++;
-            else
-                obacht = 0;
-
-            if (obacht > 1) {
-                // NCBIgffAlignment subAlignment =
-                // extractSubAlignment(alignment, start, stop - 1);
-                // System.out.println(subAlignment + "\n\n");
-                // alignments.add(subAlignment);
-                alignments.add(alignment.getSubAlignment(start, stop - 1));
-                start = stop + 1;
-            }
-            stop++;
-        }
-        // System.out.println("stop: " + stop + " elements: " +
-        // alignment.getElements().size());
-        // NCBIgffAlignment subAlignment = extractSubAlignment(alignment, start,
-        // stop);
-        // System.out.println(subAlignment + "\n\n");
-        // alignments.add(subAlignment);
-        if (start < stop)
-            alignments.add(alignment.getSubAlignment(start, stop));
-        else
-            alignments.add(alignment);
-
-        // System.out.println("refend: " + ref + "\taltend: " + alt);
-        // System.out.println("original:\n" + alignment + "\n\n");
-        return alignments;
-    }
+    // /**
+    // * SPlit up the alignment at these curious large Insert/Deletions.
+    // *
+    // * @param alignment
+    // * @return
+    // */
+    // private ArrayList<NCBIgffAlignment> splitupAlignmentAtLargeIndels(NCBIgffAlignment alignment) {
+    // ArrayList<NCBIgffAlignment> alignments = new ArrayList<>();
+    // final int LIMIT = 5000;
+    // int start = 0;
+    // int stop = start;
+    // int obacht = 0;
+    // // tmp
+    // // int ref = alignment.getRefStart() - 1;
+    // // int alt = alignment.getAltStart() - 1;
+    // for (NCBIgffAlignmentElement element : alignment.getElements()) {
+    // if (element.getType() == NCBIgffAlignmentElementType.INSERTION && element.getLength() >= LIMIT)
+    // obacht++;
+    // else if (element.getType() == NCBIgffAlignmentElementType.DELETION && element.getLength() >= LIMIT)
+    // obacht++;
+    // else
+    // obacht = 0;
+    //
+    // if (obacht > 1) {
+    // // NCBIgffAlignment subAlignment =
+    // // extractSubAlignment(alignment, start, stop - 1);
+    // // System.out.println(subAlignment + "\n\n");
+    // // alignments.add(subAlignment);
+    // alignments.add(alignment.getSubAlignment(start, stop - 1));
+    // start = stop + 1;
+    // }
+    // stop++;
+    // }
+    // // System.out.println("stop: " + stop + " elements: " +
+    // // alignment.getElements().size());
+    // // NCBIgffAlignment subAlignment = extractSubAlignment(alignment, start,
+    // // stop);
+    // // System.out.println(subAlignment + "\n\n");
+    // // alignments.add(subAlignment);
+    // if (start < stop)
+    // alignments.add(alignment.getSubAlignment(start, stop));
+    // else
+    // alignments.add(alignment);
+    //
+    // // System.out.println("refend: " + ref + "\taltend: " + alt);
+    // // System.out.println("original:\n" + alignment + "\n\n");
+    // return alignments;
+    // }
 
     /**
      * Extract list
@@ -607,10 +676,15 @@ public class AlignCommand extends AltLociSelectorCommand {
      * Extract the Sequence from the
      * 
      * @param refFile
+     *            the {@link ReferenceSequenceFile} object
      * @param id
+     *            is the associated fasta identifier
      * @param start
+     *            inclusive, 1-based start of region.
      * @param stop
+     *            inclusive, 1-based stop of region.
      * @param strand
+     *            of the sequence.
      * @return
      */
     private byte[] extractSequence(ReferenceSequenceFile refFile, String id, int start, int stop, boolean strand) {
@@ -625,10 +699,11 @@ public class AlignCommand extends AltLociSelectorCommand {
     /**
      * Creates the Fasta identifier from accessionInfo file row in the format they are used in the reference fasta
      * files: chr<1-22|X|Y|M>_<GenBank Accession.version with '.'->'v'>_alt<br>
-     * e.g.: chr21_GL383580v2_alt
+     * e.g.: chr21_GL383580v2_alt //
      * 
      * @param info
      * @return
+     * @deprecated
      */
     private String createFastaIdentifier(AccessionInfo info) {
         StringBuilder identifier = new StringBuilder();
@@ -637,6 +712,12 @@ public class AlignCommand extends AltLociSelectorCommand {
         return identifier.toString();
     }
 
+    /**
+     * 
+     * @param info
+     * @return
+     * @deprecated
+     */
     private String createGffIdentifier(AltScaffoldPlacementInfo info) {
         StringBuilder identifier = new StringBuilder();
         identifier.append(info.getAltScafAcc()).append("_").append(info.getParentAcc()).append(".gff");
@@ -691,13 +772,18 @@ public class AlignCommand extends AltLociSelectorCommand {
      *
      */
     private class Tuple {
+
+        int start;
+        int end;
+
         public Tuple(int start, int end) {
             this.start = start;
             this.end = end;
         }
 
-        int start;
-        int end;
+        public String toString() {
+            return String.format("start: %d\tstop: %d\tlength: %d", start, end, end - start);
+        }
     }
 
 }

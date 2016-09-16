@@ -239,7 +239,7 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                     for (AltScaffoldPlacementInfo info : altScaffolds) {
 
                         try {
-                            fastaIdentifier = dbMan.getFastaIdentifier(info.getAltScafAcc());
+                            fastaIdentifier = dbMan.getFastaIdentifierAltLocus(info.getAltScafAcc());
                         } catch (SQLException e) {
                             System.err.println("Failed to connect to database: " + options.getSqlitePath());
                             System.err.println(
@@ -270,13 +270,13 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                                     && mostProbableAlleles.get(0) == mostProbableAlleles.get(1)) {
                                 writeModVariants(inputVCF, refFile, writerVCF, contig.getName(),
                                         firstASDPonRegionPosition, lastASDPonRegionPosition,
-                                        dbMan.getFastaIdentifier(
+                                        dbMan.getFastaIdentifierAltLocus(
                                                 altScaffolds.get(mostProbableAlleles.get(0)).getAltScafAcc()),
                                         GenotypeType.HOM_VAR, intersectList.get(mostProbableAlleles.get(0)));
                             } else {
                                 writeModVariants(inputVCF, refFile, writerVCF, contig.getName(),
                                         firstASDPonRegionPosition, lastASDPonRegionPosition,
-                                        dbMan.getFastaIdentifier(
+                                        dbMan.getFastaIdentifierAltLocus(
                                                 altScaffolds.get(mostProbableAlleles.get(0)).getAltScafAcc()),
                                         GenotypeType.HET, intersectList.get(mostProbableAlleles.get(0)));
 

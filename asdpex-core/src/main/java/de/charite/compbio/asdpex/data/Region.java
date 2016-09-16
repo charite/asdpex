@@ -9,13 +9,16 @@ import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * A Region is a specific area on the reference genome for which at least one
- * alternative locus is known.
+ * A Region is a specific area on the reference genome for which at least one alternative locus is known.
  *
  * @author Marten Jäger <marten.jaeger@charite.de>
  *
  */
 public class Region implements Serializable, Comparable<Region> {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private final RegionInfo regionInfo;
     private final ImmutableMap<String, MetaLocus> loci;
 
@@ -34,8 +37,7 @@ public class Region implements Serializable, Comparable<Region> {
     }
 
     /**
-     * Return a {@link Map} with loci. The keys are the 'alt_scaf_acc' from NCBI
-     * alt_scaffold_placement file.
+     * Return a {@link Map} with loci. The keys are the 'alt_scaf_acc' from NCBI alt_scaffold_placement file.
      * 
      * @return the loci
      */

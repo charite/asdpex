@@ -143,7 +143,7 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
             // (currentReg.getStop() - currentReg.getStart() + 1));
 
             try {
-                if (options.singleAltLociFile)
+                if (options.isSingleAltLociFile())
                     FastaFileWriter.createFastaFile(
                             options.getFastaOutputPath() + "/altLoci_single/" + identifier + "_extended.fa", identifier,
                             altExtended, false);
