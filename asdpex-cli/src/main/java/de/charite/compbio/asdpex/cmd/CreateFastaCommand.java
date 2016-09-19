@@ -145,12 +145,11 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
             try {
                 if (options.isSingleAltLociFile())
                     FastaFileWriter.createFastaFile(
-                            options.getFastaOutputPath() + "/altLoci_single/" + identifier + "_extended.fa", identifier,
-                            altExtended, false);
+                            new File(options.getFastaOutputPath() + "/altLoci_single", identifier + "_extended.fa"),
+                            identifier, altExtended, false);
                 else
-                    FastaFileWriter.createFastaFile(
-                            options.getFastaOutputPath() + "/altLoci/" + currentReg.getRegionName() + "_altLoci.fa",
-                            identifier, altExtended, true);
+                    FastaFileWriter.createFastaFile(new File(options.getFastaOutputPath() + "/altLoci",
+                            currentReg.getRegionName() + "_altLoci.fa"), identifier, altExtended, true);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -161,7 +160,7 @@ public class CreateFastaCommand extends AltLociSelectorCommand {
                     currentReg.getStop());
             try {
                 FastaFileWriter.createFastaFile(
-                        options.getFastaOutputPath() + "/regions/" + currentReg.getRegionName() + ".fa",
+                        new File(options.getFastaOutputPath() + "/regions", currentReg.getRegionName() + ".fa"),
                         currentReg.getRegionName(), reg.getBases(), false);
             } catch (IOException e) {
                 e.printStackTrace();

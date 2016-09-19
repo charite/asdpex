@@ -115,4 +115,23 @@ public class IOUtil {
         return getBufferedFileWriter(file, false);
     }
 
+    /**
+     * Checks if the specified folder
+     * 
+     * @param folder
+     *            {@link File} object representing the path to the folder
+     */
+    public static void checkOutFolder(File folder) {
+        if (folder.exists()) {
+            System.out.println("[INFO] skip existing folder: " + folder.getAbsolutePath());
+        } else {
+            if (folder.mkdirs()) {
+                System.out.println("[INFO] create folder: " + folder.getAbsolutePath());
+            } else {
+                System.err.println("[ERROR] failed to create folder: " + folder.getAbsolutePath());
+            }
+        }
+
+    }
+
 }

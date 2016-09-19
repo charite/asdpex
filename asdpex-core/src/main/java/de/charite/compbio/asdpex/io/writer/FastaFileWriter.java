@@ -26,8 +26,8 @@ public class FastaFileWriter {
     /**
      * Create the fastA file.
      * 
-     * @param path
-     *            Path to the fastA file to be created
+     * @param file
+     *            {@link File} object for the fastA file to be created
      * @param name
      *            Name or identifier in the fastA header
      * @param bases
@@ -37,16 +37,16 @@ public class FastaFileWriter {
      * @throws UnsupportedEncodingException
      * @throws IOException
      */
-    public static void createFastaFile(String path, String name, byte[] bases)
+    public static void createFastaFile(File file, String name, byte[] bases)
             throws UnsupportedEncodingException, IOException {
-        createFastaFile(path, name, bases, false, fastaLineLength);
+        createFastaFile(file, name, bases, false, fastaLineLength);
     }
 
     /**
      * Create the fastA file.
      * 
-     * @param path
-     *            Path to the fastA file to be created
+     * @param file
+     *            {@link File} object for the fastA file to be created
      * @param name
      *            Name or identifier in the fastA header
      * @param bases
@@ -56,16 +56,16 @@ public class FastaFileWriter {
      * @throws UnsupportedEncodingException
      * @throws IOException
      */
-    public static void createFastaFile(String path, String name, byte[] bases, int length)
+    public static void createFastaFile(File file, String name, byte[] bases, int length)
             throws UnsupportedEncodingException, IOException {
-        createFastaFile(path, name, bases, false, length);
+        createFastaFile(file, name, bases, false, length);
     }
 
     /**
      * Create the fastA file.
      * 
-     * @param path
-     *            Path to the fastA file to be created
+     * @param file
+     *            {@link File} object for the fastA file to be created
      * @param name
      *            Name or identifier in the fastA header
      * @param bases
@@ -75,16 +75,16 @@ public class FastaFileWriter {
      * @throws UnsupportedEncodingException
      * @throws IOException
      */
-    public static void createFastaFile(String path, String name, byte[] bases, boolean multiFasta)
+    public static void createFastaFile(File file, String name, byte[] bases, boolean multiFasta)
             throws UnsupportedEncodingException, IOException {
-        createFastaFile(path, name, bases, multiFasta, fastaLineLength);
+        createFastaFile(file, name, bases, multiFasta, fastaLineLength);
     }
 
     /**
      * Create the fastA file.
      * 
-     * @param path
-     *            Path to the fastA file to be created
+     * @param file
+     *            {@link File} object for the fastA file to be created
      * @param name
      *            Name or identifier in the fastA header
      * @param bases
@@ -96,9 +96,8 @@ public class FastaFileWriter {
      * @throws UnsupportedEncodingException
      * @throws IOException
      */
-    public static void createFastaFile(String path, String name, byte[] bases, boolean multiFasta, int length)
+    public static void createFastaFile(File file, String name, byte[] bases, boolean multiFasta, int length)
             throws UnsupportedEncodingException, IOException {
-        File file = new File(path);
 
         final BufferedWriter out;
         if (file.exists()) {

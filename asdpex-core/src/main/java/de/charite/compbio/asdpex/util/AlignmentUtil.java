@@ -89,7 +89,30 @@ public class AlignmentUtil {
         int start = 0;
         int stop = start;
         int obacht = 0;
+        // ------- TEST ---------
+        // NCBIgffAlignmentElement previos = null;
+        // int obacht2 = 0;
+        // ------- END ---------
+
         for (NCBIgffAlignmentElement element : alignment.getElements()) {
+            // ------- TEST ---------
+            // if (element.getType() == NCBIgffAlignmentElementType.INSERTION) {
+            // obacht2++;
+            // previos = element;
+            // } else if (element.getType() == NCBIgffAlignmentElementType.DELETION) {
+            // obacht2++;
+            // } else {
+            // obacht2 = 0;
+            // previos = null;
+            // }
+            // if (obacht2 > 1) {
+            // System.out.println("Ref: " + alignment.getRefId() + "\talt: " + alignment.getAltId());
+            // System.out.println("previous: " + previos);
+            // System.out.println("current: " + element);
+            // }
+
+            // ------- END ---------
+
             if (element.getType() == NCBIgffAlignmentElementType.INSERTION && element.getLength() >= limit)
                 obacht++;
             else if (element.getType() == NCBIgffAlignmentElementType.DELETION && element.getLength() >= limit)
@@ -98,6 +121,7 @@ public class AlignmentUtil {
                 obacht = 0;
 
             if (obacht > 1) {
+                // System.out.println("---> SPLIT");
                 alignments.add(getSubAlignment(alignment, start, stop - 1));
                 start = stop + 1;
             }

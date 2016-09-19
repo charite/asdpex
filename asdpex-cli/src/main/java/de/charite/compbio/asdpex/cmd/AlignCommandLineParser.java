@@ -41,8 +41,8 @@ public final class AlignCommandLineParser {
 
         options = new Options();
         options.addOption(Option.builder("h").longOpt("help").desc("show this help").build());
-        options.addOption(
-                Option.builder("n").longOpt("non").desc("do not split the alignments at 'N' stretches").build());
+        // options.addOption(
+        // Option.builder("n").longOpt("non").desc("do not split the alignments at 'N' stretches").build());
         options.addOption(
                 Option.builder("i").longOpt("noindel").desc("do not split the alignments at large InDels").build());
         options.addOption(Option.builder("t").longOpt("tmp").desc(
