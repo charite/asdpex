@@ -105,6 +105,12 @@ perl scripts/filterBadASDPs.pl -i allASDPs.SNV.vcf.gz -w 50 -m 10 -c
 ```
 This command will iterate aver all SNV ASDPs and merge them into MNV ASDPs. The above uses a window of 50bases size, allowing up to 10 ASDPs. Otherwise it will mark and skip the ASDPs in the window.
 
+Upload the variants into the SQLite database to store all needed information together in a more portable way.
+```
+java -jar asdpex-cli/target/asdpex-cli-0.2.jar \
+create-db -s asdpex.sqlite -a allASDPs.SNV.50_10.valid.vcf.gz
+```
+
 Finally we can annotate a VCF file with the information from the filtered ASDPs.
 ```
 java -jar asdpex-cli/target/asdpex-cli-0.2.jar \

@@ -40,6 +40,7 @@ public final class CreateDatabaseCommandLineParser {
         options.addOption(Option.builder("h").longOpt("help").desc("show this help").hasArg().build());
         options.addOption(
                 Option.builder("d").longOpt("data-dir").desc("folder with the downloaded data files").hasArg().build());
+        options.addOption(Option.builder("a").longOpt("asdp").desc("path to the ASDP VCF file").hasArg().build());
         options.addOption(Option.builder("s").longOpt("sql").desc("path to the final SQLite database").hasArg()
                 .required().build());
         parser = new DefaultParser();
