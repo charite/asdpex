@@ -51,9 +51,9 @@ If everything goes well, you will see a message including the words BUILD SUCCES
 
 The jar file asdpex-cli-0.1.jar contains the main code used in this project. An overview of available command are shown with the following command.
 ```
-java -jar asdpex-cli/target/asdpex-cli-0.1.jar
+java -jar asdpex-cli/target/asdpex-cli-0.2.jar
 Program: de.charite.compbio.asdpex (functional annotation of VCF files)
-Version: 0.1
+Version: 0.2
 Contact: Marten Jäger <marten.jaeger@charite.de>
          Peter N. Robinson <peter.robinson@jax.org>
 
@@ -64,7 +64,6 @@ Command: align       construct fasta and seed files and do the alignments
          create-db   creates a SQLite database used for this tool
          create-fa   construct fasta files for the alignments
          create-seed construct seed files for the alignments from the NCBI alignments
-         download    download transcript database  (not yet implemented)
 
 Example: java -jar asdpex.jar create-db -s asdpex.sqlite -d data
          java -jar asdpex.jar create-fa -o data
@@ -80,11 +79,18 @@ make
 cd ..
 ```
 
+## Create database and init
+Create the SQLite database and inititate with the downloaded data.
+
+```
+java -jar asdpex-cli/target/asdpex-cli-0.2.jar create-db -s asdpex.sqlite -d data
+```
+
 ## Alignment and variant detection
 Now since we have all tools and data we run the alignment and look up the variants.
 ```
-java -jar asdpex-cli/target/asdpex-cli-0.1.jar \
-  align -d data/ -s seqan/regionalign2bed -o alignresults
+java -jar asdpex-cli/target/asdpex-cli-0.2.jar \
+  align -d data/ -s seqan/regionalign2bed -o alignresults -q asdpex.sqlite
 ```
 
 Right now the variants are saved in a separate file per alternate loci and even for the alignment blocks in the scaffolds. We merge the VCF files into a single file __allASDPs.vcf.gz__ and filter for SNVs. This and the following scripts
@@ -101,7 +107,7 @@ This command will iterate aver all SNV ASDPs and merge them into MNV ASDPs. The 
 
 Finally we can annotate a VCF file with the information from the filtered ASDPs.
 ```
-java -jar asdpex-cli/target/asdpex-cli-0.1.jar \
+java -jar asdpex-cli/target/asdpex-cli-0.2.jar \
   annotate -a allASDPs.SNV.50_10.valid.vcf.gz -d data/ -v <infile>.vcf.gz \
   -o <annot>.vcf.gz
 ```

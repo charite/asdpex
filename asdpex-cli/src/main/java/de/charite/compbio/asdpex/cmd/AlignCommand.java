@@ -165,8 +165,6 @@ public class AlignCommand extends AltLociSelectorCommand {
                 // REF
                 byte[] ref = extractSequence(refFile, identifierRefFasta, alignment.getRefStart(),
                         alignment.getRefStop(), alignment.isRefStrand());
-                System.out.println("identifierALtLocusFasta: " + identifierAltLocusFasta);
-                System.out.println("identifierRefFasta: " + identifierRefFasta);
                 writeFilesToDisc(identifierAltLocusFasta, placement.getRegion(), block, altLoci, ref, alignment);
 
                 try {

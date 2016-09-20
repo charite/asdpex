@@ -72,7 +72,7 @@ public class App {
         sb.append("         create-db   creates a SQLite database used for this tool").append("\n");
         sb.append("         create-fa   construct fasta files for the alignments").append("\n");
         sb.append("         create-seed construct seed files for the alignments from the NCBI alignments").append("\n");
-        sb.append("         download    download transcript database  (not yet implemented)").append("\n").append("\n");
+        // sb.append(" download download transcript database (not yet implemented)").append("\n").append("\n");
         sb.append("Example: java -jar asdpex.jar create-db -s asdpex.sqlite -d data").append("\n");
         sb.append("         java -jar asdpex.jar create-fa -o data/").append("\n").append("\n");
         HelpFormatter.printUsage(sb.toString());

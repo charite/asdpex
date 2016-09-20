@@ -17,7 +17,7 @@ import java.io.File;
  */
 public final class Hg38altLociSeletorOptions {
 
-    public final static String VERSION = "0.2";
+    public static final String VERSION = "0.2";
 
     public static final String VCFALTLOCISTRING = "ALTLOCI";
 
@@ -196,7 +196,7 @@ public final class Hg38altLociSeletorOptions {
      * @return the tempFolder
      */
     public String getTempFolder() {
-        return dataPath + File.separator + tempFolder;
+        return this.resultsFolder + File.separator + tempFolder;
     }
 
     // /**

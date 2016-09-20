@@ -101,7 +101,7 @@ public final class AlignCommandLineParser {
         if (cmd.hasOption("sql")) {
             asdpexOptions.setSqlitePath(cmd.getOptionValue("sql"));
         } else {
-            asdpexOptions.error = "Missing path to SQLite database: -s";
+            asdpexOptions.error = "Missing path to SQLite database: -q";
             printHelp(asdpexOptions);
         }
 
