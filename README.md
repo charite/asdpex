@@ -19,6 +19,7 @@ cd to the 'scripts' directory, make the "downloadData.sh" executable, and execut
 cd scripts
 chmod +x downloadData.sh
 ./downloadData all
+cd ..
 ```
 After you have downloaded the data, you will need to index the Genome using samtools (the script will produce a message with the command you need, and if samtools is not in your path adjust the command accordingly).
 
@@ -34,7 +35,6 @@ This command should result in an executable programm called regionalign2vcf, whi
 
 We use the maven build system to compile the code. First cd back to the main folder.
 ```
-cd ..
 mvn package
 ```
 If everything goes well, you will see a message including the words BUILD SUCCESS.
