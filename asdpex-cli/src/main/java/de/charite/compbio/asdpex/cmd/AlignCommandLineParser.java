@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.charite.compbio.hg38altlociselector.cmd;
+package de.charite.compbio.asdpex.cmd;
 
 import java.io.File;
 
@@ -12,8 +12,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 import de.charite.compbio.asdpex.util.HelpFormatter;
-import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
-import de.charite.compbio.hg38altlociselector.exceptions.HelpRequestedException;
+import de.charite.compbio.asdpex.Hg38altLociSeletorOptions;
+import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
 
 /**
  * Helper class for parsing the commandline of the align command.
@@ -92,7 +92,7 @@ public final class AlignCommandLineParser {
 
     private void printHelp(Hg38altLociSeletorOptions options) {
         org.apache.commons.cli.HelpFormatter formatter = new org.apache.commons.cli.HelpFormatter();
-        formatter.printHelp("java -jar hg38altlociselector.jar " + options.command.toString(), "options:", this.options,
+        formatter.printHelp("java -jar asdpex.jar " + options.command.toString(), "options:", this.options,
                 options.error, true);
         // HelpFormatter.printUsage(options.command.toString(), "wie das alles
         // funzt", options);
