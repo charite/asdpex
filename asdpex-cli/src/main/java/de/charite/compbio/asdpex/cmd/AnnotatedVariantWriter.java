@@ -1,10 +1,10 @@
-package de.charite.compbio.hg38altlociselector.cmd;
+package de.charite.compbio.asdpex.cmd;
 
 import java.io.IOException;
 import java.util.EnumSet;
 
 import de.charite.compbio.asdpex.exceptions.AnnotationException;
-import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
+import de.charite.compbio.asdpex.Hg38altLociSeletorOptions;
 import htsjdk.samtools.reference.ReferenceSequenceFile;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.writer.Options;

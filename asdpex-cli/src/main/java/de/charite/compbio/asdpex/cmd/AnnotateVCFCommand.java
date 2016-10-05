@@ -1,7 +1,7 @@
 /**
  *
  */
-package de.charite.compbio.hg38altlociselector.cmd;
+package de.charite.compbio.asdpex.cmd;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -21,9 +21,9 @@ import de.charite.compbio.asdpex.data.RegionInfo;
 import de.charite.compbio.asdpex.db.DatabaseManger;
 import de.charite.compbio.asdpex.exceptions.AltLociSelectorException;
 import de.charite.compbio.asdpex.util.VariantContextUtil;
-import de.charite.compbio.hg38altlociselector.Hg38altLociSeletorOptions;
-import de.charite.compbio.hg38altlociselector.exceptions.CommandLineParsingException;
-import de.charite.compbio.hg38altlociselector.exceptions.HelpRequestedException;
+import de.charite.compbio.asdpex.Hg38altLociSeletorOptions;
+import de.charite.compbio.asdpex.exceptions.CommandLineParsingException;
+import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
 import htsjdk.samtools.reference.ReferenceSequence;
 import htsjdk.samtools.reference.ReferenceSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequenceFileFactory;
@@ -68,7 +68,7 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
     /*
      * (non-Javadoc)
      *
-     * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#
+     * @see de.charite.compbio.asdpex.cmd.AltLociSelectorCommand#
      * parseCommandLine(java.lang.String[])
      */
     @Override
@@ -85,7 +85,7 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
      * (non-Javadoc)
      *
      * @see
-     * de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#run()
+     * de.charite.compbio.asdpex.cmd.AltLociSelectorCommand#run()
      */
     @Override
     public void run() throws AltLociSelectorException {

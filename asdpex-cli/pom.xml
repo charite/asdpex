@@ -76,7 +76,7 @@
 					<!-- MainClass in mainfest make a executable jar -->
 					<archive>
 					  <manifest>
-						<mainClass>de.charite.compbio.hg38altlociselector.App</mainClass>
+						<mainClass>de.charite.compbio.asdpex.App</mainClass>
 					  </manifest>
 					</archive>
 
