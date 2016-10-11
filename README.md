@@ -4,10 +4,11 @@ The application ASDPex and the scripts in this repository can be used to improve
 
 Prerequisites:
 
-In addition to Java 8, you will need to install the tabix package. If you are on a debian-based system, enter
+In addition to Java 8, you will need to install the tabix and samtools packages. If you are on a debian-based system, enter
 
 ```
 sudo apt-get install tabix
+sudo apt-get install samtools
 ```
 
 Tutorial:
@@ -23,6 +24,13 @@ cd ..
 ```
 After you have downloaded the data, you will need to index the Genome using samtools (the script will produce a message with the command you need, and if samtools is not in your path adjust the command accordingly).
 
+```
+cd scripts/data/genome
+samtools faidx GRCh38.fa
+cd ../../..
+```
+This will create a file called GRCh38.fa.fai
+
 ## Build the executables
 
 First you should compile the aligner, which is written in C using the SeqAn library.
@@ -31,7 +39,7 @@ cd seqan
 make
 cd ..
 ```
-This command should result in an executable programm called regionalign2vcf, which is later on needed.
+This command should result in an executable programm called regionalign2vcf, which is needed later on.
 
 We use the maven build system to compile the code. First cd back to the main folder.
 ```
@@ -42,7 +50,7 @@ If everything goes well, you will see a message including the words BUILD SUCCES
 ## asdpex
 The jar file asdpex-cli-0.1.jar contains the main code used in this project. YOu can view the main commands with the following command.
 ```
-java -jar asdpex-cli/target/asdpex-cli-0.1-SNAPSHOT.jar
+java -jar asdpex-cli/target/asdpex-cli-0.1.jar
 Program: de.charite.compbio.asdpex (functional annotation of VCF files)
 Version: 0.0.1
 Contact: Marten Jäger <marten.jaeger@charite.de>
@@ -61,19 +69,11 @@ Example: java -jar asdpex.jar download GRCh38
 
 ```
 
-## regionalign2vcf
-The aligner was written using the SeqAn C++ library. Therfore the library has to be downloaded and the tool compiled. We have to change to the seqan folder and run the Makefile.
-```
-cd seqan
-make
-cd ..
-```
-
 ## Alignment and variant detection
 Now since we have all tools and data we run the alignment and look up the variants.
 ```
 java -jar asdpex-cli/target/asdpex-cli-0.1.jar \
-  align -d data/ -s seqan/regionalign2bed -o alignresults
+  align -d data/ -s seqan/regionalign2vcf -o alignresults
 ```
 
 Right now the variants are saved in a separate file per alternative scaffold and even for the alignment blocks in the scaffolds. We merge the VCF files into a single file __allASDPs.vcf.gz__ and filter for SNVs. This and the following scripts

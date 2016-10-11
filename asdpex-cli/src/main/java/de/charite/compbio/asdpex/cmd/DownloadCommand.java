@@ -44,7 +44,7 @@ public class DownloadCommand extends AltLociSelectorCommand {
      */
     @Override
     public void run() throws AltLociSelectorException {
-        DatabaseManger dbMan = new DatabaseManger("/home/mjaeger/git/hg38altLociSelector/hg38database.sqlite");
+        DatabaseManger dbMan = new DatabaseManger("./hg38database.sqlite");
         throw new HelpRequestedException();
     }
 
