@@ -388,7 +388,8 @@ public class DatabaseManger {
         ResultSet rs = stmt.executeQuery();
         StringBuilder sb = new StringBuilder();
         if (rs.next()) {
-            sb.append("chr").append(rs.getInt(1)).append("_").append(rs.getString(2).replace(".", "v")).append("_alt");
+            sb.append("chr").append(rs.getString(1)).append("_").append(rs.getString(2).replace(".", "v"))
+                    .append("_alt");
             return sb.toString();
         } else
             return null;
