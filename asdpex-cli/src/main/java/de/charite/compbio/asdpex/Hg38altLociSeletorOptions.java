@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package de.charite.compbio.asdpex;
 
@@ -7,9 +7,9 @@ import java.io.File;
 
 /**
  * Configuration for the Hg38altLociSeletor program.
- * 
+ *
  * Most of the parameters are only used by one or several but not all commands.
- * 
+ *
  * @author Marten Jäger <marten.jaeger@charite.de>
  *
  */
@@ -17,9 +17,9 @@ public final class Hg38altLociSeletorOptions {
 
     public final static String VERSION = "0.0.2";
 
-    public static final String VCFALTLOCISTRING = "ALTLOCI";
+    public static final String VCFALTLOCUSSTRING = "ALTLOCUS";
 
-    public static final String VCFALTLOCIGENOTYPE = "ALTGENOTYPE";
+    public static final String VCFALTLOCUSGENOTYPE = "ALTGENOTYPE";
 
     public static final String VCFASDP = "ASDP";
 
@@ -271,7 +271,7 @@ public final class Hg38altLociSeletorOptions {
 
     /**
      * Sets the path to the SQLite database file.
-     * 
+     *
      * @param sqlitePath
      *            path to the SQLite file
      */
@@ -281,7 +281,7 @@ public final class Hg38altLociSeletorOptions {
 
     /**
      * Returns the path to the SQLite database file.
-     * 
+     *
      * @return path to SQLite file
      */
     public String getSqlitePath() {
