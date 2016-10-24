@@ -364,8 +364,8 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
             if (pairwiseVariantContextIntersect.getSet1flagged()[counter]) {
                 builder = new VariantContextBuilder(currentVariants.next());
                 builder.filter(Hg38altLociSeletorOptions.VCFASDP);
-                builder.attribute(Hg38altLociSeletorOptions.VCFALTLOCISTRING, altLocusID);
-                builder.attribute(Hg38altLociSeletorOptions.VCFALTLOCIGENOTYPE, type.toString());
+                builder.attribute(Hg38altLociSeletorOptions.VCFALTLOCUSSTRING, altLocusID);
+                builder.attribute(Hg38altLociSeletorOptions.VCFALTLOCUSGENOTYPE, type.toString());
                 curVC = builder.make();
             } else {
                 curVC = currentVariants.next();
