@@ -83,7 +83,7 @@ java -jar asdpex-cli/target/asdpex-cli-0.2.jar create-db -s asdpex.sqlite -d dat
 Now since we have all tools and data we run the alignment and look up the variants.
 ```
 java -jar asdpex-cli/target/asdpex-cli-0.2.jar \
-  align -d data/ -s seqan/regionalign2bed -o alignresults -q asdpex.sqlite
+  align -d data/ -s seqan/regionalign2vcf -o alignresults -q asdpex.sqlite
 ```
 
 Right now the variants are saved in a separate file per alternate loci and even for the alignment blocks in the scaffolds. We merge the VCF files into a single file __allASDPs.vcf.gz__ and filter for SNVs. This and the following scripts
