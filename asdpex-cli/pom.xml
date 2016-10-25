@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>de.charite.compbio</groupId>
 		<artifactId>asdpex</artifactId>
-		<version>0.1</version>
+		<version>0.2</version>
 	</parent>
 	<artifactId>asdpex-cli</artifactId>
 	<name>${project.groupId}:${project.artifactId}</name>
@@ -76,7 +76,7 @@
 					<!-- MainClass in mainfest make a executable jar -->
 					<archive>
 					  <manifest>
-						<mainClass>de.charite.compbio.asdpex.App</mainClass>
+						<mainClass>de.charite.compbio.hg38altlociselector.App</mainClass>
 					  </manifest>
 					</archive>
 
@@ -114,7 +114,7 @@
 		<dependency>
 			<groupId>de.charite.compbio</groupId>
 			<artifactId>asdpex-core</artifactId>
-			<version>0.1</version>
+			<version>0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-cli</groupId>

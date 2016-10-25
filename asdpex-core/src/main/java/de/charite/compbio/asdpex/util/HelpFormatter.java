@@ -10,10 +10,10 @@ package de.charite.compbio.asdpex.util;
 public class HelpFormatter {
 
     public enum Failure {
-        MISSING_VCF, MISSING_DATA_PATH
+        MISSING_VCF, MISSING_DATA_PATH, MISSING_PATH
     }
 
-    public static final String VERSION = "0.1";
+    public static final String VERSION = "0.2";
 
     public static final void printHeader() {
         System.err.println("Program: de.charite.compbio.asdpex (functional annotation of VCF files)");

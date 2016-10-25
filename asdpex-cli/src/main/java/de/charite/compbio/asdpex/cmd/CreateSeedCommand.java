@@ -11,17 +11,17 @@ import org.apache.commons.cli.ParseException;
 
 import com.google.common.collect.ImmutableList;
 
+import de.charite.compbio.asdpex.Hg38altLociSeletorOptions;
 import de.charite.compbio.asdpex.data.AccessionInfo;
 import de.charite.compbio.asdpex.data.AlternativeLociBuilder;
 import de.charite.compbio.asdpex.data.AlternativeLocus;
 import de.charite.compbio.asdpex.data.NCBIgffAlignmentElement;
 import de.charite.compbio.asdpex.data.NCBIgffAlignmentElementType;
 import de.charite.compbio.asdpex.exceptions.AltLociSelectorException;
-import de.charite.compbio.asdpex.io.parser.NCBIgffAlignmentParser;
-import de.charite.compbio.asdpex.util.IOUtil;
-import de.charite.compbio.asdpex.Hg38altLociSeletorOptions;
 import de.charite.compbio.asdpex.exceptions.CommandLineParsingException;
 import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
+import de.charite.compbio.asdpex.io.parser.NCBIgffAlignmentParser;
+import de.charite.compbio.asdpex.util.IOUtil;
 
 /**
  * 
@@ -38,7 +38,7 @@ public class CreateSeedCommand extends AltLociSelectorCommand {
     /*
      * (non-Javadoc)
      * 
-     * @see de.charite.compbio.asdpex.cmd.AltLociSelectorCommand#parseCommandLine(java.lang.String[])
+     * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#parseCommandLine(java.lang.String[])
      */
     @Override
     protected Hg38altLociSeletorOptions parseCommandLine(String[] args)
@@ -53,7 +53,7 @@ public class CreateSeedCommand extends AltLociSelectorCommand {
     /*
      * (non-Javadoc)
      * 
-     * @see de.charite.compbio.asdpex.cmd.AltLociSelectorCommand#run()
+     * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#run()
      */
     @Override
     public void run() throws AltLociSelectorException {

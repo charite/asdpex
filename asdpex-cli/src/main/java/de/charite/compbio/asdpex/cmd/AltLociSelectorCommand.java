@@ -3,8 +3,8 @@
  */
 package de.charite.compbio.asdpex.cmd;
 
-import de.charite.compbio.asdpex.exceptions.AltLociSelectorException;
 import de.charite.compbio.asdpex.Hg38altLociSeletorOptions;
+import de.charite.compbio.asdpex.exceptions.AltLociSelectorException;
 import de.charite.compbio.asdpex.exceptions.CommandLineParsingException;
 import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
 

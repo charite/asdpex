@@ -1,7 +1,5 @@
 package de.charite.compbio.asdpex;
 
-import de.charite.compbio.asdpex.exceptions.AltLociSelectorException;
-import de.charite.compbio.asdpex.util.HelpFormatter;
 import de.charite.compbio.asdpex.cmd.AlignCommand;
 import de.charite.compbio.asdpex.cmd.AltLociSelectorCommand;
 import de.charite.compbio.asdpex.cmd.AnnotateVCFCommand;
@@ -9,8 +7,10 @@ import de.charite.compbio.asdpex.cmd.CreateDatabaseCommand;
 import de.charite.compbio.asdpex.cmd.CreateFastaCommand;
 import de.charite.compbio.asdpex.cmd.CreateSeedCommand;
 import de.charite.compbio.asdpex.cmd.DownloadCommand;
+import de.charite.compbio.asdpex.exceptions.AltLociSelectorException;
 import de.charite.compbio.asdpex.exceptions.CommandLineParsingException;
 import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
+import de.charite.compbio.asdpex.util.HelpFormatter;
 
 /**
  * Hello world!
@@ -72,8 +72,8 @@ public class App {
         sb.append("         create-db   creates a SQLite database used for this tool").append("\n");
         sb.append("         create-fa   construct fasta files for the alignments").append("\n");
         sb.append("         create-seed construct seed files for the alignments from the NCBI alignments").append("\n");
-        sb.append("         download    download transcript database  (not yet implemented)").append("\n").append("\n");
-        sb.append("Example: java -jar asdpex.jar download GRCh38").append("\n");
+        // sb.append(" download download transcript database (not yet implemented)").append("\n").append("\n");
+        sb.append("Example: java -jar asdpex.jar create-db -s asdpex.sqlite -d data").append("\n");
         sb.append("         java -jar asdpex.jar create-fa -o data/").append("\n").append("\n");
         HelpFormatter.printUsage(sb.toString());
     }

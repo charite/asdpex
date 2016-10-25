@@ -23,7 +23,20 @@ public class RegionBuilder {
     private final String altAccessionsPath;
     private final String altScaffoldPlacementPath;
     private final String genomicRegionsDefinitionsPath;
-    private final String chrAccessionsPath;
+    // private final String chrAccessionsPath;
+
+    /**
+     * 
+     * @param altAccessionsPath
+     * @param altScaffoldPlacementPath
+     * @param genomicRegionsDefinitionsPath
+     */
+    public RegionBuilder(String altAccessionsPath, String altScaffoldPlacementPath,
+            String genomicRegionsDefinitionsPath) {
+        this.altAccessionsPath = altAccessionsPath;
+        this.altScaffoldPlacementPath = altScaffoldPlacementPath;
+        this.genomicRegionsDefinitionsPath = genomicRegionsDefinitionsPath;
+    }
 
     /**
      * 
@@ -36,7 +49,7 @@ public class RegionBuilder {
         this.altAccessionsPath = altAccessionsPath;
         this.altScaffoldPlacementPath = altScaffoldPlacementPath;
         this.genomicRegionsDefinitionsPath = genomicRegionsDefinitionsPath;
-        this.chrAccessionsPath = chrAccessionsPath;
+        // this.chrAccessionsPath = chrAccessionsPath;
     }
 
     public ImmutableList<Region> build() {
@@ -54,7 +67,7 @@ public class RegionBuilder {
         System.out.println("found placement for " + asMap.size() + " alt_loci");
 
         System.out.print("[INFO] Read region definitions ... ");
-        RegionInfoParser regParser = new RegionInfoParser(genomicRegionsDefinitionsPath, chrAccessionsPath);
+        RegionInfoParser regParser = new RegionInfoParser(genomicRegionsDefinitionsPath);
         ImmutableMap<String, RegionInfo> regMap = regParser.parse();
         System.out.println("found " + regMap.size() + " regions definitions");
 

@@ -2,8 +2,9 @@
 
 if [ ! $2 ]
 then
-  echo "missing data path - set default to ./data"
-  DATA=data
+  echo "missing data path - set default to ../data"
+  ROOT=`dirname $0`
+  DATA="$ROOT/../data"
 else
   DATA=$2
 fi
@@ -12,7 +13,7 @@ fi
 RELEASE=GRCh38
 
 url38="ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_full_analysis_set.fna.gz"
-NCBI="ftp://ftp.ncbi.nlm.nih.gov/genomes/H_sapiens"
+NCBI="ftp://ftp.ncbi.nlm.nih.gov/genomes/H_sapiens/ARCHIVE/ANNOTATION_RELEASE.107"
 
 printHELP(){
 	  echo "Usage: $0 <param> [<datapath>]"
@@ -23,17 +24,17 @@ printHELP(){
 	  echo "alt     alts_accessions_GRCh38.p2         provides the correspondence between the RefSeq and GenBank records for each alt. scaffold in the assembly"
 	  echo "alt     all_alt_scaffold_placement.txt    provides the genomic localization for each alt. scaffold"
 	  echo "region  genomic_regions_definitions.txt   defining the regions on the primary assembly for which alternate loci or patch scaffolds are available"
-	  echo "aln     genomic_regions_definitions.txt   defining the regions on the primary assembly for which alternate loci or patch scaffolds are available"
+	  echo "aln     GFF files                         precalculated alignments between reference region and alternate loci"
 	  echo "all                                       download the complete dataset - all of the above"
 	  echo ""
 	  echo "Note: This script downloads the human reference genome for GRCh38 (hs38DH),"
-	  echo "      the chromosome, genomic region and alternative scaffold definitions,"
+	  echo "      the chromosome, genomic region and alternate loci definitions,"
 	  echo "      and the precomputed alignments from NCBI."
 	  exit 1;
 }
 
 downloadAlignments(){
-  echo "[INFO] download alt. scaffold alignments"
+  echo "[INFO] download alternate loci alignments"
   SCAFFOLDS=$DATA/all_alt_scaffold_placement.txt
   if [ ! -f $SCAFFOLDS ]; then
     echo "[ERROR] file $SCAFFOLDS is missing, please download first."
@@ -52,7 +53,7 @@ downloadAlignments(){
 
 
 downloadScaffolds(){
-  echo "[INFO] download alt. scaffold placement"
+  echo "[INFO] download alternate loci placement"
   SCAFFOLDS=$DATA/all_alt_scaffold_placement.txt
   if [ ! -f $SCAFFOLDS ]; then
     mkdir -p $DATA/TMP
@@ -93,7 +94,7 @@ downloadChrInfo(){
 }
 
 downloadScaffoldInfo(){
-  echo "[INFO] download alt. scaffold info"
+  echo "[INFO] download alternate loci info"
   FILE=alts_accessions_GRCh38.p2
   if [ ! -f $DATA/$FILE ]; then
     wget --progress=bar -O $DATA/$FILE $NCBI/Assembled_chromosomes/$FILE

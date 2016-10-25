@@ -11,14 +11,14 @@ import org.apache.commons.cli.ParseException;
 
 import com.google.common.collect.Lists;
 
+import de.charite.compbio.asdpex.Hg38altLociSeletorOptions;
 import de.charite.compbio.asdpex.db.DatabaseManger;
 import de.charite.compbio.asdpex.exceptions.AltLociSelectorException;
+import de.charite.compbio.asdpex.exceptions.CommandLineParsingException;
+import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
 import de.charite.compbio.asdpex.io.parser.AccessionInfoParser;
 import de.charite.compbio.asdpex.io.parser.AltScaffoldPlacementParser;
 import de.charite.compbio.asdpex.io.parser.RegionInfoParser;
-import de.charite.compbio.asdpex.Hg38altLociSeletorOptions;
-import de.charite.compbio.asdpex.exceptions.CommandLineParsingException;
-import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFFileReader;
 
@@ -42,7 +42,8 @@ public class CreateDatabaseCommand extends AltLociSelectorCommand {
     /*
      * (non-Javadoc)
      * 
-     * @see de.charite.compbio.asdpex.cmd.AltLociSelectorCommand# parseCommandLine(java.lang.String[])
+     * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#
+     * parseCommandLine(java.lang.String[])
      */
     @Override
     protected Hg38altLociSeletorOptions parseCommandLine(String[] args)
@@ -57,7 +58,8 @@ public class CreateDatabaseCommand extends AltLociSelectorCommand {
     /*
      * (non-Javadoc)
      * 
-     * @see de.charite.compbio.asdpex.cmd.AltLociSelectorCommand#run()
+     * @see
+     * de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#run()
      */
     @Override
     public void run() throws AltLociSelectorException {
@@ -104,8 +106,7 @@ public class CreateDatabaseCommand extends AltLociSelectorCommand {
             e.printStackTrace();
         }
         // regions
-        RegionInfoParser rip = new RegionInfoParser(this.options.getGenomicRegionsDefinitionsPath(),
-                this.options.getChrAccessionsPath());
+        RegionInfoParser rip = new RegionInfoParser(this.options.getGenomicRegionsDefinitionsPath());
         System.out.println("[INFO] Updated regions");
         try {
             dbman.uploadRegionInfos(rip.parse());

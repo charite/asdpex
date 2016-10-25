@@ -13,6 +13,7 @@ import org.apache.commons.cli.ParseException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
+import de.charite.compbio.asdpex.Hg38altLociSeletorOptions;
 import de.charite.compbio.asdpex.data.AltScaffoldPlacementInfo;
 import de.charite.compbio.asdpex.data.PairwiseVariantContextIntersect;
 import de.charite.compbio.asdpex.data.Region;
@@ -20,10 +21,9 @@ import de.charite.compbio.asdpex.data.RegionBuilder;
 import de.charite.compbio.asdpex.data.RegionInfo;
 import de.charite.compbio.asdpex.db.DatabaseManger;
 import de.charite.compbio.asdpex.exceptions.AltLociSelectorException;
-import de.charite.compbio.asdpex.util.VariantContextUtil;
-import de.charite.compbio.asdpex.Hg38altLociSeletorOptions;
 import de.charite.compbio.asdpex.exceptions.CommandLineParsingException;
 import de.charite.compbio.asdpex.exceptions.HelpRequestedException;
+import de.charite.compbio.asdpex.util.VariantContextUtil;
 import htsjdk.samtools.reference.ReferenceSequence;
 import htsjdk.samtools.reference.ReferenceSequenceFile;
 import htsjdk.samtools.reference.ReferenceSequenceFileFactory;
@@ -68,7 +68,7 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
     /*
      * (non-Javadoc)
      *
-     * @see de.charite.compbio.asdpex.cmd.AltLociSelectorCommand#
+     * @see de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#
      * parseCommandLine(java.lang.String[])
      */
     @Override
@@ -85,7 +85,7 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
      * (non-Javadoc)
      *
      * @see
-     * de.charite.compbio.asdpex.cmd.AltLociSelectorCommand#run()
+     * de.charite.compbio.hg38altlociselector.cmd.AltLociSelectorCommand#run()
      */
     @Override
     public void run() throws AltLociSelectorException {
@@ -239,7 +239,7 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                     for (AltScaffoldPlacementInfo info : altScaffolds) {
 
                         try {
-                            fastaIdentifier = dbMan.getFastaIdentifier(info.getAltScafAcc());
+                            fastaIdentifier = dbMan.getFastaIdentifierAltLocus(info.getAltScafAcc());
                         } catch (SQLException e) {
                             System.err.println("Failed to connect to database: " + options.getSqlitePath());
                             System.err.println(
@@ -270,13 +270,13 @@ public class AnnotateVCFCommand extends AltLociSelectorCommand {
                                     && mostProbableAlleles.get(0) == mostProbableAlleles.get(1)) {
                                 writeModVariants(inputVCF, refFile, writerVCF, contig.getName(),
                                         firstASDPonRegionPosition, lastASDPonRegionPosition,
-                                        dbMan.getFastaIdentifier(
+                                        dbMan.getFastaIdentifierAltLocus(
                                                 altScaffolds.get(mostProbableAlleles.get(0)).getAltScafAcc()),
                                         GenotypeType.HOM_VAR, intersectList.get(mostProbableAlleles.get(0)));
                             } else {
                                 writeModVariants(inputVCF, refFile, writerVCF, contig.getName(),
                                         firstASDPonRegionPosition, lastASDPonRegionPosition,
-                                        dbMan.getFastaIdentifier(
+                                        dbMan.getFastaIdentifierAltLocus(
                                                 altScaffolds.get(mostProbableAlleles.get(0)).getAltScafAcc()),
                                         GenotypeType.HET, intersectList.get(mostProbableAlleles.get(0)));
 

@@ -3,8 +3,8 @@ package de.charite.compbio.asdpex.cmd;
 import java.io.IOException;
 import java.util.EnumSet;
 
-import de.charite.compbio.asdpex.exceptions.AnnotationException;
 import de.charite.compbio.asdpex.Hg38altLociSeletorOptions;
+import de.charite.compbio.asdpex.exceptions.AnnotationException;
 import htsjdk.samtools.reference.ReferenceSequenceFile;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.writer.Options;
@@ -42,7 +42,7 @@ public class AnnotatedVariantWriter {
         header.addMetaDataLine(new VCFHeaderLine("hg38altLociSelectorCommand", "TODO ..."));
         // TODO add line with Command line call
         header.addMetaDataLine(
-                new VCFFilterHeaderLine(options.VCFASDP, "Filtered due to a more likely alternate locus"));
+                new VCFFilterHeaderLine(options.VCFASDP, "Filtered due to a more likely alternative scaffold"));
         header.addMetaDataLine(new VCFInfoHeaderLine(options.VCFALTLOCUSSTRING, VCFHeaderLineCount.A,
                 VCFHeaderLineType.String, "most likely alternate locus id replacement"));
         header.addMetaDataLine(new VCFInfoHeaderLine(options.VCFALTLOCUSGENOTYPE, VCFHeaderLineCount.A,
