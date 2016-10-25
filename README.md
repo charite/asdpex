@@ -6,10 +6,11 @@ The application ASDPex and the scripts in this repository can be used to improve
 
 Prerequisites:
 
-In addition to Java 8, you will need to install the tabix package. If you are on a debian-based system, enter
+In addition to Java 8, you will need to install the tabix and samtools packages. If you are on a debian-based system, enter
 
 ```
 sudo apt-get install tabix
+sudo apt-get install samtools
 ```
 
 ## Getting started
