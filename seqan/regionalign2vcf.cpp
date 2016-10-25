@@ -148,11 +148,10 @@ int findDifferences(TAlign &align, TSequence chr, TSequence ref, TSequence sampl
 		vcffile << "##INFO=<ID=SVTYPE,Number=1,Type=String,Description=\"Type of structural variant\">" << std::endl;
 		vcffile << "##INFO=<ID=END,Number=1,Type=Integer,Description=\"End position of the structural variant\">" << std::endl;
 		vcffile << "##INFO=<ID=RE,Number=1,Type=String,Description=\"Region\">" << std::endl;
-		vcffile << "##INFO=<ID=AL,Number=1,Type=String,Description=\"Alternative Loci\">" << std::endl;
+		vcffile << "##INFO=<ID=AL,Number=1,Type=String,Description=\"Alternate Locus\">" << std::endl;
 		vcffile << "##INFO=<ID=RP,Number=1,Type=Integer,Description=\"position in region\">" << std::endl;
 		vcffile << "##ALT=<ID=DEL,Description=\"Deletion\">" << std::endl;
 		vcffile << "##ALT=<ID=INS,Description=\"Insertion\">" << std::endl;
-//		vcffile << "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t" << sample << std::endl;
 		vcffile << "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tSAMPLE" << std::endl;
 	}else{
 		std::cout << "[INFO] append to file: " << vcfFilename << std::endl;

@@ -43,10 +43,10 @@ public class AnnotatedVariantWriter {
         // TODO add line with Command line call
         header.addMetaDataLine(
                 new VCFFilterHeaderLine(options.VCFASDP, "Filtered due to a more likely alternative scaffold"));
-        header.addMetaDataLine(new VCFInfoHeaderLine(options.VCFALTLOCISTRING, VCFHeaderLineCount.A,
-                VCFHeaderLineType.String, "most likely alternate scaffold id replacement"));
-        header.addMetaDataLine(new VCFInfoHeaderLine(options.VCFALTLOCIGENOTYPE, VCFHeaderLineCount.A,
-                VCFHeaderLineType.String, "most likely alternate scaffold replacement genotype"));
+        header.addMetaDataLine(new VCFInfoHeaderLine(options.VCFALTLOCUSSTRING, VCFHeaderLineCount.A,
+                VCFHeaderLineType.String, "most likely alternate locus id replacement"));
+        header.addMetaDataLine(new VCFInfoHeaderLine(options.VCFALTLOCUSGENOTYPE, VCFHeaderLineCount.A,
+                VCFHeaderLineType.String, "most likely alternate locus replacement genotype"));
         this.out.writeHeader(header);
     }
 
