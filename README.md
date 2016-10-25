@@ -38,13 +38,13 @@ The aligner was written using the SeqAn C++ library. Therfore the library has to
 ```
 cd seqan
 make
+cd ..
 ```
 This command should result in an executable programm called regionalign2vcf, which is later on needed.
 
 #### asdpex
 We use the maven build system to compile the code. First cd back to the main folder.
 ```
-cd ..
 mvn package
 ```
 If everything goes well, you will see a message including the words BUILD SUCCESS.
@@ -71,13 +71,6 @@ Example: java -jar asdpex.jar create-db -s asdpex.sqlite -d data
 
 ```
 
-## regionalign2vcf
-The aligner was written using the SeqAn C++ library. Therfore the library has to be downloaded and the tool compiled. We have to change to the seqan folder and run the Makefile.
-```
-cd seqan
-make
-cd ..
-```
 
 ## Create database and init
 Create the SQLite database and inititate with the downloaded data.
