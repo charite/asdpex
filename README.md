@@ -29,7 +29,7 @@ chmod +x downloadData.sh
 ./downloadData all data
 cd ..
 ```
-After you have downloaded the data, you will need to index the Genome using samtools (the script will produce a message with the command you need, and if samtools is not in your path adjust the command accordingly).
+After you have downloaded the data, you will need to index the genome using samtools (the script will produce a message with the command you need, and if samtools is not in your path adjust the command accordingly).
 
 ## Build the executables
 
@@ -86,12 +86,18 @@ Create the SQLite database and inititate with the downloaded data.
 java -jar asdpex-cli/target/asdpex-cli-0.2.jar create-db -s asdpex.sqlite -d data
 ```
 
+
+
 ## Alignment and variant detection
-Now since we have all tools and data we run the alignment and look up the variants.
+The following command will perform the alignment of the alternate loci with the corresponding regions of the primary assembly
+and will store the discrepant alignment positions for each of the alternate loci in one individual VCF file (e.g., chr5_KI270897v1_alt.vcf). The files will be written to the (new) directory "alignresults" (as indicated by the -o flag). The -q flag indicates the SQlite database that we created in the previous step.
+
 ```
 java -jar asdpex-cli/target/asdpex-cli-0.2.jar \
   align -d data/ -s seqan/regionalign2bed -o alignresults -q asdpex.sqlite
 ```
+This command will 
+
 
 Right now the variants are saved in a separate file per alternate loci and even for the alignment blocks in the scaffolds. We merge the VCF files into a single file __allASDPs.vcf.gz__ and filter for SNVs. This and the following scripts
 presume [BGZIP](https://github.com/samtools/htslib "htslib repository") and [TABIX](https://github.com/samtools/htslib "htslib repository") to be defined in the environment variable.
