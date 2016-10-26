@@ -6,10 +6,11 @@ The application ASDPex and the scripts in this repository can be used to improve
 
 Prerequisites:
 
-In addition to Java 8, you will need to install the tabix package. If you are on a debian-based system, enter
+In addition to Java 8, you will need to install the tabix and samtools packages. If you are on a debian-based system, enter
 
 ```
 sudo apt-get install tabix
+sudo apt-get install samtools
 ```
 
 ## Getting started
@@ -38,13 +39,13 @@ The aligner was written using the SeqAn C++ library. Therfore the library has to
 ```
 cd seqan
 make
+cd ..
 ```
 This command should result in an executable programm called regionalign2vcf, which is later on needed.
 
 #### asdpex
 We use the maven build system to compile the code. First cd back to the main folder.
 ```
-cd ..
 mvn package
 ```
 If everything goes well, you will see a message including the words BUILD SUCCESS.
@@ -71,13 +72,6 @@ Example: java -jar asdpex.jar create-db -s asdpex.sqlite -d data
 
 ```
 
-## regionalign2vcf
-The aligner was written using the SeqAn C++ library. Therfore the library has to be downloaded and the tool compiled. We have to change to the seqan folder and run the Makefile.
-```
-cd seqan
-make
-cd ..
-```
 
 ## Create database and init
 Create the SQLite database and inititate with the downloaded data.
@@ -94,7 +88,7 @@ and will store the discrepant alignment positions for each of the alternate loci
 
 ```
 java -jar asdpex-cli/target/asdpex-cli-0.2.jar \
-  align -d data/ -s seqan/regionalign2bed -o alignresults -q asdpex.sqlite
+  align -d data/ -s seqan/regionalign2vcf -o alignresults -q asdpex.sqlite
 ```
 This command will 
 
