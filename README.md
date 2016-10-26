@@ -129,6 +129,25 @@ java -jar asdpex-cli/target/asdpex-cli-0.2.jar \
   -o <annot>.vcf.gz
 ```
 ##Example
+Here, we will take  GRCh38 high-confidence calls for NA12878 to show how to use the ASDPex program on real data. Download the VCF and the index (tbi) files from [ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv3.3.1/GRCh38/](ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv3.3.1/GRCh38/). Then (assuming we are in the same directory as in the above example), enter the following command:
+```
+$ java -jar asdpex-cli/target/asdpex-cli-0.2.jar annotate -a allASDPs.SNV.50_10.valid.vcf.gz\
+   -d data/ -v HG001_GRCh38_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-X_v.3.3.1_highconf_phased.vcf.gz \
+   -o HG001-annot.vcf.gz
+```
+This will output an annotated (compressed) VCF file called __HG001-annot.vcf.gz__. The lines of the VCF file will be modified to indicate the presence of ASDPs inferred by ASDPex. For example,
+```
+chr22	42252402	.	C	T	50	ASDP	ALTGENOTYPE=HET;ALTLOCUS=chr22_GL383582v2_alt; ...
+```
+This line states that the variant called on chromosome 22 at position 42252402 was inferred to be a heterozygous ASDP-associated variant related to the
+alternate locus __GL383582v2__. Similarly,
+```
+chr18	43747118	.	A	T	50	ASDP	ALTGENOTYPE=HOM_VAR;ALTLOCUS=chr18_KI270864v1_alt;...
+```
+This line states that the  variant called on chromosome 18 at position 43747118 was inferred to be a homozygous  ASDP-associated variant related to the
+alternate locus __KI270864v1__.
+In total, 2653 ASDP-associated variants are called (homozygous: 441; heterozygous: 2212). The following table shows the number of
+ASDP-associated variants called for 32 regions.
 
 
 
