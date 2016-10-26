@@ -128,3 +128,43 @@ java -jar asdpex-cli/target/asdpex-cli-0.2.jar \
   annotate -a allASDPs.SNV.50_10.valid.vcf.gz -d data/ -v <infile>.vcf.gz \
   -o <annot>.vcf.gz
 ```
+##Example
+
+
+
+Alternate Locus | ASDPs (n) 
+--------------- | ----------
+chr4_GL000257v2_alt | 470
+chr8_KI270822v1_alt | 382
+chr8_KI270810v1_alt | 184
+chr7_KI270808v1_alt | 157
+chr4_KI270788v1_alt | 116
+chr11_KI270832v1_alt | 114
+chr9_GL383542v1_alt | 89
+chr6_KI270800v1_alt | 87
+chr1_KI270760v1_alt | 79
+chr12_GL383550v2_alt | 78
+chr11_JH159136v1_alt | 71
+chr4_KI270790v1_alt | 70
+chr5_GL383531v1_alt | 69
+chr14_KI270844v1_alt | 69
+chr3_KI270781v1_alt | 64
+chr18_KI270864v1_alt | 63
+chr2_GL383521v1_alt | 59
+chr22_GL383582v2_alt | 48
+chr4_GL383527v1_alt | 46
+chr3_KI270777v1_alt | 44
+chr2_GL383522v1_alt | 42
+chr15_GL383555v2_alt | 35
+chr13_KI270839v1_alt | 34
+chr1_KI270763v1_alt | 30
+chr13_KI270843v1_alt | 27
+chr22_KI270876v1_alt | 26
+chr16_GL383557v1_alt | 23
+chr6_KI270802v1_alt | 23
+chr21_GL383580v2_alt | 17
+chr6_GL383533v1_alt | 16
+chr18_GL383571v1_alt | 15
+chr6_KI270801v1_alt | 6
+
+
