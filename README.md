@@ -118,6 +118,10 @@ java -jar asdpex-cli/target/asdpex-cli-0.2.jar \
 create-db -s asdpex.sqlite -a allASDPs.SNV.50_10.valid.vcf.gz
 ```
 
+We have copied the files allASDPs.SNV.50_10.valid.vcf.gz and allASDPs.SNV.50_10.valid.vcf.gz.tbi into the directory __vcf__ in this repository. These are the files that are created by the code described above and that were used for the analysis described in the manuscript.
+
+
+
 ##Postprocess VCF files from Whole-Genome Sequencing (WGS)
 As described in the main manuscript, we can now use the ASDP file generated above (__allASDPs.SNV.50_10.valid.vcf.gz__) to postprocess
 a WGS file to mark up called variants that correspond to ASPDs. The following command performs this analysis and outputs a file (__<annot>.vcf.gz__)
