@@ -19,9 +19,9 @@ public final class Hg38altLociSeletorOptions {
 
     public static final String VERSION = "0.2";
 
-    public static final String VCFALTLOCISTRING = "ALTLOCI";
+    public static final String VCFALTLOCUSSTRING = "ALTLOCUS";
 
-    public static final String VCFALTLOCIGENOTYPE = "ALTGENOTYPE";
+    public static final String VCFALTLOCUSGENOTYPE = "ALTGENOTYPE";
 
     public static final String VCFASDP = "ASDP";
 
