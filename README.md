@@ -4,7 +4,7 @@
 
 The application ASDPex and the scripts in this repository can be used to improve the alignments of the alternate loci provided by GRC, to search for alignable scaffold-discrepant positions (ASDPs) in the alignments, and to use the resulting ASDP file to screen sample VCF files from whole-genome sequencing for ASDPs (which are likely to be false-positive variant calls).
 
-See Jäger et al. (2016) (Alternate-locus aware variant calling in whole genome sequencing. Genome Medicine 8:130)[https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-016-0383-z]
+See Jäger et al. (2016) [Alternate-locus aware variant calling in whole genome sequencing. Genome Medicine 8:130](https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-016-0383-z)
 
 
 ## Prerequisites:
