@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>de.charite.compbio</groupId>
 		<artifactId>asdpex</artifactId>
-		<version>0.2</version>
+		<version>0.3</version>
 	</parent>
 	<artifactId>asdpex-core</artifactId>
 	<name>${project.groupId}:${project.artifactId}</name>

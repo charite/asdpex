@@ -17,6 +17,16 @@ sudo apt-get install bedtools
 sudo apt-get install samtools
 ```
 
+Alternatively you can install these tools using conda:
+
+```
+conda install tabix
+conda install bedtools
+conda install samtools
+```
+This can also be done in a separate environment, which then has to be loaded before running ASDPex.
+
+
 ### Getting started
 
 ```
@@ -31,7 +41,7 @@ cd to the 'scripts' directory, make the "downloadData.sh" executable, and execut
 ```
 cd scripts
 chmod +x downloadData.sh
-./downloadData all data
+./downloadData.sh all data
 cd ..
 ```
 After you have downloaded the data, you will need to index the genome using samtools (the script will produce a message with the command you need, and if samtools is not in your path adjust the command accordingly).
@@ -54,11 +64,11 @@ mvn package
 ```
 If everything goes well, you will see a message including the words BUILD SUCCESS.
 
-The jar file asdpex-cli-0.1.jar contains the main code used in this project. An overview of available command are shown with the following command.
+The jar file asdpex-cli-0.3.jar contains the main code used in this project. An overview of available command are shown with the following command.
 ```
-java -jar asdpex-cli/target/asdpex-cli-0.2.jar
+java -jar asdpex-cli/target/asdpex-cli-0.3.jar
 Program: de.charite.compbio.asdpex (functional annotation of VCF files)
-Version: 0.2
+Version: 0.3
 Contact: Marten Jäger <marten.jaeger@charite.de>
          Peter N. Robinson <peter.robinson@jax.org>
 
@@ -81,7 +91,7 @@ Example: java -jar asdpex.jar create-db -s asdpex.sqlite -d data
 Create the SQLite database and inititate with the downloaded data.
 
 ```
-java -jar asdpex-cli/target/asdpex-cli-0.2.jar create-db -s asdpex.sqlite -d data
+java -jar asdpex-cli/target/asdpex-cli-0.3.jar create-db -s asdpex.sqlite -d data
 ```
 
 
@@ -92,7 +102,7 @@ and will store the discrepant alignment positions for each of the alternate loci
 The files will be written to the (new) directory "alignresults" (as indicated by the -o flag). The -q flag indicates the SQlite database that we created in the previous step.
 
 ```
-java -jar asdpex-cli/target/asdpex-cli-0.2.jar \
+java -jar asdpex-cli/target/asdpex-cli-0.3.jar \
   align -d data/ -s seqan/regionalign2vcf -o alignresults -q asdpex.sqlite
 ```
 
@@ -117,7 +127,7 @@ therwise it will mark and remove the ASDPs in the window. The ASDPs that survive
 
 Upload the variants into the SQLite database to store all needed information together in a more portable way.
 ```
-java -jar asdpex-cli/target/asdpex-cli-0.2.jar \
+java -jar asdpex-cli/target/asdpex-cli-0.3.jar \
 create-db -s asdpex.sqlite -a allASDPs.SNV.50_10.valid.vcf.gz
 ```
 
@@ -131,14 +141,14 @@ a WGS file to mark up called variants that correspond to ASPDs. The following co
 that contains the annotations.
 
 ```
-java -jar asdpex-cli/target/asdpex-cli-0.2.jar \
+java -jar asdpex-cli/target/asdpex-cli-0.3.jar \
   annotate -a allASDPs.SNV.50_10.valid.vcf.gz -d data/ -v <infile>.vcf.gz \
   -o <annot>.vcf.gz
 ```
 ##Example
 Here, we will take  GRCh38 high-confidence calls for NA12878 to show how to use the ASDPex program on real data. Download the VCF and the index (tbi) files from [ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv3.3.1/GRCh38/](ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv3.3.1/GRCh38/). Then (assuming we are in the same directory as in the above example), enter the following command:
 ```
-$ java -jar asdpex-cli/target/asdpex-cli-0.2.jar annotate -a allASDPs.SNV.50_10.valid.vcf.gz\
+$ java -jar asdpex-cli/target/asdpex-cli-0.3.jar annotate -a allASDPs.SNV.50_10.valid.vcf.gz\
    -d data/ -v HG001_GRCh38_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-X_v.3.3.1_highconf_phased.vcf.gz \
    -o HG001-annot.vcf.gz
 ```
@@ -158,7 +168,7 @@ ASDP-associated variants called for 32 regions.
 
 
 
-Alternate Locus | ASDPs (n) 
+Alternate Locus | ASDPs (n)
 --------------- | ----------
 chr4_GL000257v2_alt | 470
 chr8_KI270822v1_alt | 382
@@ -192,5 +202,3 @@ chr21_GL383580v2_alt | 17
 chr6_GL383533v1_alt | 16
 chr18_GL383571v1_alt | 15
 chr6_KI270801v1_alt | 6
-
-
